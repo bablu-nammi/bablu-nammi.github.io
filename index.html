@@ -269,6 +269,36 @@
       100%{box-shadow:0 0 0 0 transparent;}
     }
     .node.active .nring{animation:ringpulse 1.8s ease-out infinite;}
+
+    /* ── PDF viewer mode ─────────────────────────────────── */
+    .card-body.pdf-mode{
+      padding:20px 24px;
+      overflow:hidden;
+      display:flex;flex-direction:column;
+      gap:16px;
+    }
+    .pdf-meta{flex-shrink:0;}
+    .pdf-title{font-size:15px;font-weight:800;color:#eef2ff;line-height:1.45;margin-bottom:8px;}
+    .pdf-authors{font-size:12px;color:#818cf8;font-weight:500;margin-bottom:10px;}
+    .pdf-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+    .pdf-frame{
+      flex:1;min-height:0;width:100%;
+      border:none;border-radius:10px;
+      background:#0a0d1c;
+    }
+    .pdf-fallback{
+      flex:1;min-height:0;
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      gap:14px;background:#0a0d1c;border-radius:10px;
+    }
+    .pdf-fallback p{font-size:13px;color:#3d4a6a;}
+    .pdf-open-btn{
+      display:inline-flex;align-items:center;gap:8px;
+      background:rgba(99,102,241,0.12);border:1px solid rgba(99,102,241,0.3);
+      color:#818cf8;text-decoration:none;padding:11px 22px;border-radius:10px;
+      font-family:inherit;font-size:13px;font-weight:700;transition:all 0.2s;
+    }
+    .pdf-open-btn:hover{background:rgba(99,102,241,0.22);color:#c7d2fe;}
   </style>
 </head>
 <body>
@@ -561,6 +591,96 @@ const CONTENT = {
     </div>`
   },
 
+  p1:{
+    title:'CRISPR-Cas Protein Classifier', sub:'bioRxiv · 2024 · Bioinformatics', subColor:'#06b6d4',
+    pdfMode:true,
+    pdfUrl:'https://www.biorxiv.org/content/10.1101/2024.03.02.583136v1.full.pdf',
+    pdfLink:'https://www.biorxiv.org/content/10.1101/2024.03.02.583136v1',
+    html:`
+    <div class="pdf-meta">
+      <div class="pdf-title">Transformer-Based Deep Learning Model with Latent Space Regularization for CRISPR-Cas Protein Sequence Classification</div>
+      <div class="pdf-authors">B. Nammi, S. S. Madugula, P. Pujar, V. Arachchige, J. Lui, S. Wang</div>
+      <div class="pdf-row">
+        <span class="ptag">Transformer</span><span class="ptag">CRISPR-Cas</span>
+        <span class="ptag">Protein Classification</span><span class="ptag">ProtBert</span>
+        <span class="paper-year">2024</span>
+        <a class="paper-link" href="https://www.biorxiv.org/content/10.1101/2024.03.02.583136v1" target="_blank">
+          Open on bioRxiv ↗
+        </a>
+      </div>
+    </div>
+    <iframe class="pdf-frame"
+      src="https://docs.google.com/viewer?url=https%3A%2F%2Fwww.biorxiv.org%2Fcontent%2F10.1101%2F2024.03.02.583136v1.full.pdf&embedded=true"
+      allowfullscreen></iframe>`
+  },
+
+  p2:{
+    title:'CasGen — CRISPR Cas Protein Design', sub:'bioRxiv · 2025 · Genomics', subColor:'#06b6d4',
+    pdfMode:true,
+    pdfUrl:'https://www.biorxiv.org/content/10.1101/2025.02.28.640911v1.full.pdf',
+    pdfLink:'https://www.biorxiv.org/content/10.1101/2025.02.28.640911v1',
+    html:`
+    <div class="pdf-meta">
+      <div class="pdf-title">CasGen: A Regularized Generative Model for CRISPR Cas Protein Design with Classification and Margin-Based Optimization</div>
+      <div class="pdf-authors">B. Nammi, V. M. Jayasinghe-Arachchige, S. S. Madugula, M. Artiles, C. N. Radler, T. Pham, J. Liu, S. Wang</div>
+      <div class="pdf-row">
+        <span class="ptag">Generative Model</span><span class="ptag">CRISPR-Cas</span>
+        <span class="ptag">Protein Design</span><span class="ptag">AlphaFold</span>
+        <span class="paper-year">2025</span>
+        <a class="paper-link" href="https://www.biorxiv.org/content/10.1101/2025.02.28.640911v1" target="_blank">
+          Open on bioRxiv ↗
+        </a>
+      </div>
+    </div>
+    <iframe class="pdf-frame"
+      src="https://docs.google.com/viewer?url=https%3A%2F%2Fwww.biorxiv.org%2Fcontent%2F10.1101%2F2025.02.28.640911v1.full.pdf&embedded=true"
+      allowfullscreen></iframe>`
+  },
+
+  a1:{
+    title:'insARance', sub:'Facebook AR Hackathon 2020 · Winner 🏆', subColor:'#f59e0b',
+    html:`
+    <div class="awards-grid" style="max-width:600px;margin:0 auto">
+      <div class="award-card win" style="--ac:linear-gradient(90deg,#f59e0b,#fbbf24)">
+        <div class="award-top">
+          <div class="award-title-wrap">
+            <div class="award-event">Facebook AR Hackathon 2020</div>
+            <div class="award-project">insARance — Augmented Reality Insurance App</div>
+          </div>
+          <span class="award-badge badge-gold">🏆 Winner</span>
+        </div>
+        <div class="award-desc" style="font-size:13.5px;line-height:1.75">
+          Built an AR application that overlays real-time insurance information on physical objects using the camera.
+          Users point their phone at a car, home, or object and instantly see policy details, claim history, and coverage.
+          Won against teams from top universities across the Dallas–Fort Worth region.
+        </div>
+        <div class="award-year" style="margin-top:14px;font-size:12px">2020 · Facebook-sponsored · Dallas, TX</div>
+      </div>
+    </div>`
+  },
+
+  a2:{
+    title:'WeCare', sub:'Hackathon Winner 2020 🏆', subColor:'#f59e0b',
+    html:`
+    <div class="awards-grid" style="max-width:600px;margin:0 auto">
+      <div class="award-card win" style="--ac:linear-gradient(90deg,#f59e0b,#fbbf24)">
+        <div class="award-top">
+          <div class="award-title-wrap">
+            <div class="award-event">Hackathon Win · 2020</div>
+            <div class="award-project">WeCare — Post-Accident Information App</div>
+          </div>
+          <span class="award-badge badge-gold">🏆 Winner</span>
+        </div>
+        <div class="award-desc" style="font-size:13.5px;line-height:1.75">
+          Streamlined information exchange between parties after vehicle accidents.
+          The app uses AI-assisted data capture to reduce friction, improve accuracy of incident documentation,
+          and speed up the insurance claims process — removing the need for manual paperwork at the scene.
+        </div>
+        <div class="award-year" style="margin-top:14px;font-size:12px">2020 · Texas hackathon circuit</div>
+      </div>
+    </div>`
+  },
+
   edu:{
     title:'Education', sub:'Academic background', subColor:'#10b981',
     html:`
@@ -658,11 +778,10 @@ function renderTree(){
         <div class="nring" style="--np:${n.glow};background:${n.color}10;border-color:${n.color}40;box-shadow:0 0 10px ${n.color}10">
           <div class="ndot" style="background:${n.color}"></div>
         </div>
-        <div class="nlabel">${n.label}</div>`;
+        <div class="nlabel">${n.label.replace('\n','<br>')}</div>`;
     }
 
-    const targetKey = n.parent || key;
-    el.addEventListener('click', e => { e.stopPropagation(); openCard(targetKey, key); });
+    el.addEventListener('click', e => { e.stopPropagation(); openCard(key, key); });
     wrap.appendChild(el);
   }
 }
@@ -691,7 +810,15 @@ function openCard(key, clickedKey){
   document.getElementById('cTitle').textContent = c.title;
   document.getElementById('cSub').textContent   = c.sub;
   document.getElementById('cSub').style.color   = c.subColor || '#7c88a8';
-  document.getElementById('cBody').innerHTML    = c.html;
+
+  const body = document.getElementById('cBody');
+  body.innerHTML = c.html;
+
+  if(c.pdfMode){
+    body.className = 'card-body pdf-mode';
+  } else {
+    body.className = 'card-body';
+  }
 
   document.getElementById('hint').classList.add('hide');
   document.body.classList.add('zoomed-in');
@@ -700,6 +827,7 @@ function openCard(key, clickedKey){
 
 function closeCard(){
   document.body.classList.remove('zoomed-in');
+  document.getElementById('cBody').className = 'card-body';
   // small delay so backdrop fades first, then reset zoom
   setTimeout(()=>{
     zc.style.transform = 'scale(1)';
