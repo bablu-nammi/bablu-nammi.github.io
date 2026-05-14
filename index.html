@@ -83,27 +83,27 @@
     }
     .node:hover .ndot{opacity:1;transform:scale(1.3);}
 
+    /* Labels hidden by default, appear on hover / active */
     .nlabel{
       font-size:11px;font-weight:700;color:#7c88a8;
       text-align:center;line-height:1.35;white-space:nowrap;
       text-transform:uppercase;letter-spacing:0.6px;
-      transition:color 0.25s;
+      opacity:0;transform:translateY(5px);
+      transition:opacity 0.22s, transform 0.22s, color 0.22s;
+      pointer-events:none;
     }
-    .node:hover .nlabel{color:#c7d2fe;}
-    .node.active .nlabel{color:#eef2ff;}
+    .node:hover .nlabel{opacity:1;transform:translateY(0);color:#c7d2fe;}
+    .node.active .nlabel{opacity:1;transform:translateY(0);color:#eef2ff;}
     .node.active .nring{border-width:2px;}
 
-    .nbadge{
-      font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;
-      border:1px solid;text-transform:uppercase;letter-spacing:0.4px;
-      margin-top:-4px;
-    }
+    /* Badges hidden in orbit view — shown only in content cards */
+    .nbadge{display:none;}
 
-    /* Leaf nodes */
-    .node-leaf .nring{width:48px;height:48px;}
-    .node-leaf .nglow{width:80px;height:80px;top:-16px;left:-16px;}
+    /* Leaf nodes — smaller and cleaner */
+    .node-leaf .nring{width:38px;height:38px;}
+    .node-leaf .nglow{width:64px;height:64px;top:-13px;left:-13px;}
     .node-leaf .ndot{width:6px;height:6px;}
-    .node-leaf .nlabel{font-size:9.5px;max-width:72px;white-space:normal;text-align:center;letter-spacing:0.3px;}
+    .node-leaf .nlabel{font-size:9.5px;max-width:68px;white-space:normal;text-align:center;letter-spacing:0.3px;}
 
     /* ── Zoom backdrop ──────────────────────────────────── */
     #zoom-backdrop{
@@ -438,8 +438,8 @@
       box-shadow:0 6px 40px rgba(99,102,241,0.2) !important;
     }
     body.light .nlabel{color:#374151;}
-    body.light .node:hover .nlabel{color:#1e2030;}
-    body.light .node.active .nlabel{color:#1e2030;}
+    body.light .node:hover .nlabel{opacity:1;transform:translateY(0);color:#1e2030;}
+    body.light .node.active .nlabel{opacity:1;transform:translateY(0);color:#1e2030;}
     body.light .root-name{color:#1e2030;}
     body.light .root-title{color:#6366f1;}
     body.light .root-av{background:linear-gradient(135deg,#6366f1,#4f46e5);}
@@ -496,7 +496,7 @@
     body.light.node-active .node:hover{opacity:0.7;filter:none;}
   </style>
 </head>
-<body>
+<body class="light">
 
 <div id="bg">
   <div class="orb orb1"></div>
@@ -505,7 +505,7 @@
 </div>
 
 <div id="sig">BN<em>.</em></div>
-<button id="theme-toggle" title="Toggle light/dark mode">🌙</button>
+<button id="theme-toggle" title="Toggle light/dark mode">🌑</button>
 
 <div id="tree">
   <div class="zoom-canvas" id="zc">
@@ -998,7 +998,7 @@ function renderTree(){
   const inner   = sMin * 0.115;          // innermost planet orbit
   const spacing = sMin * 0.105;          // gap between rings (wider)
   const OR = [inner, inner+spacing, inner+spacing*2, inner+spacing*3];
-  const MR = Math.min(inner * 0.44, 62); // moon orbit radius (same for all planets)
+  const MR = Math.min(spacing * 0.62, 78); // moon orbit radius — clear of planet, clear of next ring
 
   // Planet definitions: [nodeKey, startAngleDeg, periodSec, orbitRadiusIndex]
   // Ordered inner→outer: edu, papers, awards, exp  (inner = faster)
