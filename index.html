@@ -1048,43 +1048,35 @@ function mkRing(r, color){
   return d;
 }
 
-// ── Zoom state ───────────────────────────────────────────────────────────
-let zoomedPlanet = null;
+// ── View state (drill-down) ───────────────────────────────────────────────
+let viewState = 'root'; // 'root' | planet key
 
-function zoomToPlanet(key){
-  const el = document.getElementById('node-'+key);
-  if(!el) return;
-  const rect = el.getBoundingClientRect();
-  const cx = rect.left + rect.width/2;
-  const cy = rect.top  + rect.height/2;
-  zc.style.transformOrigin = cx+'px '+cy+'px';
-  zc.style.transform = 'scale(2.8)';
-  zoomedPlanet = key;
-  document.body.classList.add('planet-zoomed');
-  updateLegend();
-}
-
-function zoomOutPlanet(){
-  zc.style.transformOrigin = '50% 50%';
-  zc.style.transform = '';
-  zoomedPlanet = null;
-  document.body.classList.remove('planet-zoomed');
-  updateLegend();
+function switchView(key){
+  wrap.style.opacity = '0';
+  wrap.style.transform = 'scale(0.78)';
+  setTimeout(()=>{
+    viewState = key;
+    renderTree();
+    requestAnimationFrame(()=>{
+      wrap.style.opacity = '1';
+      wrap.style.transform = 'scale(1)';
+    });
+  }, 290);
 }
 
 function updateLegend(){
   const leg = document.getElementById('legend');
-  if(!zoomedPlanet){
+  if(viewState === 'root'){
     const cats = Object.entries(NODES).filter(([,n])=>n.type==='cat');
     leg.innerHTML = '<div class="leg-section">Explore</div>'
       + cats.map(([k,n])=>
-        `<div class="leg-item"><span class="leg-dot" style="background:${n.color}"></span>${n.label.replace('\n',' ')}</div>`
+        `<div class="leg-item" onclick="switchView('${k}')" style="cursor:pointer"><span class="leg-dot" style="background:${n.color}"></span>${n.label.replace('\n',' ')}</div>`
       ).join('');
   } else {
-    const pN = NODES[zoomedPlanet];
-    const ms = MOONS[zoomedPlanet]||[];
+    const pN = NODES[viewState];
+    const ms = MOONS[viewState]||[];
     leg.innerHTML =
-      '<div class="leg-back" onclick="zoomOutPlanet()">← Solar System</div>'
+      '<div class="leg-back" onclick="switchView(\'root\')">← Solar System</div>'
       +'<div class="leg-section">'+pN.label.replace('\n',' ')+'</div>'
       + ms.map(m=>
         `<div class="leg-item"><span class="leg-dot" style="background:${NODES[m.key].color}"></span>${NODES[m.key].label.replace('\n',' ')}</div>`
@@ -1092,13 +1084,10 @@ function updateLegend(){
   }
 }
 
-// ── Full solar system render ──────────────────────────────────────────────
-function renderTree(){
-  svg.innerHTML=''; wrap.innerHTML='';
-  const W=vw(), H=vh();
+// ── Root view: sun + 4 planets orbiting ──────────────────────────────────
+function renderRootView(W, H){
   const sMin=Math.min(W,H), inner=sMin*0.115, gap=sMin*0.115;
   const OR=[inner, inner+gap, inner+gap*2, inner+gap*3];
-  const MR=Math.min(gap*0.50, 68);
 
   const PLANETS=[
     {key:'edu',   ang:142, dur:22, or:OR[0]},
@@ -1118,26 +1107,8 @@ function renderTree(){
   PLANETS.forEach((p,pi)=>{
     const {arm,body}=mkOrbitArm(p.dur,p.ang,p.or);
     const pEl=makeNode(p.key,NODES[p.key],(pi+1)*0.14);
-
     if(MOONS[p.key]){
-      pEl.addEventListener('click',e=>{e.stopPropagation();zoomToPlanet(p.key);});
-      body.appendChild(mkRing(MR,'rgba(0,0,0,0.07)'));
-      MOONS[p.key].forEach((m,mi)=>{
-        const delay=-((m.ang/360)*m.dur);
-        const mArm=document.createElement('div');
-        mArm.className='orbit-arm';
-        mArm.style.animation=`orbitSpin ${m.dur}s linear infinite ${delay}s`;
-        const mAtR=document.createElement('div');
-        mAtR.className='orbit-at-r';
-        mAtR.style.left=MR+'px';
-        const mBody=document.createElement('div');
-        mBody.className='orbit-body';
-        mBody.style.animation=`orbitSpinRev ${m.dur}s linear infinite ${delay}s`;
-        const mEl=makeNode(m.key,NODES[m.key],(pi+1+mi)*0.12);
-        mEl.addEventListener('click',e=>{e.stopPropagation();openCard(m.key,m.key);});
-        mBody.appendChild(mEl); mAtR.appendChild(mBody); mArm.appendChild(mAtR);
-        body.appendChild(mArm);
-      });
+      pEl.addEventListener('click',e=>{e.stopPropagation();switchView(p.key);});
     } else {
       pEl.addEventListener('click',e=>{e.stopPropagation();openCard(p.key,p.key);});
     }
@@ -1146,6 +1117,44 @@ function renderTree(){
   });
 
   wrap.appendChild(sw);
+}
+
+// ── Planet view: selected planet at center, moons orbiting ───────────────
+function renderPlanetView(planetKey, W, H){
+  const sMin=Math.min(W,H);
+  const MR=sMin*0.26;
+  const pN=NODES[planetKey];
+  const ms=MOONS[planetKey]||[];
+
+  const sw=document.createElement('div');
+  sw.style.cssText='position:absolute;left:50%;top:50%;width:0;height:0;overflow:visible;';
+  sw.appendChild(mkRing(MR));
+
+  const pEl=makeNode(planetKey,pN,0);
+  pEl.classList.add('planet-center');
+  pEl.style.cursor='default';
+  sw.appendChild(pEl);
+
+  const durations=[10,13,9,8,11,7,12];
+  ms.forEach((m,mi)=>{
+    const dur=durations[mi % durations.length];
+    const ang=m.ang;
+    const {arm,body}=mkOrbitArm(dur,ang,MR);
+    const mEl=makeNode(m.key,NODES[m.key],(mi+1)*0.15);
+    mEl.addEventListener('click',e=>{e.stopPropagation();openCard(m.key,m.key);});
+    body.appendChild(mEl);
+    sw.appendChild(arm);
+  });
+
+  wrap.appendChild(sw);
+}
+
+// ── Render dispatcher ─────────────────────────────────────────────────────
+function renderTree(){
+  svg.innerHTML=''; wrap.innerHTML='';
+  const W=vw(), H=vh();
+  if(viewState==='root') renderRootView(W,H);
+  else renderPlanetView(viewState,W,H);
   updateLegend();
 }
 
@@ -1186,16 +1195,13 @@ document.getElementById('theme-toggle').addEventListener('click', ()=>{
 });
 document.getElementById('zoom-backdrop').addEventListener('click', ()=>{
   if(document.body.classList.contains('zoomed-in')) closeCard();
-  else if(zoomedPlanet) zoomOutPlanet();
+  else if(viewState!=='root') switchView('root');
 });
 document.getElementById('content-card').addEventListener('click', e=>e.stopPropagation());
-document.getElementById('tree').addEventListener('click', ()=>{
-  if(zoomedPlanet && !document.body.classList.contains('zoomed-in')) zoomOutPlanet();
-});
 document.addEventListener('keydown', e=>{
   if(e.key==='Escape'){
     if(document.body.classList.contains('zoomed-in')) closeCard();
-    else if(zoomedPlanet) zoomOutPlanet();
+    else if(viewState!=='root') switchView('root');
   }
 });
 window.addEventListener('resize', renderTree);
