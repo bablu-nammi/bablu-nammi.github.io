@@ -997,176 +997,104 @@ function vw(){ return window.innerWidth; }
 function vh(){ return window.innerHeight; }
 function px(pct, dim){ return pct / 100 * dim; }
 
-let viewState = 'root'; // 'root' | planet key
+// ── Zoom state ───────────────────────────────────────────────────────────
+let zoomedPlanet = null;
 
-function switchView(key){
-  wrap.style.opacity = '0';
-  wrap.style.transform = 'scale(0.78)';
-  setTimeout(()=>{
-    viewState = key;
-    renderTree();
-    wrap.style.transition = 'none';
-    wrap.style.transform = 'scale(1.08)';
-    wrap.style.opacity = '0';
-    requestAnimationFrame(()=>requestAnimationFrame(()=>{
-      wrap.style.transition = 'opacity 0.32s, transform 0.38s cubic-bezier(0.34,1.56,0.64,1)';
-      wrap.style.opacity = '1';
-      wrap.style.transform = 'scale(1)';
-    }));
-  }, 290);
+function zoomToPlanet(key){
+  const el = document.getElementById('node-'+key);
+  if(!el) return;
+  const rect = el.getBoundingClientRect();
+  const cx = rect.left + rect.width/2;
+  const cy = rect.top  + rect.height/2;
+  zc.style.transformOrigin = cx+'px '+cy+'px';
+  zc.style.transform = 'scale(2.8)';
+  zoomedPlanet = key;
+  document.body.classList.add('planet-zoomed');
+  updateLegend();
+}
+
+function zoomOutPlanet(){
+  zc.style.transformOrigin = '50% 50%';
+  zc.style.transform = '';
+  zoomedPlanet = null;
+  document.body.classList.remove('planet-zoomed');
+  updateLegend();
 }
 
 function updateLegend(){
   const leg = document.getElementById('legend');
-  if(viewState === 'root'){
+  if(!zoomedPlanet){
     const cats = Object.entries(NODES).filter(([,n])=>n.type==='cat');
-    leg.innerHTML = `<div class="leg-section">Explore</div>`
+    leg.innerHTML = '<div class="leg-section">Explore</div>'
       + cats.map(([k,n])=>
-        `<div class="leg-item" onclick="switchView('${k}')">
-          <span class="leg-dot" style="background:${n.color};--ldc:${n.glow}"></span>
-          ${n.label.replace('\n',' ')}
-        </div>`
+        `<div class="leg-item"><span class="leg-dot" style="background:${n.color}"></span>${n.label.replace('\n',' ')}</div>`
       ).join('');
   } else {
-    const pN = NODES[viewState];
-    const ms = MOONS[viewState]||[];
+    const pN = NODES[zoomedPlanet];
+    const ms = MOONS[zoomedPlanet]||[];
     leg.innerHTML =
-      `<div class="leg-back" onclick="switchView('root')">← Solar System</div>`
-      + `<div class="leg-section">${pN.label.replace('\n',' ')}</div>`
+      '<div class="leg-back" onclick="zoomOutPlanet()">← Solar System</div>'
+      +'<div class="leg-section">'+pN.label.replace('\n',' ')+'</div>'
       + ms.map(m=>
-        `<div class="leg-item" onclick="document.getElementById('node-${m.key}').click()">
-          <span class="leg-dot" style="background:${NODES[m.key].color};--ldc:${NODES[m.key].glow}"></span>
-          ${NODES[m.key].label.replace('\n',' ')}
-        </div>`
+        `<div class="leg-item"><span class="leg-dot" style="background:${NODES[m.key].color}"></span>${NODES[m.key].label.replace('\n',' ')}</div>`
       ).join('');
   }
 }
 
-function makeNode(key, n, delay){
-  const el = document.createElement('div');
-  el.id = `node-${key}`;
-  el.style.cssText = `position:absolute;left:0;top:0;transform:translate(-50%,-50%);`;
-  el.style.animationDelay = delay + 's';
-
-  if(n.type === 'root'){
-    el.className = 'node node-root';
-    el.innerHTML = `
-      <div class="nglow"></div>
-      <div class="nring" style="--np:${n.glow};background:linear-gradient(135deg,rgba(99,102,241,0.22),rgba(99,102,241,0.06));border-color:${n.color};box-shadow:0 0 52px rgba(99,102,241,0.28),inset 0 1px 0 rgba(255,255,255,0.05)">
-        <div class="root-init">
-          <div class="root-av">BN</div>
-          <div class="root-name">Bharani Nammi</div>
-          <div class="root-title">Deep Learning</div>
-        </div>
-      </div>`;
-  } else if(n.type === 'cat'){
-    el.className = 'node node-cat';
-    el.innerHTML = `
-      <div class="nglow" style="background:radial-gradient(circle,${n.glow},transparent 65%)"></div>
-      <div class="nring" style="--np:${n.glow};background:${n.color}14;border-color:${n.color}65;box-shadow:0 0 26px ${n.color}28">
-        <div class="ndot" style="background:${n.color}"></div>
-      </div>
-      <div class="nlabel">${n.label.replace('\n','<br>')}</div>
-      ${n.badge?`<span class="nbadge ${n.badgeClass}" style="border-color:${n.color}55;color:${n.color}">${n.badge}</span>`:''}`;
-  } else {
-    el.className = 'node node-leaf';
-    el.innerHTML = `
-      <div class="nglow" style="background:radial-gradient(circle,${n.glow},transparent 65%)"></div>
-      <div class="nring" style="--np:${n.glow};background:${n.color}12;border-color:${n.color}55;box-shadow:0 0 14px ${n.color}22">
-        <div class="ndot" style="background:${n.color}"></div>
-      </div>
-      <div class="nlabel">${n.label.replace('\n','<br>')}</div>`;
-  }
-  return el;
-}
-
-function mkOrbitArm(dur, ang, radius){
-  const delay = -((ang/360)*dur);
-  const arm = document.createElement('div');
-  arm.className = 'orbit-arm';
-  arm.style.animation = `orbitSpin ${dur}s linear infinite ${delay}s`;
-  const atR = document.createElement('div');
-  atR.className = 'orbit-at-r';
-  atR.style.left = radius+'px';
-  const body = document.createElement('div');
-  body.className = 'orbit-body';
-  body.style.animation = `orbitSpinRev ${dur}s linear infinite ${delay}s`;
-  atR.appendChild(body);
-  arm.appendChild(atR);
-  return {arm, body};
-}
-
-function mkRing(r, color){
-  const d = document.createElement('div');
-  d.className = 'orbit-path-ring';
-  d.style.cssText += `width:${r*2}px;height:${r*2}px;${color?'border-color:'+color+';':''}`;
-  return d;
-}
-
-function renderRootView(W,H){
+// ── Full solar system render ──────────────────────────────────────────────
+function renderTree(){
+  svg.innerHTML=''; wrap.innerHTML='';
+  const W=vw(), H=vh();
   const sMin=Math.min(W,H), inner=sMin*0.115, gap=sMin*0.115;
-  const OR=[inner,inner+gap,inner+gap*2,inner+gap*3];
+  const OR=[inner, inner+gap, inner+gap*2, inner+gap*3];
+  const MR=Math.min(gap*0.50, 68);
+
   const PLANETS=[
-    {key:'edu',  ang:142,dur:22,or:OR[0]},
-    {key:'papers',ang:215,dur:30,or:OR[1]},
-    {key:'awards',ang:325,dur:40,or:OR[2]},
-    {key:'exp',  ang: 42,dur:50,or:OR[3]},
+    {key:'edu',   ang:142, dur:22, or:OR[0]},
+    {key:'papers',ang:215, dur:30, or:OR[1]},
+    {key:'awards',ang:325, dur:40, or:OR[2]},
+    {key:'exp',   ang: 42, dur:50, or:OR[3]},
   ];
+
   const sw=document.createElement('div');
   sw.style.cssText='position:absolute;left:50%;top:50%;width:0;height:0;overflow:visible;';
   OR.forEach(r=>sw.appendChild(mkRing(r)));
+
   const rootEl=makeNode('root',NODES.root,0);
   rootEl.addEventListener('click',e=>{e.stopPropagation();openCard('root','root');});
   sw.appendChild(rootEl);
+
   PLANETS.forEach((p,pi)=>{
     const {arm,body}=mkOrbitArm(p.dur,p.ang,p.or);
     const pEl=makeNode(p.key,NODES[p.key],(pi+1)*0.14);
+
     if(MOONS[p.key]){
-      pEl.addEventListener('click',e=>{e.stopPropagation();switchView(p.key);});
+      pEl.addEventListener('click',e=>{e.stopPropagation();zoomToPlanet(p.key);});
+      body.appendChild(mkRing(MR,'rgba(0,0,0,0.07)'));
+      MOONS[p.key].forEach((m,mi)=>{
+        const delay=-((m.ang/360)*m.dur);
+        const mArm=document.createElement('div');
+        mArm.className='orbit-arm';
+        mArm.style.animation=`orbitSpin ${m.dur}s linear infinite ${delay}s`;
+        const mAtR=document.createElement('div');
+        mAtR.className='orbit-at-r';
+        mAtR.style.left=MR+'px';
+        const mBody=document.createElement('div');
+        mBody.className='orbit-body';
+        mBody.style.animation=`orbitSpinRev ${m.dur}s linear infinite ${delay}s`;
+        const mEl=makeNode(m.key,NODES[m.key],(pi+1+mi)*0.12);
+        mEl.addEventListener('click',e=>{e.stopPropagation();openCard(m.key,m.key);});
+        mBody.appendChild(mEl); mAtR.appendChild(mBody); mArm.appendChild(mAtR);
+        body.appendChild(mArm);
+      });
     } else {
       pEl.addEventListener('click',e=>{e.stopPropagation();openCard(p.key,p.key);});
     }
     body.appendChild(pEl);
     sw.appendChild(arm);
   });
-  wrap.appendChild(sw);
-}
 
-function renderPlanetView(planetKey,W,H){
-  const sMin=Math.min(W,H), MR=Math.min(sMin*0.26,240);
-  const pN=NODES[planetKey], ms=MOONS[planetKey]||[];
-  const sw=document.createElement('div');
-  sw.style.cssText='position:absolute;left:50%;top:50%;width:0;height:0;overflow:visible;';
-  sw.appendChild(mkRing(MR,'rgba(0,0,0,0.07)'));
-  const cEl=document.createElement('div');
-  cEl.id=`node-${planetKey}`;
-  cEl.className='node node-cat planet-center';
-  cEl.style.cssText='position:absolute;left:0;top:0;transform:translate(-50%,-50%);';
-  cEl.innerHTML=`
-    <div class="nglow" style="background:radial-gradient(circle,${pN.glow},transparent 65%)"></div>
-    <div class="nring" style="--np:${pN.glow};background:${pN.color}14;border-color:${pN.color}70;box-shadow:0 0 48px ${pN.color}35;">
-      <div class="ndot" style="background:${pN.color};width:14px;height:14px;border-radius:50%;"></div>
-    </div>
-    <div class="nlabel">${pN.label.replace('\n','<br>')}</div>`;
-  cEl.addEventListener('click',e=>{e.stopPropagation();openCard(planetKey,planetKey);});
-  sw.appendChild(cEl);
-  const step=360/ms.length;
-  ms.forEach((m,mi)=>{
-    const mN=NODES[m.key];
-    const {arm,body}=mkOrbitArm(m.dur*0.7, mi*step, MR);
-    const mEl=makeNode(m.key,mN,mi*0.15);
-    mEl.addEventListener('click',e=>{e.stopPropagation();openCard(m.key,m.key);});
-    body.appendChild(mEl);
-    sw.appendChild(arm);
-  });
   wrap.appendChild(sw);
-}
-
-function renderTree(){
-  svg.innerHTML=''; wrap.innerHTML='';
-  const W=vw(),H=vh();
-  if(viewState==='root') renderRootView(W,H);
-  else renderPlanetView(viewState,W,H);
   updateLegend();
 }
 
@@ -1176,22 +1104,15 @@ let activeKey = null;
 function openCard(key, clickedKey){
   const c = CONTENT[key];
   if(!c) return;
-
-  // Highlight node
   document.querySelectorAll('.node').forEach(n=>n.classList.remove('active'));
   document.getElementById(`node-${clickedKey}`)?.classList.add('active');
   document.getElementById(`node-${key}`)?.classList.add('active');
-
-  // Fill card
   document.getElementById('cTitle').textContent = c.title;
   document.getElementById('cSub').textContent   = c.sub;
   document.getElementById('cSub').style.color   = c.subColor || '#7c88a8';
-
   const body = document.getElementById('cBody');
   body.innerHTML = c.html;
-
   body.className = c.pdfEmbed ? 'card-body pdf-embed' : 'card-body';
-
   document.getElementById('hint').classList.add('hide');
   document.body.classList.add('zoomed-in');
   document.body.classList.add('node-active');
@@ -1202,7 +1123,6 @@ function closeCard(){
   document.body.classList.remove('zoomed-in');
   document.body.classList.remove('node-active');
   document.getElementById('cBody').className = 'card-body';
-  zc.style.transform = '';
   document.querySelectorAll('.node').forEach(n=>n.classList.remove('active'));
   document.getElementById('hint').classList.remove('hide');
   activeKey = null;
@@ -1211,11 +1131,22 @@ function closeCard(){
 document.getElementById('backBtn').addEventListener('click', closeCard);
 document.getElementById('theme-toggle').addEventListener('click', ()=>{
   const isLight = document.body.classList.toggle('light');
-  document.getElementById('theme-toggle').textContent = isLight ? '🌑' : '🌙';
+  document.getElementById('theme-toggle').textContent = isLight ? '\u{1F311}' : '\u{1F319}';
 });
-document.getElementById('zoom-backdrop').addEventListener('click', closeCard);
+document.getElementById('zoom-backdrop').addEventListener('click', ()=>{
+  if(document.body.classList.contains('zoomed-in')) closeCard();
+  else if(zoomedPlanet) zoomOutPlanet();
+});
 document.getElementById('content-card').addEventListener('click', e=>e.stopPropagation());
-document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeCard(); });
+document.getElementById('tree').addEventListener('click', ()=>{
+  if(zoomedPlanet && !document.body.classList.contains('zoomed-in')) zoomOutPlanet();
+});
+document.addEventListener('keydown', e=>{
+  if(e.key==='Escape'){
+    if(document.body.classList.contains('zoomed-in')) closeCard();
+    else if(zoomedPlanet) zoomOutPlanet();
+  }
+});
 window.addEventListener('resize', renderTree);
 
 renderTree();
