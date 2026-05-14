@@ -902,16 +902,20 @@ function renderTree(){
   svg.innerHTML = '';
   wrap.innerHTML = '';
 
-  // Responsive orbit radii
-  const OR = Math.min(W * 0.22, H * 0.28, 235); // planet orbit radius
-  const MR = Math.min(OR * 0.38, 88);             // moon orbit radius
+  // Responsive orbit radii — 4 distinct concentric rings
+  const sMin    = Math.min(W, H);
+  const inner   = sMin * 0.13;           // innermost planet orbit
+  const spacing = sMin * 0.085;          // gap between rings
+  const OR = [inner, inner+spacing, inner+spacing*2, inner+spacing*3];
+  const MR = Math.min(inner * 0.44, 62); // moon orbit radius (same for all planets)
 
-  // Planet definitions: [nodeKey, startAngleDeg, periodSec]
+  // Planet definitions: [nodeKey, startAngleDeg, periodSec, orbitRadiusIndex]
+  // Ordered inner→outer: edu, papers, awards, exp  (inner = faster)
   const PLANETS = [
-    { key:'papers', ang:215, dur:34 },
-    { key:'awards', ang:325, dur:27 },
-    { key:'exp',    ang: 42, dur:40 },
-    { key:'edu',    ang:142, dur:31 },
+    { key:'edu',    ang:142, dur:22, or:OR[0] },
+    { key:'papers', ang:215, dur:30, or:OR[1] },
+    { key:'awards', ang:325, dur:40, or:OR[2] },
+    { key:'exp',    ang: 42, dur:50, or:OR[3] },
   ];
 
   // Moon definitions per planet
@@ -924,11 +928,13 @@ function renderTree(){
   const sunWrap = document.createElement('div');
   sunWrap.style.cssText = `position:absolute;left:50%;top:50%;width:0;height:0;overflow:visible;`;
 
-  // Planet orbit path ring (centred at sun)
-  const pRing = document.createElement('div');
-  pRing.className = 'orbit-path-ring';
-  pRing.style.cssText += `width:${OR*2}px;height:${OR*2}px;`;
-  sunWrap.appendChild(pRing);
+  // Draw one orbit path ring per planet (concentric)
+  OR.forEach(r => {
+    const ring = document.createElement('div');
+    ring.className = 'orbit-path-ring';
+    ring.style.cssText += `width:${r*2}px;height:${r*2}px;`;
+    sunWrap.appendChild(ring);
+  });
 
   // Root / Sun node
   const rootEl = makeNode('root', NODES.root, 0);
@@ -946,7 +952,7 @@ function renderTree(){
 
     const atR = document.createElement('div');
     atR.className = 'orbit-at-r';
-    atR.style.left = OR + 'px';
+    atR.style.left = p.or + 'px';
 
     const body = document.createElement('div');
     body.className = 'orbit-body';
