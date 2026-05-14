@@ -380,6 +380,14 @@
     body.light .leg-item{color:#6b7280;}
     body.light .leg-item:hover{color:#1e2030;}
     body.light .leg-section{color:#9ca3af;}
+    /* ── Legend detail mode (planet view) ────────── */
+    #legend.leg-detail{max-width:240px;}
+    .leg-item-d{align-items:flex-start;gap:10px;flex-direction:row;padding:6px 0;}
+    .leg-item-text{display:flex;flex-direction:column;gap:3px;}
+    .leg-name{font-size:12px;font-weight:700;color:#c4cde8;line-height:1.2;}
+    .leg-desc{font-size:10.5px;font-weight:400;color:#6b7280;line-height:1.4;}
+    body.light .leg-name{color:#2d3555;}
+    body.light .leg-desc{color:#8492b4;}
 
     /* ── Planet-view center node ─────────────────────────── */
     .planet-center .nring{width:90px!important;height:90px!important;}
@@ -606,11 +614,11 @@ const NODES = {
     badge:null, badgeClass:'',
     children:[],
   },
-  p1:{ type:'leaf', label:'CRISPR\nClassifier',    x:9,  y:8,  color:'#67e8f9', glow:'rgba(103,232,249,0.3)', parent:'papers' },
-  p2:{ type:'leaf', label:'CasGen',               x:23, y:3,  color:'#67e8f9', glow:'rgba(103,232,249,0.3)', parent:'papers' },
-  p3:{ type:'leaf', label:'Cas9 & Cas12\nFeature',x:38, y:8,  color:'#67e8f9', glow:'rgba(103,232,249,0.3)', parent:'papers' },
-  a1:{ type:'leaf', label:'insARance',             x:63, y:7,  color:'#fbbf24', glow:'rgba(251,191,36,0.3)', parent:'awards' },
-  a2:{ type:'leaf', label:'WeCare',                x:82, y:7,  color:'#fbbf24', glow:'rgba(251,191,36,0.3)', parent:'awards' },
+  p1:{ type:'leaf', label:'CRISPR\nClassifier',    x:9,  y:8,  color:'#67e8f9', glow:'rgba(103,232,249,0.3)', parent:'papers', desc:'Transformer + margin regularization for CRISPR-Cas protein classification · bioRxiv 2024' },
+  p2:{ type:'leaf', label:'CasGen',               x:23, y:3,  color:'#67e8f9', glow:'rgba(103,232,249,0.3)', parent:'papers', desc:'Generative model for de novo CRISPR-Cas protein design · bioRxiv 2025' },
+  p3:{ type:'leaf', label:'Cas9 & Cas12\nFeature',x:38, y:8,  color:'#67e8f9', glow:'rgba(103,232,249,0.3)', parent:'papers', desc:'ML-based feature identification distinguishing Cas9 & Cas12 proteins · ACS 2024' },
+  a1:{ type:'leaf', label:'insARance',             x:63, y:7,  color:'#fbbf24', glow:'rgba(251,191,36,0.3)', parent:'awards', desc:'AR app overlaying insurance info on real objects · Facebook Hackathon Winner 2020' },
+  a2:{ type:'leaf', label:'WeCare',                x:82, y:7,  color:'#fbbf24', glow:'rgba(251,191,36,0.3)', parent:'awards', desc:'AI-powered post-accident info exchange app · Hackathon Winner 2020' },
 };
 
 const EDGES = [
@@ -1063,20 +1071,29 @@ function switchView(key){
 function updateLegend(){
   const leg = document.getElementById('legend');
   if(viewState === 'root'){
+    leg.className='';
     const cats = Object.entries(NODES).filter(([,n])=>n.type==='cat');
     leg.innerHTML = '<div class="leg-section">Explore</div>'
       + cats.map(([k,n])=>
-        `<div class="leg-item" onclick="switchView('${k}')" style="cursor:pointer"><span class="leg-dot" style="background:${n.color}"></span>${n.label.replace('\n',' ')}</div>`
+        `<div class="leg-item" onclick="switchView('${k}')"><span class="leg-dot" style="background:${n.color}"></span>${n.label.replace('\n',' ')}</div>`
       ).join('');
   } else {
+    leg.className='leg-detail';
     const pN = NODES[viewState];
     const ms = MOONS[viewState]||[];
     leg.innerHTML =
       '<div class="leg-back" onclick="switchView(\'root\')">← Solar System</div>'
       +'<div class="leg-section">'+pN.label.replace('\n',' ')+'</div>'
-      + ms.map(m=>
-        `<div class="leg-item"><span class="leg-dot" style="background:${NODES[m.key].color}"></span>${NODES[m.key].label.replace('\n',' ')}</div>`
-      ).join('');
+      + ms.map(m=>{
+          const mn=NODES[m.key];
+          return `<div class="leg-item leg-item-d" onclick="openCard('${m.key}','${m.key}')">
+            <span class="leg-dot" style="background:${mn.color};flex-shrink:0"></span>
+            <div class="leg-item-text">
+              <div class="leg-name">${mn.label.replace('\n',' ')}</div>
+              <div class="leg-desc">${mn.desc||''}</div>
+            </div>
+          </div>`;
+        }).join('');
   }
 }
 
@@ -1115,16 +1132,18 @@ function renderRootView(W, H){
   wrap.appendChild(sw);
 }
 
-// ── Planet view: selected planet at center, moons orbiting ───────────────
+// ── Planet view: selected planet at center, moons on separate orbits ──────
 function renderPlanetView(planetKey, W, H){
   const sMin=Math.min(W,H);
-  const MR=sMin*0.26;
+  const baseR=sMin*0.17, gapR=sMin*0.10;
   const pN=NODES[planetKey];
   const ms=MOONS[planetKey]||[];
 
   const sw=document.createElement('div');
   sw.style.cssText='position:absolute;left:50%;top:50%;width:0;height:0;overflow:visible;';
-  sw.appendChild(mkRing(MR));
+
+  // draw a ring for each moon at its own radius
+  ms.forEach((_,mi)=> sw.appendChild(mkRing(baseR + mi*gapR)));
 
   const pEl=makeNode(planetKey,pN,0);
   pEl.classList.add('planet-center');
@@ -1133,9 +1152,9 @@ function renderPlanetView(planetKey, W, H){
 
   const durations=[10,13,9,8,11,7,12];
   ms.forEach((m,mi)=>{
+    const r=baseR + mi*gapR;
     const dur=durations[mi % durations.length];
-    const ang=m.ang;
-    const {arm,body}=mkOrbitArm(dur,ang,MR);
+    const {arm,body}=mkOrbitArm(dur,m.ang,r);
     const mEl=makeNode(m.key,NODES[m.key],(mi+1)*0.15);
     mEl.addEventListener('click',e=>{e.stopPropagation();openCard(m.key,m.key);});
     body.appendChild(mEl);
