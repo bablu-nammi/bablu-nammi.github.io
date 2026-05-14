@@ -388,7 +388,7 @@
     body.light .planet-center .nlabel{color:#1e2030!important;}
 
     /* ── View transition ────────────────────────────────── */
-    #nodes-wrap{transition:opacity 0.28s,transform 0.28s cubic-bezier(0.4,0,0.2,1);}
+    #nodes-wrap{position:absolute;inset:0;transition:opacity 0.28s ease;}
 
     /* ── Node entrance pop ───────────────────────────────── */
     @keyframes nodeIn {
@@ -1053,15 +1053,11 @@ let viewState = 'root'; // 'root' | planet key
 
 function switchView(key){
   wrap.style.opacity = '0';
-  wrap.style.transform = 'scale(0.78)';
   setTimeout(()=>{
     viewState = key;
     renderTree();
-    requestAnimationFrame(()=>{
-      wrap.style.opacity = '1';
-      wrap.style.transform = 'scale(1)';
-    });
-  }, 290);
+    requestAnimationFrame(()=>{ wrap.style.opacity = '1'; });
+  }, 300);
 }
 
 function updateLegend(){
