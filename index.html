@@ -327,6 +327,61 @@
     .pd-highlight{background:rgba(99,102,241,0.07);border:1px solid rgba(99,102,241,0.18);border-radius:10px;padding:14px;}
     .pd-highlight-label{font-size:10px;font-weight:700;color:#818cf8;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;}
     .pd-highlight-text{font-size:12.5px;color:#94a3b8;line-height:1.7;}
+
+    /* ── Node entrance pop ───────────────────────────────── */
+    @keyframes nodeIn {
+      0%   { opacity:0; transform:translate(-50%,-50%) scale(0.35); }
+      65%  { opacity:1; transform:translate(-50%,-50%) scale(1.1); }
+      100% { opacity:1; transform:translate(-50%,-50%) scale(1); }
+    }
+    .node { opacity:0; animation:nodeIn 0.75s cubic-bezier(0.34,1.56,0.64,1) both; }
+    .node:hover { animation-play-state:paused; transform:translate(-50%,-50%) scale(1.1) !important; }
+
+    /* ── Float wrapper ───────────────────────────────────── */
+    @keyframes nFloat {
+      0%,100% { transform:translateY(0px); }
+      50%     { transform:translateY(-7px); }
+    }
+    .nfloat {
+      display:flex; align-items:center; justify-content:center;
+      position:relative; flex-shrink:0;
+    }
+    .nfloat { animation:nFloat var(--fd,5s) ease-in-out infinite var(--fdelay,0s); }
+    .node:hover .nfloat { animation-play-state:paused; }
+
+    /* ── Orbit ring on category nodes ───────────────────── */
+    @keyframes orbitSpin { to { transform:rotate(360deg); } }
+    .norbit {
+      position:absolute; border-radius:50%;
+      border:1.5px dashed rgba(255,255,255,0.07);
+      animation:orbitSpin 18s linear infinite;
+      pointer-events:none;
+      transform:translate(-50%,-50%);
+      top:50%; left:50%;
+      transition:border-color 0.3s;
+    }
+    .node:hover .norbit { border-color:rgba(255,255,255,0.18); }
+    .node.active .norbit { border-color:rgba(255,255,255,0.25); animation-duration:6s; }
+
+    /* ── Inactive node dim when card is open ─────────────── */
+    body.node-active .node {
+      opacity:0.28; filter:saturate(0.15);
+      transition:opacity 0.5s, filter 0.5s;
+    }
+    body.node-active .node.active { opacity:1; filter:none; }
+    body.node-active .node:hover  { opacity:0.75; filter:saturate(0.6); }
+
+    /* ── Sharper card entrance ───────────────────────────── */
+    #content-card {
+      transform:translate(-50%, calc(-50% + 32px)) scale(0.88) !important;
+    }
+    body.zoomed-in #content-card {
+      transform:translate(-50%,-50%) scale(1) !important;
+    }
+
+    /* ── Edge glow double-line ───────────────────────────── */
+    .edge-glow { fill:none; stroke-width:1; opacity:0.6;
+      stroke-dasharray:0; animation:none; }
   </style>
 </head>
 <body>
@@ -397,11 +452,11 @@ const NODES = {
     badge:null, badgeClass:'',
     children:[],
   },
-  p1:{ type:'leaf', label:'CRISPR\nClassifier', x:10, y:9,  color:'#67e8f9', glow:'rgba(103,232,249,0.3)', parent:'papers' },
-  p2:{ type:'leaf', label:'CasGen',             x:26, y:5,  color:'#67e8f9', glow:'rgba(103,232,249,0.3)', parent:'papers' },
-  p3:{ type:'leaf', label:'Cas Feature\nML',    x:14, y:4,  color:'#67e8f9', glow:'rgba(103,232,249,0.3)', parent:'papers' },
-  a1:{ type:'leaf', label:'insARance', x:74, y:7,  color:'#fbbf24', glow:'rgba(251,191,36,0.3)', parent:'awards' },
-  a2:{ type:'leaf', label:'WeCare',   x:87, y:20, color:'#fbbf24', glow:'rgba(251,191,36,0.3)', parent:'awards' },
+  p1:{ type:'leaf', label:'CRISPR\nClassifier',    x:9,  y:8,  color:'#67e8f9', glow:'rgba(103,232,249,0.3)', parent:'papers' },
+  p2:{ type:'leaf', label:'CasGen',               x:23, y:3,  color:'#67e8f9', glow:'rgba(103,232,249,0.3)', parent:'papers' },
+  p3:{ type:'leaf', label:'Cas9 & Cas12\nFeature',x:38, y:8,  color:'#67e8f9', glow:'rgba(103,232,249,0.3)', parent:'papers' },
+  a1:{ type:'leaf', label:'insARance',             x:63, y:7,  color:'#fbbf24', glow:'rgba(251,191,36,0.3)', parent:'awards' },
+  a2:{ type:'leaf', label:'WeCare',                x:82, y:7,  color:'#fbbf24', glow:'rgba(251,191,36,0.3)', parent:'awards' },
 };
 
 const EDGES = [
@@ -787,7 +842,7 @@ function renderTree(){
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
   svg.innerHTML = '';
 
-  // Edges
+  // Edges — draw main line + bright inner glow line
   for(const [a, b, color] of EDGES){
     const na = NODES[a], nb = NODES[b];
     if(!na||!nb) continue;
@@ -796,48 +851,80 @@ function renderTree(){
     const mx=(x1+x2)/2, my=(y1+y2)/2;
     const dx=x2-x1, dy=y2-y1;
     const cx=mx-dy*0.1, cy=my+dx*0.1;
+    const d=`M${x1},${y1} Q${cx},${cy} ${x2},${y2}`;
+    // Outer dim path
     const path=document.createElementNS('http://www.w3.org/2000/svg','path');
-    path.setAttribute('d',`M${x1},${y1} Q${cx},${cy} ${x2},${y2}`);
+    path.setAttribute('d', d);
     path.setAttribute('class','edge');
-    path.setAttribute('stroke', color+'44');
+    path.setAttribute('stroke', color+'50');
+    path.setAttribute('stroke-width','2');
     svg.appendChild(path);
+    // Inner bright glow
+    const glow=document.createElementNS('http://www.w3.org/2000/svg','path');
+    glow.setAttribute('d', d);
+    glow.setAttribute('class','edge edge-glow');
+    glow.setAttribute('stroke', color+'bb');
+    glow.setAttribute('stroke-width','0.75');
+    svg.appendChild(glow);
   }
+
+  // Float timing per node
+  const FLOAT = {
+    root: {fd:'7s', fdelay:'0s'},
+    papers:{fd:'5.2s',fdelay:'-1.3s'}, awards:{fd:'5.8s',fdelay:'-2.1s'},
+    exp:  {fd:'4.9s',fdelay:'-0.7s'}, edu:  {fd:'5.5s',fdelay:'-3.2s'},
+    p1:   {fd:'4.2s',fdelay:'-0.4s'}, p2:   {fd:'4.6s',fdelay:'-1.8s'},
+    p3:   {fd:'4.0s',fdelay:'-2.6s'}, a1:   {fd:'4.4s',fdelay:'-1.1s'},
+    a2:   {fd:'4.8s',fdelay:'-3.0s'},
+  };
 
   // Nodes
   wrap.innerHTML='';
-  for(const [key, n] of Object.entries(NODES)){
+  const nodeOrder = Object.keys(NODES);
+  for(let i=0; i<nodeOrder.length; i++){
+    const key=nodeOrder[i], n=NODES[key];
     const el = document.createElement('div');
     const x  = px(n.x, W), y = px(n.y, H);
+    const ft = FLOAT[key]||{fd:'5s',fdelay:'0s'};
     el.id = `node-${key}`;
     el.style.left = x+'px';
     el.style.top  = y+'px';
+    el.style.animationDelay = (i*0.1)+'s';
 
     if(n.type==='root'){
       el.className = 'node node-root';
       el.innerHTML = `
-        <div class="nglow" style="width:200px;height:200px;top:-41px;left:-41px;background:radial-gradient(circle,${n.glow},transparent 65%)"></div>
-        <div class="nring" style="--np:${n.glow};background:linear-gradient(135deg,rgba(99,102,241,0.2),rgba(99,102,241,0.05));border-color:${n.color};box-shadow:0 0 36px rgba(99,102,241,0.18)">
-          <div class="root-init">
-            <div class="root-av">BN</div>
-            <div class="root-name">Bharani Nammi</div>
-            <div class="root-title">Deep Learning</div>
+        <div class="nfloat" style="--fd:${ft.fd};--fdelay:${ft.fdelay};position:relative;">
+          <div class="nglow" style="width:220px;height:220px;top:-51px;left:-51px;position:absolute;background:radial-gradient(circle,${n.glow},transparent 65%)"></div>
+          <div class="norbit" style="width:155px;height:155px;"></div>
+          <div class="nring" style="--np:${n.glow};background:linear-gradient(135deg,rgba(99,102,241,0.22),rgba(99,102,241,0.06));border-color:${n.color};box-shadow:0 0 48px rgba(99,102,241,0.25),inset 0 1px 0 rgba(255,255,255,0.05)">
+            <div class="root-init">
+              <div class="root-av">BN</div>
+              <div class="root-name">Bharani Nammi</div>
+              <div class="root-title">Deep Learning</div>
+            </div>
           </div>
         </div>`;
     } else if(n.type==='cat'){
       el.className = 'node node-cat';
       el.innerHTML = `
-        <div class="nglow" style="width:120px;height:120px;top:-24px;left:-24px;background:radial-gradient(circle,${n.glow},transparent 65%)"></div>
-        <div class="nring" style="--np:${n.glow};background:${n.color}12;border-color:${n.color}50;box-shadow:0 0 20px ${n.color}18">
-          <div class="ndot" style="background:${n.color}"></div>
+        <div class="nfloat" style="--fd:${ft.fd};--fdelay:${ft.fdelay};position:relative;">
+          <div class="nglow" style="width:130px;height:130px;top:-29px;left:-29px;position:absolute;background:radial-gradient(circle,${n.glow},transparent 65%)"></div>
+          <div class="norbit" style="width:98px;height:98px;"></div>
+          <div class="nring" style="--np:${n.glow};background:${n.color}14;border-color:${n.color}60;box-shadow:0 0 24px ${n.color}22,0 0 2px ${n.color}66">
+            <div class="ndot" style="background:${n.color}"></div>
+          </div>
         </div>
         <div class="nlabel">${n.label.replace('\n','<br>')}</div>
         ${n.badge?`<span class="nbadge ${n.badgeClass}" style="border-color:${n.color}55;color:${n.color}">${n.badge}</span>`:''}`;
     } else {
       el.className = 'node node-leaf';
       el.innerHTML = `
-        <div class="nglow" style="width:80px;height:80px;top:-16px;left:-16px;background:radial-gradient(circle,${n.glow},transparent 65%)"></div>
-        <div class="nring" style="--np:${n.glow};background:${n.color}10;border-color:${n.color}40;box-shadow:0 0 10px ${n.color}10">
-          <div class="ndot" style="background:${n.color}"></div>
+        <div class="nfloat" style="--fd:${ft.fd};--fdelay:${ft.fdelay};position:relative;">
+          <div class="nglow" style="width:88px;height:88px;top:-20px;left:-20px;position:absolute;background:radial-gradient(circle,${n.glow},transparent 65%)"></div>
+          <div class="nring" style="--np:${n.glow};background:${n.color}12;border-color:${n.color}50;box-shadow:0 0 14px ${n.color}18,0 0 2px ${n.color}55">
+            <div class="ndot" style="background:${n.color}"></div>
+          </div>
         </div>
         <div class="nlabel">${n.label.replace('\n','<br>')}</div>`;
     }
@@ -879,11 +966,13 @@ function openCard(key, clickedKey){
 
   document.getElementById('hint').classList.add('hide');
   document.body.classList.add('zoomed-in');
+  document.body.classList.add('node-active');
   activeKey = key;
 }
 
 function closeCard(){
   document.body.classList.remove('zoomed-in');
+  document.body.classList.remove('node-active');
   document.getElementById('cBody').className = 'card-body';
   // small delay so backdrop fades first, then reset zoom
   setTimeout(()=>{
