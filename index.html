@@ -350,6 +350,46 @@
     .pd-highlight-label{font-size:10px;font-weight:700;color:#818cf8;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;}
     .pd-highlight-text{font-size:12.5px;color:#94a3b8;line-height:1.7;}
 
+    /* ── Legend ──────────────────────────────────────────── */
+    #legend{
+      position:fixed;left:24px;top:50%;transform:translateY(-50%);
+      z-index:200;display:flex;flex-direction:column;gap:10px;
+      pointer-events:none;
+    }
+    .leg-section{font-size:9.5px;font-weight:800;color:#9ca3af;
+      text-transform:uppercase;letter-spacing:1.2px;margin-bottom:2px;}
+    .leg-item{
+      display:flex;align-items:center;gap:9px;
+      font-size:12px;font-weight:600;color:#6b7280;
+      transition:color 0.2s;
+      pointer-events:auto;cursor:pointer;
+    }
+    .leg-item:hover{color:#1e2030;}
+    .leg-dot{
+      width:9px;height:9px;border-radius:50%;flex-shrink:0;
+      box-shadow:0 0 6px var(--ldc,transparent);
+    }
+    .leg-back{
+      display:flex;align-items:center;gap:7px;
+      font-size:11.5px;font-weight:700;color:#6366f1;
+      background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.18);
+      padding:7px 13px;border-radius:10px;cursor:pointer;
+      pointer-events:auto;transition:all 0.2s;margin-bottom:6px;
+    }
+    .leg-back:hover{background:rgba(99,102,241,0.16);color:#4338ca;}
+    body.light .leg-item{color:#6b7280;}
+    body.light .leg-item:hover{color:#1e2030;}
+    body.light .leg-section{color:#9ca3af;}
+
+    /* ── Planet-view center node ─────────────────────────── */
+    .planet-center .nring{width:90px!important;height:90px!important;}
+    .planet-center .nlabel{opacity:1!important;transform:none!important;
+      font-size:12px!important;font-weight:800!important;}
+    body.light .planet-center .nlabel{color:#1e2030!important;}
+
+    /* ── View transition ────────────────────────────────── */
+    #nodes-wrap{transition:opacity 0.28s,transform 0.28s cubic-bezier(0.4,0,0.2,1);}
+
     /* ── Node entrance pop ───────────────────────────────── */
     @keyframes nodeIn {
       0%   { opacity:0; transform:translate(-50%,-50%) scale(0.35); }
@@ -530,6 +570,7 @@
   <div class="card-body" id="cBody"></div>
 </div>
 
+<div id="legend"></div>
 <div id="hint">✦ Click a node to explore</div>
 
 <script>
@@ -940,6 +981,12 @@ const CONTENT = {
   },
 };
 
+// ── Moon definitions (global) ─────────────────────────────────────────────
+const MOONS = {
+  papers:[ {key:'p1',ang:0,dur:10}, {key:'p2',ang:120,dur:13}, {key:'p3',ang:240,dur:9} ],
+  awards:[ {key:'a1',ang:80,dur:8}, {key:'a2',ang:260,dur:11} ],
+};
+
 // ── Render tree ──────────────────────────────────────────────────────────
 const tree = document.getElementById('tree');
 const zc   = document.getElementById('zc');
@@ -949,6 +996,51 @@ const wrap = document.getElementById('nodes-wrap');
 function vw(){ return window.innerWidth; }
 function vh(){ return window.innerHeight; }
 function px(pct, dim){ return pct / 100 * dim; }
+
+let viewState = 'root'; // 'root' | planet key
+
+function switchView(key){
+  wrap.style.opacity = '0';
+  wrap.style.transform = 'scale(0.78)';
+  setTimeout(()=>{
+    viewState = key;
+    renderTree();
+    wrap.style.transition = 'none';
+    wrap.style.transform = 'scale(1.08)';
+    wrap.style.opacity = '0';
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      wrap.style.transition = 'opacity 0.32s, transform 0.38s cubic-bezier(0.34,1.56,0.64,1)';
+      wrap.style.opacity = '1';
+      wrap.style.transform = 'scale(1)';
+    }));
+  }, 290);
+}
+
+function updateLegend(){
+  const leg = document.getElementById('legend');
+  if(viewState === 'root'){
+    const cats = Object.entries(NODES).filter(([,n])=>n.type==='cat');
+    leg.innerHTML = `<div class="leg-section">Explore</div>`
+      + cats.map(([k,n])=>
+        `<div class="leg-item" onclick="switchView('${k}')">
+          <span class="leg-dot" style="background:${n.color};--ldc:${n.glow}"></span>
+          ${n.label.replace('\n',' ')}
+        </div>`
+      ).join('');
+  } else {
+    const pN = NODES[viewState];
+    const ms = MOONS[viewState]||[];
+    leg.innerHTML =
+      `<div class="leg-back" onclick="switchView('root')">← Solar System</div>`
+      + `<div class="leg-section">${pN.label.replace('\n',' ')}</div>`
+      + ms.map(m=>
+        `<div class="leg-item" onclick="document.getElementById('node-${m.key}').click()">
+          <span class="leg-dot" style="background:${NODES[m.key].color};--ldc:${NODES[m.key].glow}"></span>
+          ${NODES[m.key].label.replace('\n',' ')}
+        </div>`
+      ).join('');
+  }
+}
 
 function makeNode(key, n, delay){
   const el = document.createElement('div');
@@ -988,112 +1080,94 @@ function makeNode(key, n, delay){
   return el;
 }
 
-function renderTree(){
-  const W = vw(), H = vh();
-  svg.innerHTML = '';
-  wrap.innerHTML = '';
+function mkOrbitArm(dur, ang, radius){
+  const delay = -((ang/360)*dur);
+  const arm = document.createElement('div');
+  arm.className = 'orbit-arm';
+  arm.style.animation = `orbitSpin ${dur}s linear infinite ${delay}s`;
+  const atR = document.createElement('div');
+  atR.className = 'orbit-at-r';
+  atR.style.left = radius+'px';
+  const body = document.createElement('div');
+  body.className = 'orbit-body';
+  body.style.animation = `orbitSpinRev ${dur}s linear infinite ${delay}s`;
+  atR.appendChild(body);
+  arm.appendChild(atR);
+  return {arm, body};
+}
 
-  // Responsive orbit radii — 4 distinct concentric rings, well spaced
-  const sMin    = Math.min(W, H);
-  const inner   = sMin * 0.115;          // innermost planet orbit
-  const spacing = sMin * 0.105;          // gap between rings (wider)
-  const OR = [inner, inner+spacing, inner+spacing*2, inner+spacing*3];
-  const MR = Math.min(spacing * 0.62, 78); // moon orbit radius — clear of planet, clear of next ring
+function mkRing(r, color){
+  const d = document.createElement('div');
+  d.className = 'orbit-path-ring';
+  d.style.cssText += `width:${r*2}px;height:${r*2}px;${color?'border-color:'+color+';':''}`;
+  return d;
+}
 
-  // Planet definitions: [nodeKey, startAngleDeg, periodSec, orbitRadiusIndex]
-  // Ordered inner→outer: edu, papers, awards, exp  (inner = faster)
-  const PLANETS = [
-    { key:'edu',    ang:142, dur:22, or:OR[0] },
-    { key:'papers', ang:215, dur:30, or:OR[1] },
-    { key:'awards', ang:325, dur:40, or:OR[2] },
-    { key:'exp',    ang: 42, dur:50, or:OR[3] },
+function renderRootView(W,H){
+  const sMin=Math.min(W,H), inner=sMin*0.115, gap=sMin*0.115;
+  const OR=[inner,inner+gap,inner+gap*2,inner+gap*3];
+  const PLANETS=[
+    {key:'edu',  ang:142,dur:22,or:OR[0]},
+    {key:'papers',ang:215,dur:30,or:OR[1]},
+    {key:'awards',ang:325,dur:40,or:OR[2]},
+    {key:'exp',  ang: 42,dur:50,or:OR[3]},
   ];
-
-  // Moon definitions per planet
-  const MOONS = {
-    papers:[ {key:'p1',ang:0,dur:10}, {key:'p2',ang:120,dur:13}, {key:'p3',ang:240,dur:9} ],
-    awards:[ {key:'a1',ang:80,dur:8}, {key:'a2',ang:260,dur:11} ],
-  };
-
-  // ── Sun wrap (0×0 anchor at canvas center) ──────────────
-  const sunWrap = document.createElement('div');
-  sunWrap.style.cssText = `position:absolute;left:50%;top:50%;width:0;height:0;overflow:visible;`;
-
-  // Draw one orbit path ring per planet (concentric)
-  OR.forEach(r => {
-    const ring = document.createElement('div');
-    ring.className = 'orbit-path-ring';
-    ring.style.cssText += `width:${r*2}px;height:${r*2}px;`;
-    sunWrap.appendChild(ring);
-  });
-
-  // Root / Sun node
-  const rootEl = makeNode('root', NODES.root, 0);
-  rootEl.addEventListener('click', e=>{ e.stopPropagation(); openCard('root','root'); });
-  sunWrap.appendChild(rootEl);
-
-  // ── Planet orbit arms ────────────────────────────────────
-  PLANETS.forEach((p, pi) => {
-    const pN = NODES[p.key];
-    const armDelay = -((p.ang / 360) * p.dur);
-
-    const arm = document.createElement('div');
-    arm.className = 'orbit-arm';
-    arm.style.animation = `orbitSpin ${p.dur}s linear infinite ${armDelay}s`;
-
-    const atR = document.createElement('div');
-    atR.className = 'orbit-at-r';
-    atR.style.left = p.or + 'px';
-
-    const body = document.createElement('div');
-    body.className = 'orbit-body';
-    body.style.animation = `orbitSpinRev ${p.dur}s linear infinite ${armDelay}s`;
-
-    // Moon orbit path ring (if planet has moons)
+  const sw=document.createElement('div');
+  sw.style.cssText='position:absolute;left:50%;top:50%;width:0;height:0;overflow:visible;';
+  OR.forEach(r=>sw.appendChild(mkRing(r)));
+  const rootEl=makeNode('root',NODES.root,0);
+  rootEl.addEventListener('click',e=>{e.stopPropagation();openCard('root','root');});
+  sw.appendChild(rootEl);
+  PLANETS.forEach((p,pi)=>{
+    const {arm,body}=mkOrbitArm(p.dur,p.ang,p.or);
+    const pEl=makeNode(p.key,NODES[p.key],(pi+1)*0.14);
     if(MOONS[p.key]){
-      const mRing = document.createElement('div');
-      mRing.className = 'orbit-path-ring';
-      mRing.style.cssText += `width:${MR*2}px;height:${MR*2}px;border-color:rgba(255,255,255,0.055);`;
-      body.appendChild(mRing);
+      pEl.addEventListener('click',e=>{e.stopPropagation();switchView(p.key);});
+    } else {
+      pEl.addEventListener('click',e=>{e.stopPropagation();openCard(p.key,p.key);});
     }
-
-    // Planet node visual
-    const pEl = makeNode(p.key, pN, (pi+1)*0.14);
-    pEl.addEventListener('click', e=>{ e.stopPropagation(); openCard(p.key, p.key); });
     body.appendChild(pEl);
-
-    // ── Moon orbit arms ──────────────────────────────────
-    (MOONS[p.key]||[]).forEach((m, mi) => {
-      const mN = NODES[m.key];
-      const mArmDelay = -((m.ang / 360) * m.dur);
-
-      const mArm = document.createElement('div');
-      mArm.className = 'orbit-arm';
-      mArm.style.animation = `orbitSpin ${m.dur}s linear infinite ${mArmDelay}s`;
-
-      const mAtR = document.createElement('div');
-      mAtR.className = 'orbit-at-r';
-      mAtR.style.left = MR + 'px';
-
-      const mBody = document.createElement('div');
-      mBody.className = 'orbit-body';
-      mBody.style.animation = `orbitSpinRev ${m.dur}s linear infinite ${mArmDelay}s`;
-
-      const mEl = makeNode(m.key, mN, (pi+1+mi)*0.12);
-      mEl.addEventListener('click', e=>{ e.stopPropagation(); openCard(m.key, m.key); });
-
-      mBody.appendChild(mEl);
-      mAtR.appendChild(mBody);
-      mArm.appendChild(mAtR);
-      body.appendChild(mArm);
-    });
-
-    atR.appendChild(body);
-    arm.appendChild(atR);
-    sunWrap.appendChild(arm);
+    sw.appendChild(arm);
   });
+  wrap.appendChild(sw);
+}
 
-  wrap.appendChild(sunWrap);
+function renderPlanetView(planetKey,W,H){
+  const sMin=Math.min(W,H), MR=Math.min(sMin*0.26,240);
+  const pN=NODES[planetKey], ms=MOONS[planetKey]||[];
+  const sw=document.createElement('div');
+  sw.style.cssText='position:absolute;left:50%;top:50%;width:0;height:0;overflow:visible;';
+  sw.appendChild(mkRing(MR,'rgba(0,0,0,0.07)'));
+  const cEl=document.createElement('div');
+  cEl.id=`node-${planetKey}`;
+  cEl.className='node node-cat planet-center';
+  cEl.style.cssText='position:absolute;left:0;top:0;transform:translate(-50%,-50%);';
+  cEl.innerHTML=`
+    <div class="nglow" style="background:radial-gradient(circle,${pN.glow},transparent 65%)"></div>
+    <div class="nring" style="--np:${pN.glow};background:${pN.color}14;border-color:${pN.color}70;box-shadow:0 0 48px ${pN.color}35;">
+      <div class="ndot" style="background:${pN.color};width:14px;height:14px;border-radius:50%;"></div>
+    </div>
+    <div class="nlabel">${pN.label.replace('\n','<br>')}</div>`;
+  cEl.addEventListener('click',e=>{e.stopPropagation();openCard(planetKey,planetKey);});
+  sw.appendChild(cEl);
+  const step=360/ms.length;
+  ms.forEach((m,mi)=>{
+    const mN=NODES[m.key];
+    const {arm,body}=mkOrbitArm(m.dur*0.7, mi*step, MR);
+    const mEl=makeNode(m.key,mN,mi*0.15);
+    mEl.addEventListener('click',e=>{e.stopPropagation();openCard(m.key,m.key);});
+    body.appendChild(mEl);
+    sw.appendChild(arm);
+  });
+  wrap.appendChild(sw);
+}
+
+function renderTree(){
+  svg.innerHTML=''; wrap.innerHTML='';
+  const W=vw(),H=vh();
+  if(viewState==='root') renderRootView(W,H);
+  else renderPlanetView(viewState,W,H);
+  updateLegend();
 }
 
 // ── Card open / close ────────────────────────────────────────────────────
