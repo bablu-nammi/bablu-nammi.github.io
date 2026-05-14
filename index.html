@@ -11,226 +11,223 @@
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
     html,body{width:100%;height:100%;overflow:hidden;background:#03050e;font-family:'Inter',system-ui,sans-serif;}
 
-    /* ── Background ────────────────────────────────────── */
-    #bg {
-      position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;
-    }
-    .orb {
-      position:absolute;border-radius:50%;filter:blur(120px);opacity:0.1;
-      animation:drift 14s ease-in-out infinite alternate;
-    }
+    /* ── Background ─────────────────────────────────────── */
+    #bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+    .orb{position:absolute;border-radius:50%;filter:blur(120px);opacity:0.09;animation:drift 14s ease-in-out infinite alternate;}
     .orb1{width:800px;height:800px;background:#6366f1;top:-300px;right:-200px;}
     .orb2{width:600px;height:600px;background:#06b6d4;bottom:-200px;left:-200px;animation-delay:-7s;}
-    .orb3{width:400px;height:400px;background:#f59e0b;bottom:10%;right:20%;animation-delay:-3s;opacity:0.06;}
+    .orb3{width:400px;height:400px;background:#f59e0b;bottom:10%;right:20%;animation-delay:-3s;opacity:0.05;}
     @keyframes drift{from{transform:translate(0,0)}to{transform:translate(50px,30px)}}
-
-    /* Grid */
     #bg::after{
       content:'';position:absolute;inset:0;
-      background-image:linear-gradient(rgba(99,102,241,0.04)1px,transparent 1px),
-        linear-gradient(90deg,rgba(99,102,241,0.04)1px,transparent 1px);
+      background-image:linear-gradient(rgba(99,102,241,0.035)1px,transparent 1px),
+        linear-gradient(90deg,rgba(99,102,241,0.035)1px,transparent 1px);
       background-size:60px 60px;
     }
 
-    /* ── Tree canvas ───────────────────────────────────── */
-    #tree {
-      position:fixed;inset:0;z-index:10;
-      transition:transform 0.7s cubic-bezier(0.4,0,0.2,1),
-                 left 0.7s cubic-bezier(0.4,0,0.2,1),
-                 width 0.7s cubic-bezier(0.4,0,0.2,1);
-    }
-    /* When panel is open: shrink tree to left 42% */
-    body.panel-open #tree {
-      width:42%;
-    }
-    body.panel-open #tree .zoom-canvas {
-      transform:scale(1.0) !important;
-    }
-
-    .zoom-canvas {
+    /* ── Tree canvas ────────────────────────────────────── */
+    #tree{position:fixed;inset:0;z-index:10;}
+    .zoom-canvas{
       position:absolute;inset:0;
-      transition:transform 0.7s cubic-bezier(0.4,0,0.2,1);
+      transition:transform 0.8s cubic-bezier(0.4,0,0.2,1);
+      will-change:transform;
     }
 
-    /* ── SVG connections ───────────────────────────────── */
-    #svg-layer {
-      position:absolute;inset:0;width:100%;height:100%;
-      pointer-events:none;overflow:visible;
-    }
-    .edge {
-      fill:none;
-      stroke-width:1.5;
-      stroke-dasharray:8 5;
-      animation:dashflow 2.5s linear infinite;
-    }
-    .edge.glow {
-      stroke-dasharray:none;
-      filter:drop-shadow(0 0 4px currentColor);
-    }
-    @keyframes dashflow{to{stroke-dashoffset:-52;}}
+    /* ── SVG connections ────────────────────────────────── */
+    #svg-layer{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible;}
+    .edge{fill:none;stroke-width:1.5;stroke-dasharray:7 5;animation:dashflow 3s linear infinite;}
+    @keyframes dashflow{to{stroke-dashoffset:-48;}}
 
-    /* ── Nodes ─────────────────────────────────────────── */
-    .node {
-      position:absolute;
-      transform:translate(-50%,-50%);
-      cursor:pointer;
-      display:flex;flex-direction:column;align-items:center;gap:10px;
-      transition:filter 0.2s;
+    /* ── Nodes ──────────────────────────────────────────── */
+    .node{
+      position:absolute;transform:translate(-50%,-50%);
+      cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:9px;
+      transition:filter 0.25s,transform 0.25s;
     }
-    .node:hover .nring{transform:scale(1.1);}
+    .node:hover{transform:translate(-50%,-50%) scale(1.06);}
+
+    .nglow{
+      position:absolute;border-radius:50%;opacity:0;
+      transition:opacity 0.35s;pointer-events:none;z-index:0;
+    }
     .node:hover .nglow{opacity:1;}
 
-    .nglow {
-      position:absolute;border-radius:50%;opacity:0;
-      transition:opacity 0.3s;pointer-events:none;
-      z-index:0;
-    }
-    .nring {
-      border-radius:50%;
-      display:flex;align-items:center;justify-content:center;
-      border:2px solid;
-      transition:transform 0.3s,box-shadow 0.3s;
-      position:relative;z-index:1;
-      flex-shrink:0;
-    }
-    .node.active .nring {
-      border-width:3px;
+    .nring{
+      border-radius:50%;display:flex;align-items:center;justify-content:center;
+      border:1.5px solid;position:relative;z-index:1;flex-shrink:0;
+      transition:box-shadow 0.3s,transform 0.3s,border-color 0.3s;
     }
 
-    /* Root node */
+    /* Root */
     .node-root .nring{
-      width:110px;height:110px;
-      background:linear-gradient(135deg,rgba(99,102,241,0.25),rgba(99,102,241,0.08));
+      width:118px;height:118px;
+      background:linear-gradient(135deg,rgba(99,102,241,0.2),rgba(99,102,241,0.05));
       border-color:#6366f1;
-      box-shadow:0 0 32px rgba(99,102,241,0.25),inset 0 1px 0 rgba(255,255,255,0.05);
+      box-shadow:0 0 40px rgba(99,102,241,0.2),inset 0 1px 0 rgba(255,255,255,0.04);
     }
-    .node-root .nglow{width:180px;height:180px;top:-35px;left:-35px;background:radial-gradient(circle,rgba(99,102,241,0.3),transparent 65%);}
-    .node-root:hover .nring{box-shadow:0 0 50px rgba(99,102,241,0.45);}
-    .root-init{display:flex;flex-direction:column;align-items:center;gap:3px;}
-    .root-av{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#4f46e5);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:white;letter-spacing:-1px;}
-    .root-name{font-size:13px;font-weight:800;color:#eef2ff;letter-spacing:-0.3px;white-space:nowrap;}
-    .root-title{font-size:9px;font-weight:600;color:#818cf8;text-transform:uppercase;letter-spacing:1px;white-space:nowrap;}
+    .node-root .nglow{width:200px;height:200px;top:-41px;left:-41px;background:radial-gradient(circle,rgba(99,102,241,0.25),transparent 65%);}
+    .node-root:hover .nring{box-shadow:0 0 60px rgba(99,102,241,0.4),inset 0 1px 0 rgba(255,255,255,0.06);}
+    .root-init{display:flex;flex-direction:column;align-items:center;gap:4px;}
+    .root-av{width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#4f46e5);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:white;letter-spacing:-0.5px;}
+    .root-name{font-size:12px;font-weight:800;color:#eef2ff;letter-spacing:-0.3px;white-space:nowrap;}
+    .root-title{font-size:8.5px;font-weight:600;color:#818cf8;text-transform:uppercase;letter-spacing:0.9px;white-space:nowrap;}
 
-    /* Category nodes (tier 1) */
-    .node-cat .nring{width:70px;height:70px;}
-    .node-cat .nglow{width:110px;height:110px;top:-20px;left:-20px;}
-    .nicon{font-size:22px;line-height:1;}
+    /* Category nodes */
+    .node-cat .nring{width:72px;height:72px;}
+    .node-cat .nglow{width:120px;height:120px;top:-24px;left:-24px;}
+
+    /* Center dot */
+    .ndot{
+      width:8px;height:8px;border-radius:50%;opacity:0.7;
+      transition:opacity 0.2s,transform 0.2s;
+    }
+    .node:hover .ndot{opacity:1;transform:scale(1.3);}
+
     .nlabel{
-      font-size:11px;font-weight:700;color:#94a3b8;
-      text-align:center;line-height:1.3;white-space:nowrap;
-      text-transform:uppercase;letter-spacing:0.5px;
+      font-size:11px;font-weight:700;color:#7c88a8;
+      text-align:center;line-height:1.35;white-space:nowrap;
+      text-transform:uppercase;letter-spacing:0.6px;
+      transition:color 0.25s;
     }
+    .node:hover .nlabel{color:#c7d2fe;}
     .node.active .nlabel{color:#eef2ff;}
+    .node.active .nring{border-width:2px;}
+
     .nbadge{
-      font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;
-      border:1px solid;text-transform:uppercase;letter-spacing:0.5px;
-      margin-top:-5px;
+      font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;
+      border:1px solid;text-transform:uppercase;letter-spacing:0.4px;
+      margin-top:-4px;
     }
 
-    /* Leaf nodes (tier 2) */
-    .node-leaf .nring{width:50px;height:50px;}
-    .node-leaf .nglow{width:80px;height:80px;top:-15px;left:-15px;}
-    .node-leaf .nicon{font-size:16px;}
-    .node-leaf .nlabel{font-size:10px;max-width:80px;white-space:normal;text-align:center;}
+    /* Leaf nodes */
+    .node-leaf .nring{width:48px;height:48px;}
+    .node-leaf .nglow{width:80px;height:80px;top:-16px;left:-16px;}
+    .node-leaf .ndot{width:6px;height:6px;}
+    .node-leaf .nlabel{font-size:9.5px;max-width:72px;white-space:normal;text-align:center;letter-spacing:0.3px;}
 
-    /* ── Panel ─────────────────────────────────────────── */
-    #panel {
-      position:fixed;top:0;right:0;bottom:0;width:58%;z-index:50;
+    /* ── Zoom backdrop ──────────────────────────────────── */
+    #zoom-backdrop{
+      position:fixed;inset:0;z-index:40;
+      background:rgba(2,4,14,0.72);
+      opacity:0;pointer-events:none;
+      transition:opacity 0.5s;
+      backdrop-filter:blur(3px);
+    }
+    body.zoomed-in #zoom-backdrop{opacity:1;pointer-events:auto;}
+
+    /* ── Content card ───────────────────────────────────── */
+    #content-card{
+      position:fixed;
+      top:50%;left:50%;
+      transform:translate(-50%,-50%) scale(0.93);
+      opacity:0;pointer-events:none;
+      width:min(720px,92vw);
+      max-height:84vh;
       background:rgba(4,6,18,0.97);
-      border-left:1px solid #1a2236;
-      transform:translateX(100%);
-      transition:transform 0.65s cubic-bezier(0.4,0,0.2,1);
+      border:1px solid rgba(255,255,255,0.07);
+      border-radius:22px;
+      z-index:51;
+      transition:opacity 0.38s 0.15s, transform 0.38s 0.15s;
       display:flex;flex-direction:column;
-      backdrop-filter:blur(20px);
+      overflow:hidden;
+      box-shadow:0 32px 100px rgba(0,0,0,0.7),0 0 0 1px rgba(99,102,241,0.08);
     }
-    body.panel-open #panel{transform:translateX(0);}
+    body.zoomed-in #content-card{
+      opacity:1;pointer-events:auto;
+      transform:translate(-50%,-50%) scale(1);
+    }
 
-    .panel-topbar {
-      display:flex;align-items:center;gap:12px;padding:20px 28px;
-      border-bottom:1px solid #1a2236;flex-shrink:0;
+    .card-topbar{
+      display:flex;align-items:center;gap:14px;
+      padding:18px 24px;
+      border-bottom:1px solid rgba(255,255,255,0.05);
+      flex-shrink:0;
+      background:rgba(255,255,255,0.02);
     }
-    .back-btn {
-      background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.25);
-      color:#818cf8;padding:7px 14px;border-radius:8px;cursor:pointer;
+    .back-btn{
+      background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.22);
+      color:#818cf8;padding:6px 14px;border-radius:8px;cursor:pointer;
       font-family:inherit;font-size:12px;font-weight:700;
       display:flex;align-items:center;gap:6px;transition:all 0.2s;
+      flex-shrink:0;
     }
     .back-btn:hover{background:rgba(99,102,241,0.2);color:#c7d2fe;}
-    .panel-node-icon{font-size:24px;}
-    .panel-node-name{font-size:18px;font-weight:800;color:#eef2ff;letter-spacing:-0.5px;}
-    .panel-node-sub{font-size:12px;font-weight:600;margin-top:1px;}
+    .card-title-wrap{}
+    .card-title{font-size:17px;font-weight:800;color:#eef2ff;letter-spacing:-0.4px;}
+    .card-sub{font-size:12px;font-weight:500;margin-top:2px;}
 
-    .panel-body{flex:1;overflow-y:auto;padding:28px;scrollbar-width:thin;scrollbar-color:#1e2840 transparent;}
-    .panel-body::-webkit-scrollbar{width:4px;}
-    .panel-body::-webkit-scrollbar-thumb{background:#1e2840;border-radius:2px;}
+    .card-body{
+      flex:1;overflow-y:auto;padding:26px;
+      scrollbar-width:thin;scrollbar-color:#1a2236 transparent;
+    }
+    .card-body::-webkit-scrollbar{width:4px;}
+    .card-body::-webkit-scrollbar-thumb{background:#1a2236;border-radius:2px;}
 
-    /* ── Panel content components ──────────────────────── */
-    /* About */
-    .about-hero{display:flex;gap:24px;align-items:flex-start;margin-bottom:28px;}
-    .about-avatar{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#4f46e5);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900;color:white;flex-shrink:0;}
-    .about-meta{}
-    .about-name{font-size:22px;font-weight:900;letter-spacing:-1px;color:#eef2ff;margin-bottom:3px;}
+    /* ── About ──────────────────────────────────────────── */
+    .about-hero{display:flex;gap:22px;align-items:flex-start;margin-bottom:26px;}
+    .about-avatar{width:68px;height:68px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#4f46e5);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:white;flex-shrink:0;}
+    .about-name{font-size:21px;font-weight:900;letter-spacing:-0.8px;color:#eef2ff;margin-bottom:4px;}
     .about-role{font-size:13px;color:#818cf8;font-weight:600;margin-bottom:8px;}
-    .about-locs{display:flex;gap:8px;flex-wrap:wrap;}
+    .about-locs{display:flex;gap:7px;flex-wrap:wrap;}
     .loc-chip{background:#0c1020;border:1px solid #161e30;color:#7c88a8;font-size:11px;font-weight:600;padding:3px 10px;border-radius:6px;}
-    .about-bio{font-size:14px;color:#7c88a8;line-height:1.8;margin-bottom:24px;}
-    .about-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;}
+    .about-bio{font-size:13.5px;color:#7c88a8;line-height:1.8;margin-bottom:22px;}
+    .about-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:22px;}
     .ast{background:#0c1020;border:1px solid #161e30;border-radius:10px;padding:14px;text-align:center;}
-    .ast-v{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;color:#eef2ff;}
-    .ast-l{font-size:10px;color:#3d4a6a;text-transform:uppercase;letter-spacing:0.8px;margin-top:3px;}
-    .about-links{display:flex;gap:10px;flex-wrap:wrap;}
-    .alink{display:flex;align-items:center;gap:7px;background:#0c1020;border:1px solid #1e2840;color:#7c88a8;text-decoration:none;padding:10px 16px;border-radius:9px;font-size:13px;font-weight:600;transition:all 0.2s;}
+    .ast-v{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:#eef2ff;}
+    .ast-l{font-size:9.5px;color:#3d4a6a;text-transform:uppercase;letter-spacing:0.8px;margin-top:3px;}
+    .about-links{display:flex;gap:9px;flex-wrap:wrap;}
+    .alink{display:flex;align-items:center;gap:7px;background:#0c1020;border:1px solid #1e2840;color:#7c88a8;text-decoration:none;padding:9px 15px;border-radius:9px;font-size:12.5px;font-weight:600;transition:all 0.2s;}
     .alink:hover{border-color:#6366f1;color:#eef2ff;}
 
-    /* Papers */
-    .papers-grid{display:flex;flex-direction:column;gap:14px;}
-    .paper-card{background:#0c1020;border:1px solid #161e30;border-radius:12px;padding:20px;transition:border-color 0.2s;}
-    .paper-card:hover{border-color:#1e2840;}
-    .paper-title{font-size:14px;font-weight:700;color:#eef2ff;line-height:1.4;margin-bottom:6px;}
-    .paper-authors{font-size:12px;color:#818cf8;margin-bottom:3px;font-weight:500;}
-    .paper-venue{font-size:11px;color:#3d4a6a;font-style:italic;margin-bottom:10px;}
-    .paper-abstract{font-size:12px;color:#7c88a8;line-height:1.65;margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
-    .paper-footer{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+    /* ── Papers ─────────────────────────────────────────── */
+    .papers-grid{display:flex;flex-direction:column;gap:13px;}
+    .paper-card{background:#0c1020;border:1px solid #161e30;border-radius:12px;padding:18px;transition:border-color 0.2s;}
+    .paper-card:hover{border-color:#243048;}
+    .paper-title{font-size:13.5px;font-weight:700;color:#eef2ff;line-height:1.4;margin-bottom:5px;}
+    .paper-authors{font-size:11.5px;color:#818cf8;margin-bottom:3px;font-weight:500;}
+    .paper-venue{font-size:11px;color:#3d4a6a;font-style:italic;margin-bottom:9px;}
+    .paper-abstract{font-size:11.5px;color:#7c88a8;line-height:1.65;margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+    .paper-footer{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:7px;}
     .paper-tags{display:flex;gap:5px;flex-wrap:wrap;}
-    .ptag{background:rgba(6,182,212,0.08);border:1px solid rgba(6,182,212,0.2);color:#06b6d4;font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;}
-    .paper-year{font-family:'JetBrains Mono',monospace;font-size:11px;color:#3d4a6a;background:#070a16;border:1px solid #161e30;padding:3px 8px;border-radius:5px;}
+    .ptag{background:rgba(6,182,212,0.07);border:1px solid rgba(6,182,212,0.2);color:#06b6d4;font-size:10px;font-weight:600;padding:2px 7px;border-radius:4px;}
+    .paper-year{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#3d4a6a;background:#070a16;border:1px solid #161e30;padding:2px 7px;border-radius:5px;}
     .paper-link{font-size:12px;color:#818cf8;text-decoration:none;font-weight:600;display:flex;align-items:center;gap:4px;}
     .paper-link:hover{color:#c7d2fe;}
-    .papers-drop{background:#070a16;border:2px dashed #1e2840;border-radius:12px;padding:40px 24px;text-align:center;}
+    .papers-drop{background:#070a16;border:2px dashed rgba(99,102,241,0.2);border-radius:12px;padding:36px 22px;text-align:center;}
     .papers-drop strong{display:block;font-size:14px;color:#94a3b8;margin-bottom:6px;}
-    .papers-drop span{font-size:12px;color:#3d4a6a;}
+    .papers-drop span{font-size:12px;color:#3d4a6a;line-height:1.7;display:block;}
 
-    /* Awards */
-    .awards-grid{display:flex;flex-direction:column;gap:14px;}
-    .award-card{background:#0c1020;border:1px solid #161e30;border-radius:12px;padding:20px;position:relative;overflow:hidden;transition:all 0.2s;}
+    /* ── Awards ─────────────────────────────────────────── */
+    .awards-grid{display:flex;flex-direction:column;gap:13px;}
+    .award-card{background:#0c1020;border:1px solid #161e30;border-radius:12px;padding:18px;position:relative;overflow:hidden;transition:all 0.2s;}
     .award-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--ac,linear-gradient(90deg,#f59e0b,#fbbf24));}
-    .award-card.win{border-color:rgba(245,158,11,0.3);background:rgba(245,158,11,0.03);}
+    .award-card.win{border-color:rgba(245,158,11,0.25);background:rgba(245,158,11,0.025);}
     .award-card:hover{transform:translateY(-2px);}
-    .award-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
-    .award-trophy{font-size:28px;}
-    .award-badge{font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;border:1px solid;text-transform:uppercase;letter-spacing:0.5px;}
-    .badge-gold{border-color:rgba(245,158,11,0.5);color:#f59e0b;background:rgba(245,158,11,0.1);}
-    .badge-part{border-color:#1e2840;color:#3d4a6a;background:transparent;}
+    .award-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:9px;}
+    .award-title-wrap{}
     .award-event{font-size:14px;font-weight:700;color:#eef2ff;margin-bottom:3px;}
-    .award-project{font-size:12px;color:#818cf8;font-weight:600;margin-bottom:6px;}
+    .award-project{font-size:12px;color:#f59e0b;font-weight:600;margin-bottom:6px;}
+    .award-badge{font-size:9.5px;font-weight:700;padding:3px 10px;border-radius:20px;border:1px solid;text-transform:uppercase;letter-spacing:0.4px;flex-shrink:0;margin-top:2px;}
+    .badge-gold{border-color:rgba(245,158,11,0.45);color:#f59e0b;background:rgba(245,158,11,0.1);}
+    .badge-part{border-color:#1e2840;color:#3d4a6a;background:transparent;}
     .award-desc{font-size:12px;color:#7c88a8;line-height:1.6;}
-    .award-year{font-family:'JetBrains Mono',monospace;font-size:11px;color:#3d4a6a;margin-top:8px;}
+    .award-year{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#3d4a6a;margin-top:8px;}
 
-    /* Experience */
-    .exp-timeline{display:flex;flex-direction:column;gap:14px;}
-    .exp-card{background:#0c1020;border:1px solid #161e30;border-radius:12px;padding:20px;transition:border-color 0.2s;}
-    .exp-card:hover{border-color:#1e2840;}
-    .exp-top{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:6px;}
+    /* ── Experience ──────────────────────────────────────── */
+    .exp-timeline{display:flex;flex-direction:column;gap:13px;}
+    .exp-card{background:#0c1020;border:1px solid #161e30;border-radius:12px;padding:18px;transition:border-color 0.2s;}
+    .exp-card:hover{border-color:#243048;}
+    .exp-top{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:5px;}
     .exp-role{font-size:14px;font-weight:700;color:#eef2ff;}
     .exp-co{font-size:12px;color:#818cf8;font-weight:600;margin-top:2px;}
-    .exp-period{font-family:'JetBrains Mono',monospace;font-size:11px;color:#3d4a6a;background:#070a16;border:1px solid #161e30;padding:3px 9px;border-radius:5px;align-self:flex-start;white-space:nowrap;}
+    .exp-period{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#3d4a6a;background:#070a16;border:1px solid #161e30;padding:3px 9px;border-radius:5px;align-self:flex-start;white-space:nowrap;}
     .exp-desc{font-size:12px;color:#7c88a8;line-height:1.7;margin-top:8px;}
     .exp-stack{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px;}
-    .etag{background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.18);color:#818cf8;font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;}
+    .etag{background:rgba(99,102,241,0.07);border:1px solid rgba(99,102,241,0.16);color:#818cf8;font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;}
 
-    /* Education */
-    .edu-list{display:flex;flex-direction:column;gap:14px;}
-    .edu-card{background:#0c1020;border:1px solid #161e30;border-radius:12px;padding:22px;position:relative;overflow:hidden;}
+    /* ── Education ───────────────────────────────────────── */
+    .edu-list{display:flex;flex-direction:column;gap:13px;}
+    .edu-card{background:#0c1020;border:1px solid #161e30;border-radius:12px;padding:20px;position:relative;overflow:hidden;}
     .edu-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#6366f1,#06b6d4);}
     .edu-school{font-size:15px;font-weight:800;color:#eef2ff;margin-bottom:4px;}
     .edu-deg{font-size:13px;color:#818cf8;font-weight:600;margin-bottom:3px;}
@@ -238,39 +235,44 @@
     .edu-tags{display:flex;flex-wrap:wrap;gap:6px;}
     .eutag{background:#070a16;border:1px solid #161e30;color:#7c88a8;font-size:11px;padding:3px 9px;border-radius:5px;}
 
-    /* ── Hint overlay ──────────────────────────────────── */
-    #hint {
-      position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
-      background:rgba(12,16,32,0.9);border:1px solid #161e30;
+    /* ── Hint ────────────────────────────────────────────── */
+    #hint{
+      position:fixed;bottom:22px;left:50%;transform:translateX(-50%);
+      background:rgba(12,16,32,0.88);border:1px solid rgba(255,255,255,0.05);
       color:#3d4a6a;font-size:12px;font-weight:500;
-      padding:8px 18px;border-radius:20px;
+      padding:7px 18px;border-radius:20px;
       pointer-events:none;z-index:100;
       transition:opacity 0.4s;backdrop-filter:blur(8px);
     }
     #hint.hide{opacity:0;}
 
-    /* ── Top-left signature ────────────────────────────── */
-    #sig {
+    /* ── Sig ─────────────────────────────────────────────── */
+    #sig{
       position:fixed;top:18px;left:24px;z-index:200;
       font-size:14px;font-weight:900;color:#eef2ff;letter-spacing:-0.5px;
       pointer-events:none;
     }
     #sig em{color:#818cf8;font-style:normal;}
+
+    /* ── Active node pulse ring ──────────────────────────── */
+    @keyframes ringpulse{
+      0%{box-shadow:0 0 0 0 var(--np,rgba(99,102,241,0.5));}
+      70%{box-shadow:0 0 0 12px transparent;}
+      100%{box-shadow:0 0 0 0 transparent;}
+    }
+    .node.active .nring{animation:ringpulse 1.8s ease-out infinite;}
   </style>
 </head>
 <body>
 
-<!-- Background -->
 <div id="bg">
   <div class="orb orb1"></div>
   <div class="orb orb2"></div>
   <div class="orb orb3"></div>
 </div>
 
-<!-- Signature -->
 <div id="sig">BN<em>.</em></div>
 
-<!-- Tree canvas -->
 <div id="tree">
   <div class="zoom-canvas" id="zc">
     <svg id="svg-layer"></svg>
@@ -278,65 +280,61 @@
   </div>
 </div>
 
-<!-- Content panel -->
-<div id="panel">
-  <div class="panel-topbar">
+<div id="zoom-backdrop"></div>
+
+<div id="content-card">
+  <div class="card-topbar">
     <button class="back-btn" id="backBtn">
       <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
       Back
     </button>
-    <span class="panel-node-icon" id="pIcon"></span>
-    <div>
-      <div class="panel-node-name" id="pName"></div>
-      <div class="panel-node-sub"  id="pSub"></div>
+    <div class="card-title-wrap">
+      <div class="card-title" id="cTitle"></div>
+      <div class="card-sub"  id="cSub"></div>
     </div>
   </div>
-  <div class="panel-body" id="pBody"></div>
+  <div class="card-body" id="cBody"></div>
 </div>
 
-<!-- Hint -->
 <div id="hint">✦ Click a node to explore</div>
 
 <script>
-// ── Node definitions ────────────────────────────────────────────────────
-// x, y as percentage of container width/height
+// ── Node definitions ─────────────────────────────────────────────────────
 const NODES = {
-  root: {
+  root:{
     type:'root', label:'Bharani Nammi',
     x:50, y:50,
     color:'#6366f1', glow:'rgba(99,102,241,0.5)',
     children:['papers','awards','exp','edu'],
   },
-  papers: {
-    type:'cat', icon:'📄', label:'Research\nPapers',
-    x:26, y:20, color:'#06b6d4', glow:'rgba(6,182,212,0.45)',
+  papers:{
+    type:'cat', label:'Research\nPapers',
+    x:26, y:20, color:'#06b6d4', glow:'rgba(6,182,212,0.4)',
     badge:null, badgeClass:'',
     children:['p1','p2'],
   },
-  awards: {
-    type:'cat', icon:'🏆', label:'Awards\n& Wins',
-    x:74, y:20, color:'#f59e0b', glow:'rgba(245,158,11,0.45)',
+  awards:{
+    type:'cat', label:'Awards\n& Wins',
+    x:74, y:20, color:'#f59e0b', glow:'rgba(245,158,11,0.4)',
     badge:'2× Winner', badgeClass:'badge-gold',
     children:['a1','a2'],
   },
-  exp: {
-    type:'cat', icon:'💼', label:'Experience',
-    x:78, y:72, color:'#8b5cf6', glow:'rgba(139,92,246,0.45)',
+  exp:{
+    type:'cat', label:'Experience',
+    x:78, y:72, color:'#8b5cf6', glow:'rgba(139,92,246,0.4)',
     badge:null, badgeClass:'',
     children:[],
   },
-  edu: {
-    type:'cat', icon:'🎓', label:'Education',
-    x:22, y:72, color:'#10b981', glow:'rgba(16,185,129,0.45)',
+  edu:{
+    type:'cat', label:'Education',
+    x:22, y:72, color:'#10b981', glow:'rgba(16,185,129,0.4)',
     badge:null, badgeClass:'',
     children:[],
   },
-  // paper sub-nodes
-  p1: { type:'leaf', icon:'📝', label:'Paper 1', x:12, y:9, color:'#67e8f9', glow:'rgba(103,232,249,0.3)', parent:'papers' },
-  p2: { type:'leaf', icon:'📝', label:'Paper 2', x:26, y:7, color:'#67e8f9', glow:'rgba(103,232,249,0.3)', parent:'papers' },
-  // award sub-nodes
-  a1: { type:'leaf', icon:'🥇', label:'insARance', x:74, y:7,  color:'#fbbf24', glow:'rgba(251,191,36,0.3)', parent:'awards' },
-  a2: { type:'leaf', icon:'🥇', label:'WeCare',   x:86, y:20, color:'#fbbf24', glow:'rgba(251,191,36,0.3)', parent:'awards' },
+  p1:{ type:'leaf', label:'Paper 1', x:12, y:9,  color:'#67e8f9', glow:'rgba(103,232,249,0.3)', parent:'papers' },
+  p2:{ type:'leaf', label:'Paper 2', x:28, y:6,  color:'#67e8f9', glow:'rgba(103,232,249,0.3)', parent:'papers' },
+  a1:{ type:'leaf', label:'insARance', x:74, y:7,  color:'#fbbf24', glow:'rgba(251,191,36,0.3)', parent:'awards' },
+  a2:{ type:'leaf', label:'WeCare',   x:87, y:20, color:'#fbbf24', glow:'rgba(251,191,36,0.3)', parent:'awards' },
 };
 
 const EDGES = [
@@ -350,10 +348,10 @@ const EDGES = [
   ['awards','a2','#f59e0b'],
 ];
 
-// ── Content ─────────────────────────────────────────────────────────────
+// ── Content ──────────────────────────────────────────────────────────────
 const CONTENT = {
-  root: {
-    icon:'🧠', name:'Bharani Nammi', sub:'Deep Learning Engineer & Researcher',
+  root:{
+    title:'Bharani Nammi', sub:'Deep Learning Engineer & Researcher', subColor:'#818cf8',
     html:`
     <div class="about-hero">
       <div class="about-avatar">BN</div>
@@ -362,21 +360,21 @@ const CONTENT = {
         <div class="about-role">Deep Learning Engineer & AI Researcher</div>
         <div class="about-locs">
           <span class="loc-chip">📍 Dallas, TX</span>
-          <span class="loc-chip">🎓 MS CS · UTA</span>
-          <span class="loc-chip">🔬 Open to Research Roles</span>
+          <span class="loc-chip">MS CS · UTA</span>
+          <span class="loc-chip">Open to Research Roles</span>
         </div>
       </div>
     </div>
     <div class="about-bio">
       I build production-grade deep learning systems — from time series forecasting
       and computer vision to augmented reality. My work spans the full pipeline:
-      ideation, research, training on GPU clusters, and deployment. I'm passionate
-      about pushing the frontier of applied AI and publishing novel findings.
+      ideation, research, training on GPU clusters, and deployment. Passionate about
+      pushing the frontier of applied AI.
     </div>
     <div class="about-stats">
       <div class="ast"><div class="ast-v">6+</div><div class="ast-l">Years</div></div>
       <div class="ast"><div class="ast-v">2×</div><div class="ast-l">Hackathon Winner</div></div>
-      <div class="ast"><div class="ast-v">9</div><div class="ast-l">Competitions</div></div>
+      <div class="ast"><div class="ast-v">9</div><div class="ast-l">Hackathons</div></div>
       <div class="ast"><div class="ast-v">MS</div><div class="ast-l">CS · UTA</div></div>
     </div>
     <div class="about-links">
@@ -395,82 +393,84 @@ const CONTENT = {
     </div>`
   },
 
-  papers: {
-    icon:'📄', name:'Research Papers', sub:'Academic publications in deep learning & AI',
-    subColor:'#06b6d4',
+  papers:{
+    title:'Research Papers', sub:'Academic publications in deep learning & AI', subColor:'#06b6d4',
     html:`
     <div class="papers-grid" id="papersGrid">
       <div class="papers-drop">
-        <strong>📄 Drop your papers here</strong>
-        <span>Share paper titles, PDFs, or abstracts and I'll add them with full formatting — venue, year, abstract, tags, and DOI link.</span>
+        <strong>Drop your papers here</strong>
+        <span>Share paper titles, PDFs, or abstracts in chat and I'll add them with full formatting — venue, year, abstract, tags, and DOI link.</span>
       </div>
     </div>`
   },
 
-  awards: {
-    icon:'🏆', name:'Awards & Recognition', sub:'Hackathon wins and competition history',
-    subColor:'#f59e0b',
+  awards:{
+    title:'Awards & Recognition', sub:'Hackathon wins and competition history', subColor:'#f59e0b',
     html:`
     <div class="awards-grid">
 
       <div class="award-card win" style="--ac:linear-gradient(90deg,#f59e0b,#fbbf24)">
         <div class="award-top">
-          <span class="award-trophy">🏆</span>
+          <div class="award-title-wrap">
+            <div class="award-event">Facebook AR Hackathon 2020</div>
+            <div class="award-project">insARance — Augmented Reality Insurance App</div>
+          </div>
           <span class="award-badge badge-gold">Winner</span>
         </div>
-        <div class="award-event">Facebook AR Hackathon 2020</div>
-        <div class="award-project">insARance — Augmented Reality Insurance App</div>
         <div class="award-desc">Built an AR application that overlays real-time insurance information on physical objects using the camera. Won against teams from top universities across the region.</div>
         <div class="award-year">2020 · Facebook-sponsored</div>
       </div>
 
       <div class="award-card win" style="--ac:linear-gradient(90deg,#f59e0b,#fbbf24)">
         <div class="award-top">
-          <span class="award-trophy">🏆</span>
+          <div class="award-title-wrap">
+            <div class="award-event">Hackathon Win · 2020</div>
+            <div class="award-project">WeCare — Post-Accident Information App</div>
+          </div>
           <span class="award-badge badge-gold">Winner</span>
         </div>
-        <div class="award-event">Hackathon Win · 2020</div>
-        <div class="award-project">WeCare — Post-Accident Information App</div>
-        <div class="award-desc">Streamlined information exchange between parties after vehicle accidents — reducing friction, improving accuracy of incident documentation using AI-assisted data capture.</div>
+        <div class="award-desc">Streamlined information exchange between parties after vehicle accidents — reducing friction and improving accuracy of incident documentation using AI-assisted data capture.</div>
         <div class="award-year">2020</div>
       </div>
 
       <div class="award-card" style="--ac:linear-gradient(90deg,#6366f1,#818cf8)">
         <div class="award-top">
-          <span class="award-trophy">🎖</span>
+          <div class="award-title-wrap">
+            <div class="award-event">Microsoft Azure Hack</div>
+            <div class="award-project">Accessibility Challenge</div>
+          </div>
           <span class="award-badge badge-part">Participant</span>
         </div>
-        <div class="award-event">Microsoft Azure Hack</div>
-        <div class="award-project">Accessibility Challenge</div>
         <div class="award-year">2020–21</div>
       </div>
 
       <div class="award-card" style="--ac:linear-gradient(90deg,#6366f1,#818cf8)">
         <div class="award-top">
-          <span class="award-trophy">🎖</span>
+          <div class="award-title-wrap">
+            <div class="award-event">T-Mobile Hacktober</div>
+            <div class="award-project">Innovation Challenge</div>
+          </div>
           <span class="award-badge badge-part">Participant</span>
         </div>
-        <div class="award-event">T-Mobile Hacktober</div>
-        <div class="award-project">Innovation Challenge (2019 & 2020)</div>
         <div class="award-year">2019, 2020 · Richardson, TX</div>
       </div>
 
       <div class="award-card" style="--ac:linear-gradient(90deg,#6366f1,#818cf8)">
         <div class="award-top">
-          <span class="award-trophy">🎖</span>
+          <div class="award-title-wrap">
+            <div class="award-event">Facebook AI Hack · HackDFW · HackUTD</div>
+            <div class="award-project">9 total hackathons competed — Texas circuit</div>
+          </div>
           <span class="award-badge badge-part">Participant</span>
         </div>
-        <div class="award-event">Facebook AI Hackathon · HackDFW · HackUTD</div>
-        <div class="award-project">Multiple events, 9 total hackathons competed</div>
-        <div class="award-year">2018 – 2021 · Texas circuit</div>
+        <div class="award-year">2018 – 2021</div>
       </div>
 
     </div>`
   },
 
-  exp: {
-    icon:'💼', name:'Experience', sub:'Professional work history',
-    subColor:'#8b5cf6',
+  exp:{
+    title:'Experience', sub:'Professional work history', subColor:'#8b5cf6',
     html:`
     <div class="exp-timeline">
       <div class="exp-card">
@@ -504,9 +504,8 @@ const CONTENT = {
     </div>`
   },
 
-  edu: {
-    icon:'🎓', name:'Education', sub:'Academic background',
-    subColor:'#10b981',
+  edu:{
+    title:'Education', sub:'Academic background', subColor:'#10b981',
     html:`
     <div class="edu-list">
       <div class="edu-card">
@@ -535,13 +534,13 @@ const CONTENT = {
   },
 };
 
-// ── Render ───────────────────────────────────────────────────────────────
+// ── Render tree ──────────────────────────────────────────────────────────
 const tree = document.getElementById('tree');
 const zc   = document.getElementById('zc');
 const svg  = document.getElementById('svg-layer');
 const wrap = document.getElementById('nodes-wrap');
 
-function vw(){ return tree.clientWidth || window.innerWidth; }
+function vw(){ return window.innerWidth; }
 function vh(){ return window.innerHeight; }
 function px(pct, dim){ return pct / 100 * dim; }
 
@@ -550,7 +549,7 @@ function renderTree(){
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
   svg.innerHTML = '';
 
-  // Draw edges
+  // Edges
   for(const [a, b, color] of EDGES){
     const na = NODES[a], nb = NODES[b];
     if(!na||!nb) continue;
@@ -558,27 +557,28 @@ function renderTree(){
     const x2=px(nb.x,W), y2=px(nb.y,H);
     const mx=(x1+x2)/2, my=(y1+y2)/2;
     const dx=x2-x1, dy=y2-y1;
-    const cx=mx-dy*0.12, cy=my+dx*0.12;
+    const cx=mx-dy*0.1, cy=my+dx*0.1;
     const path=document.createElementNS('http://www.w3.org/2000/svg','path');
     path.setAttribute('d',`M${x1},${y1} Q${cx},${cy} ${x2},${y2}`);
     path.setAttribute('class','edge');
-    path.setAttribute('stroke', color+'55');
+    path.setAttribute('stroke', color+'44');
     svg.appendChild(path);
   }
 
-  // Draw nodes
+  // Nodes
   wrap.innerHTML='';
   for(const [key, n] of Object.entries(NODES)){
-    const el=document.createElement('div');
-    const x=px(n.x,W), y=px(n.y,H);
+    const el = document.createElement('div');
+    const x  = px(n.x, W), y = px(n.y, H);
+    el.id = `node-${key}`;
+    el.style.left = x+'px';
+    el.style.top  = y+'px';
 
     if(n.type==='root'){
-      el.className='node node-root';
-      el.id=`node-${key}`;
-      el.style.left=x+'px'; el.style.top=y+'px';
-      el.innerHTML=`
-        <div class="nglow" style="width:180px;height:180px;top:-35px;left:-35px;background:radial-gradient(circle,${n.glow},transparent 65%)"></div>
-        <div class="nring" style="background:linear-gradient(135deg,rgba(99,102,241,0.22),rgba(99,102,241,0.06));border-color:${n.color};box-shadow:0 0 32px rgba(99,102,241,0.2)">
+      el.className = 'node node-root';
+      el.innerHTML = `
+        <div class="nglow" style="width:200px;height:200px;top:-41px;left:-41px;background:radial-gradient(circle,${n.glow},transparent 65%)"></div>
+        <div class="nring" style="--np:${n.glow};background:linear-gradient(135deg,rgba(99,102,241,0.2),rgba(99,102,241,0.05));border-color:${n.color};box-shadow:0 0 36px rgba(99,102,241,0.18)">
           <div class="root-init">
             <div class="root-av">BN</div>
             <div class="root-name">Bharani Nammi</div>
@@ -586,43 +586,38 @@ function renderTree(){
           </div>
         </div>`;
     } else if(n.type==='cat'){
-      el.className='node node-cat';
-      el.id=`node-${key}`;
-      el.style.left=x+'px'; el.style.top=y+'px';
-      el.innerHTML=`
-        <div class="nglow" style="width:110px;height:110px;top:-20px;left:-20px;background:radial-gradient(circle,${n.glow},transparent 65%)"></div>
-        <div class="nring" style="background:${n.color}18;border-color:${n.color}55;box-shadow:0 0 18px ${n.glow.replace('0.45','0.12')}">
-          <span class="nicon">${n.icon}</span>
+      el.className = 'node node-cat';
+      el.innerHTML = `
+        <div class="nglow" style="width:120px;height:120px;top:-24px;left:-24px;background:radial-gradient(circle,${n.glow},transparent 65%)"></div>
+        <div class="nring" style="--np:${n.glow};background:${n.color}12;border-color:${n.color}50;box-shadow:0 0 20px ${n.color}18">
+          <div class="ndot" style="background:${n.color}"></div>
         </div>
         <div class="nlabel">${n.label.replace('\n','<br>')}</div>
-        ${n.badge?`<span class="nbadge ${n.badgeClass}" style="border-color:${n.color}66;color:${n.color}">${n.badge}</span>`:''}`;
+        ${n.badge?`<span class="nbadge ${n.badgeClass}" style="border-color:${n.color}55;color:${n.color}">${n.badge}</span>`:''}`;
     } else {
-      el.className='node node-leaf';
-      el.id=`node-${key}`;
-      el.style.left=x+'px'; el.style.top=y+'px';
-      el.innerHTML=`
-        <div class="nglow" style="width:75px;height:75px;top:-13px;left:-13px;background:radial-gradient(circle,${n.glow},transparent 65%)"></div>
-        <div class="nring" style="background:${n.color}15;border-color:${n.color}44;box-shadow:0 0 10px ${n.glow.replace('0.3','0.08')}">
-          <span class="nicon">${n.icon}</span>
+      el.className = 'node node-leaf';
+      el.innerHTML = `
+        <div class="nglow" style="width:80px;height:80px;top:-16px;left:-16px;background:radial-gradient(circle,${n.glow},transparent 65%)"></div>
+        <div class="nring" style="--np:${n.glow};background:${n.color}10;border-color:${n.color}40;box-shadow:0 0 10px ${n.color}10">
+          <div class="ndot" style="background:${n.color}"></div>
         </div>
         <div class="nlabel">${n.label}</div>`;
     }
 
-    // Click handler
     const targetKey = n.parent || key;
-    el.addEventListener('click',(e)=>{ e.stopPropagation(); openPanel(targetKey, key); });
+    el.addEventListener('click', e => { e.stopPropagation(); openCard(targetKey, key); });
     wrap.appendChild(el);
   }
 }
 
-// ── Panel ────────────────────────────────────────────────────────────────
+// ── Card open / close ────────────────────────────────────────────────────
 let activeKey = null;
 
-function openPanel(key, clickedKey){
+function openCard(key, clickedKey){
   const c = CONTENT[key];
   if(!c) return;
 
-  // Highlight active nodes
+  // Highlight node
   document.querySelectorAll('.node').forEach(n=>n.classList.remove('active'));
   document.getElementById(`node-${clickedKey}`)?.classList.add('active');
   document.getElementById(`node-${key}`)?.classList.add('active');
@@ -631,42 +626,40 @@ function openPanel(key, clickedKey){
   const n = NODES[clickedKey] || NODES[key];
   const W = vw(), H = vh();
   const nx = px(n.x, W), ny = px(n.y, H);
-  const scale = n.type==='root' ? 1.2 : 1.5;
+  const scale = n.type==='root' ? 1.6 : 2.8;
   zc.style.transformOrigin = `${nx}px ${ny}px`;
   zc.style.transform = `scale(${scale})`;
 
-  // Fill panel
-  document.getElementById('pIcon').textContent = c.icon;
-  document.getElementById('pName').textContent = c.name;
-  document.getElementById('pSub').textContent  = c.sub;
-  document.getElementById('pSub').style.color  = c.subColor||'#7c88a8';
-  document.getElementById('pBody').innerHTML   = c.html;
+  // Fill card
+  document.getElementById('cTitle').textContent = c.title;
+  document.getElementById('cSub').textContent   = c.sub;
+  document.getElementById('cSub').style.color   = c.subColor || '#7c88a8';
+  document.getElementById('cBody').innerHTML    = c.html;
 
   document.getElementById('hint').classList.add('hide');
-  document.body.classList.add('panel-open');
+  document.body.classList.add('zoomed-in');
   activeKey = key;
 }
 
-function closePanel(){
-  document.body.classList.remove('panel-open');
-  zc.style.transform = 'scale(1)';
-  zc.style.transformOrigin = '50% 50%';
+function closeCard(){
+  document.body.classList.remove('zoomed-in');
+  // small delay so backdrop fades first, then reset zoom
+  setTimeout(()=>{
+    zc.style.transform = 'scale(1)';
+    zc.style.transformOrigin = '50% 50%';
+  }, 120);
   document.querySelectorAll('.node').forEach(n=>n.classList.remove('active'));
   document.getElementById('hint').classList.remove('hide');
   activeKey = null;
 }
 
-document.getElementById('backBtn').addEventListener('click', closePanel);
-tree.addEventListener('click', ()=>{ if(activeKey) closePanel(); });
+document.getElementById('backBtn').addEventListener('click', closeCard);
+document.getElementById('zoom-backdrop').addEventListener('click', closeCard);
+document.getElementById('content-card').addEventListener('click', e=>e.stopPropagation());
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeCard(); });
+window.addEventListener('resize', renderTree);
 
-// Prevent panel click from closing
-document.getElementById('panel').addEventListener('click', e=>e.stopPropagation());
-
-window.addEventListener('resize', ()=>{ if(!activeKey) renderTree(); else { renderTree(); } });
 renderTree();
-
-// ── ESC key ──────────────────────────────────────────────────────────────
-document.addEventListener('keydown', e=>{ if(e.key==='Escape') closePanel(); });
 </script>
 </body>
 </html>
