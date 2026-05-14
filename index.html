@@ -339,8 +339,8 @@ const NODES = {
     badge:null, badgeClass:'',
     children:[],
   },
-  p1:{ type:'leaf', label:'Paper 1', x:12, y:9,  color:'#67e8f9', glow:'rgba(103,232,249,0.3)', parent:'papers' },
-  p2:{ type:'leaf', label:'Paper 2', x:28, y:6,  color:'#67e8f9', glow:'rgba(103,232,249,0.3)', parent:'papers' },
+  p1:{ type:'leaf', label:'CRISPR\nClassifier', x:12, y:9,  color:'#67e8f9', glow:'rgba(103,232,249,0.3)', parent:'papers' },
+  p2:{ type:'leaf', label:'CasGen',            x:28, y:6,  color:'#67e8f9', glow:'rgba(103,232,249,0.3)', parent:'papers' },
   a1:{ type:'leaf', label:'insARance', x:74, y:7,  color:'#fbbf24', glow:'rgba(251,191,36,0.3)', parent:'awards' },
   a2:{ type:'leaf', label:'WeCare',   x:87, y:20, color:'#fbbf24', glow:'rgba(251,191,36,0.3)', parent:'awards' },
 };
@@ -410,11 +410,55 @@ const CONTENT = {
   papers:{
     title:'Research Papers', sub:'Academic publications in deep learning & AI', subColor:'#06b6d4',
     html:`
-    <div class="papers-drop" style="margin-bottom:20px">
-      <strong>Drop your paper PDFs in the chat</strong>
-      <span>I'll extract the title, authors, venue, abstract, and tags automatically and add each paper as a card below.</span>
-    </div>
-    <div class="two-col" id="papersGrid"></div>`
+    <div class="two-col" id="papersGrid">
+
+      <div class="paper-card">
+        <div class="paper-title">Transformer-Based Deep Learning Model with Latent Space Regularization for CRISPR-Cas Protein Sequence Classification</div>
+        <div class="paper-authors">B. Nammi, S. S. Madugula, P. Pujar, V. Arachchige, J. Lui, S. Wang</div>
+        <div class="paper-venue">bioRxiv · Bioinformatics</div>
+        <div class="paper-abstract">The discovery of the CRISPR-Cas system has significantly advanced genome editing. We developed two deep learning models: a transformer encoder trained from scratch with a novel margin-based loss function for latent space regularization, and a fine-tuned ProtBert large protein language model. The LSRMT model achieved classification accuracies of 99.81% for CAS9 vs. Non-CAS and 99.27% for multi-class tasks — outperforming the fine-tuned state-of-the-art large protein model even on a significantly smaller dataset.</div>
+        <div class="paper-footer">
+          <div class="paper-tags">
+            <span class="ptag">Transformer</span>
+            <span class="ptag">CRISPR-Cas</span>
+            <span class="ptag">Protein Classification</span>
+            <span class="ptag">Deep Learning</span>
+            <span class="ptag">ProtBert</span>
+          </div>
+          <span class="paper-year">2024</span>
+        </div>
+        <div style="margin-top:10px">
+          <a class="paper-link" href="https://www.biorxiv.org/content/10.1101/2024.03.02.583136v1" target="_blank">
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            bioRxiv · 10.1101/2024.03.02.583136
+          </a>
+        </div>
+      </div>
+
+      <div class="paper-card">
+        <div class="paper-title">CasGen: A Regularized Generative Model for CRISPR Cas Protein Design with Classification and Margin-Based Optimization</div>
+        <div class="paper-authors">B. Nammi, V. M. Jayasinghe-Arachchige, S. S. Madugula, M. Artiles, C. N. Radler, T. Pham, J. Liu, S. Wang</div>
+        <div class="paper-venue">bioRxiv · Genomics</div>
+        <div class="paper-abstract">We developed CasGen, a novel transformer-based deep generative model with margin-based latent space regularization for designing novel Cas9 and Cas12 proteins. CasGen combines classification to filter non-Cas sequences, Bayesian optimization of the latent space, and structural validation via AlphaFold2/3. Generated proteins achieved TM-scores between 0.70–0.85 and RMSD below 2.00 Å, with Cas9 orthologs showing 28–55% identity to known variants — demonstrating significant potential to expand the genome editing toolkit.</div>
+        <div class="paper-footer">
+          <div class="paper-tags">
+            <span class="ptag">Generative Model</span>
+            <span class="ptag">CRISPR-Cas</span>
+            <span class="ptag">Protein Design</span>
+            <span class="ptag">AlphaFold</span>
+            <span class="ptag">Bayesian Opt</span>
+          </div>
+          <span class="paper-year">2025</span>
+        </div>
+        <div style="margin-top:10px">
+          <a class="paper-link" href="https://www.biorxiv.org/content/10.1101/2025.02.28.640911v1" target="_blank">
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            bioRxiv · 10.1101/2025.02.28.640911
+          </a>
+        </div>
+      </div>
+
+    </div>`
   },
 
   awards:{
