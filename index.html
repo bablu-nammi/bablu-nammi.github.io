@@ -218,6 +218,7 @@
     .award-badge{font-size:9.5px;font-weight:700;padding:3px 10px;border-radius:20px;border:1px solid;text-transform:uppercase;letter-spacing:0.4px;flex-shrink:0;margin-top:2px;}
     .badge-gold{border-color:rgba(245,158,11,0.45);color:#f59e0b;background:rgba(245,158,11,0.1);}
     .badge-part{border-color:#1e2840;color:#3d4a6a;background:transparent;}
+    .badge-papers{border-color:rgba(6,182,212,0.45);color:#06b6d4;background:rgba(6,182,212,0.1);}
     .award-desc{font-size:12px;color:#7c88a8;line-height:1.6;}
     .award-year{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#3d4a6a;margin-top:8px;}
 
@@ -359,8 +360,8 @@ const NODES = {
   papers:{
     type:'cat', label:'Research\nPapers',
     x:26, y:20, color:'#06b6d4', glow:'rgba(6,182,212,0.4)',
-    badge:null, badgeClass:'',
-    children:['p1','p2'],
+    badge:'3 Papers', badgeClass:'badge-papers',
+    children:['p1','p2','p3'],
   },
   awards:{
     type:'cat', label:'Awards\n& Wins',
@@ -380,8 +381,9 @@ const NODES = {
     badge:null, badgeClass:'',
     children:[],
   },
-  p1:{ type:'leaf', label:'CRISPR\nClassifier', x:12, y:9,  color:'#67e8f9', glow:'rgba(103,232,249,0.3)', parent:'papers' },
-  p2:{ type:'leaf', label:'CasGen',            x:28, y:6,  color:'#67e8f9', glow:'rgba(103,232,249,0.3)', parent:'papers' },
+  p1:{ type:'leaf', label:'CRISPR\nClassifier', x:10, y:9,  color:'#67e8f9', glow:'rgba(103,232,249,0.3)', parent:'papers' },
+  p2:{ type:'leaf', label:'CasGen',             x:26, y:5,  color:'#67e8f9', glow:'rgba(103,232,249,0.3)', parent:'papers' },
+  p3:{ type:'leaf', label:'Cas Feature\nML',    x:14, y:4,  color:'#67e8f9', glow:'rgba(103,232,249,0.3)', parent:'papers' },
   a1:{ type:'leaf', label:'insARance', x:74, y:7,  color:'#fbbf24', glow:'rgba(251,191,36,0.3)', parent:'awards' },
   a2:{ type:'leaf', label:'WeCare',   x:87, y:20, color:'#fbbf24', glow:'rgba(251,191,36,0.3)', parent:'awards' },
 };
@@ -393,6 +395,7 @@ const EDGES = [
   ['root','edu','#6366f1'],
   ['papers','p1','#06b6d4'],
   ['papers','p2','#06b6d4'],
+  ['papers','p3','#06b6d4'],
   ['awards','a1','#f59e0b'],
   ['awards','a2','#f59e0b'],
 ];
@@ -449,57 +452,45 @@ const CONTENT = {
   },
 
   papers:{
-    title:'Research Papers', sub:'Academic publications in deep learning & AI', subColor:'#06b6d4',
+    title:'Research Papers', sub:'3 publications in deep learning, bioinformatics & AI', subColor:'#06b6d4',
     html:`
     <div class="two-col" id="papersGrid">
 
-      <div class="paper-card">
-        <div class="paper-title">Transformer-Based Deep Learning Model with Latent Space Regularization for CRISPR-Cas Protein Sequence Classification</div>
-        <div class="paper-authors">B. Nammi, S. S. Madugula, P. Pujar, V. Arachchige, J. Lui, S. Wang</div>
-        <div class="paper-venue">bioRxiv · Bioinformatics</div>
-        <div class="paper-abstract">The discovery of the CRISPR-Cas system has significantly advanced genome editing. We developed two deep learning models: a transformer encoder trained from scratch with a novel margin-based loss function for latent space regularization, and a fine-tuned ProtBert large protein language model. The LSRMT model achieved classification accuracies of 99.81% for CAS9 vs. Non-CAS and 99.27% for multi-class tasks — outperforming the fine-tuned state-of-the-art large protein model even on a significantly smaller dataset.</div>
+      <div class="paper-card" style="cursor:default">
+        <div class="paper-title">Transformer + Latent Space Regularization for CRISPR-Cas Protein Classification</div>
+        <div class="paper-authors">B. Nammi et al.</div>
+        <div class="paper-venue">bioRxiv · Bioinformatics · 2024</div>
+        <div class="paper-abstract">Novel margin-based loss for latent space regularization. LSRMT achieves 99.81% on CAS9 vs Non-CAS — outperforming fine-tuned ProtBert on a smaller dataset.</div>
         <div class="paper-footer">
-          <div class="paper-tags">
-            <span class="ptag">Transformer</span>
-            <span class="ptag">CRISPR-Cas</span>
-            <span class="ptag">Protein Classification</span>
-            <span class="ptag">Deep Learning</span>
-            <span class="ptag">ProtBert</span>
-          </div>
+          <div class="paper-tags"><span class="ptag">Transformer</span><span class="ptag">CRISPR-Cas</span><span class="ptag">ProtBert</span></div>
           <span class="paper-year">2024</span>
         </div>
-        <div style="margin-top:10px">
-          <a class="paper-link" href="https://www.biorxiv.org/content/10.1101/2024.03.02.583136v1" target="_blank">
-            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-            bioRxiv · 10.1101/2024.03.02.583136
-          </a>
-        </div>
       </div>
 
-      <div class="paper-card">
-        <div class="paper-title">CasGen: A Regularized Generative Model for CRISPR Cas Protein Design with Classification and Margin-Based Optimization</div>
-        <div class="paper-authors">B. Nammi, V. M. Jayasinghe-Arachchige, S. S. Madugula, M. Artiles, C. N. Radler, T. Pham, J. Liu, S. Wang</div>
-        <div class="paper-venue">bioRxiv · Genomics</div>
-        <div class="paper-abstract">We developed CasGen, a novel transformer-based deep generative model with margin-based latent space regularization for designing novel Cas9 and Cas12 proteins. CasGen combines classification to filter non-Cas sequences, Bayesian optimization of the latent space, and structural validation via AlphaFold2/3. Generated proteins achieved TM-scores between 0.70–0.85 and RMSD below 2.00 Å, with Cas9 orthologs showing 28–55% identity to known variants — demonstrating significant potential to expand the genome editing toolkit.</div>
+      <div class="paper-card" style="cursor:default">
+        <div class="paper-title">CasGen: Generative Model for CRISPR Cas Protein Design</div>
+        <div class="paper-authors">B. Nammi et al.</div>
+        <div class="paper-venue">bioRxiv · Genomics · 2025</div>
+        <div class="paper-abstract">Transformer-based generative model with Bayesian latent space optimization. Generated proteins validated with AlphaFold2/3 — TM-scores 0.70–0.85, RMSD &lt; 2Å.</div>
         <div class="paper-footer">
-          <div class="paper-tags">
-            <span class="ptag">Generative Model</span>
-            <span class="ptag">CRISPR-Cas</span>
-            <span class="ptag">Protein Design</span>
-            <span class="ptag">AlphaFold</span>
-            <span class="ptag">Bayesian Opt</span>
-          </div>
+          <div class="paper-tags"><span class="ptag">Generative</span><span class="ptag">AlphaFold</span><span class="ptag">Bayesian Opt</span></div>
           <span class="paper-year">2025</span>
         </div>
-        <div style="margin-top:10px">
-          <a class="paper-link" href="https://www.biorxiv.org/content/10.1101/2025.02.28.640911v1" target="_blank">
-            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-            bioRxiv · 10.1101/2025.02.28.640911
-          </a>
+      </div>
+
+      <div class="paper-card" style="cursor:default">
+        <div class="paper-title">Family-Specific Features in Cas9 & Cas12: A Machine Learning Approach</div>
+        <div class="paper-authors">S. S. Madugula, B. Nammi et al.</div>
+        <div class="paper-venue">J. Chem. Inf. Model. · ACS · 2024</div>
+        <div class="paper-abstract">Random Forest on 13,494 protein features. Cas9 classifier 95% acc, Cas12 92% acc, multi-class F1 ~0.98. Identified conserved catalytic tripeptides (PWN, PYY, HHA, DHI).</div>
+        <div class="paper-footer">
+          <div class="paper-tags"><span class="ptag">Random Forest</span><span class="ptag">Protein Features</span><span class="ptag">ACS</span></div>
+          <span class="paper-year">2024</span>
         </div>
       </div>
 
-    </div>`
+    </div>
+    <p style="font-size:11.5px;color:#3d4a6a;margin-top:16px;text-align:center">Click individual paper nodes on the tree for full details ↗</p>`
   },
 
   awards:{
@@ -695,6 +686,54 @@ const CONTENT = {
           <div class="pd-stat-row"><span class="pd-stat-key">DOI</span><span class="pd-stat-val" style="font-size:10px">10.1101/2025.02.28.640911</span></div>
           <div class="pd-stat-row"><span class="pd-stat-key">Published</span><span class="pd-stat-val">Mar 2025</span></div>
           <div class="pd-stat-row"><span class="pd-stat-key">Server</span><span class="pd-stat-val">bioRxiv</span></div>
+        </div>
+      </div>
+    </div>`
+  },
+
+  p3:{
+    title:'Cas9 & Cas12 Feature Identification', sub:'J. Chem. Inf. Model. · 2024 · Published', subColor:'#06b6d4',
+    html:`
+    <div class="paper-detail">
+      <div class="paper-detail-left">
+        <div class="pd-venue-row">
+          <span class="pd-venue">J. Chem. Inf. Model.</span><span class="pd-dot">·</span>
+          <span class="pd-venue">Vol 64, No 12</span><span class="pd-dot">·</span>
+          <span class="pd-year">June 2024</span>
+          <span class="nbadge badge-papers" style="margin-left:4px">Published</span>
+        </div>
+        <div class="pd-title">Identification of Family-Specific Features in Cas9 and Cas12 Proteins: A Machine Learning Approach Using Complete Protein Feature Spectrum</div>
+        <div class="pd-authors">S. S. Madugula, P. Pujar, Bharani Nammi, S. Wang, V. M. Jayasinghe-Arachchige, T. Pham, D. Mashburn, M. Artiles, J. Liu<br><span style="color:#3d4a6a;font-size:11px">University of Texas at Arlington · pp. 4897–4911</span></div>
+        <div class="pd-section-label">Abstract</div>
+        <div class="pd-abstract">The study employs Random Forest machine learning models to identify distinguishing protein features between Cas9, Cas12, and non-Cas proteins using 13,494 features encoding physiochemical and structural information. Binary classifiers achieved 92% and 95% accuracy for Cas12 and Cas9 respectively, while the multiclass model reached an F1 score near 0.98. Key findings show that Quasi-Sequence-Order and Composition descriptors predominate in Cas12 proteins, while Amino Acid and Tripeptide Composition descriptors characterize Cas9 proteins. Conserved tripeptides (PWN, PYY, HHA, DHI) within catalytically important domains were identified, with documented roles in DNA cleavage and PAM recognition activities.</div>
+        <div class="pd-tags">
+          <span class="ptag">Random Forest</span><span class="ptag">CRISPR-Cas</span>
+          <span class="ptag">Protein Features</span><span class="ptag">Machine Learning</span>
+          <span class="ptag">Cas9 / Cas12</span><span class="ptag">Bioinformatics</span>
+        </div>
+      </div>
+      <div class="paper-detail-right">
+        <a class="pd-read-btn" href="https://pubs.acs.org/doi/10.1021/acs.jcim.4c00625" target="_blank">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Read on ACS Publications
+        </a>
+        <div class="pd-stat-box">
+          <div class="pd-stat-label">Model Performance</div>
+          <div class="pd-stat-row"><span class="pd-stat-key">Cas9 classifier</span><span class="pd-stat-val">95% acc</span></div>
+          <div class="pd-stat-row"><span class="pd-stat-key">Cas12 classifier</span><span class="pd-stat-val">92% acc</span></div>
+          <div class="pd-stat-row"><span class="pd-stat-key">Multi-class F1</span><span class="pd-stat-val">~0.98</span></div>
+          <div class="pd-stat-row"><span class="pd-stat-key">Features used</span><span class="pd-stat-val">13,494</span></div>
+        </div>
+        <div class="pd-highlight">
+          <div class="pd-highlight-label">Key Finding</div>
+          <div class="pd-highlight-text">Identified conserved tripeptides (PWN, PYY, HHA, DHI) in catalytic domains with roles in DNA cleavage and PAM recognition — providing structural insights for engineering improved Cas variants.</div>
+        </div>
+        <div class="pd-stat-box">
+          <div class="pd-stat-label">Paper Info</div>
+          <div class="pd-stat-row"><span class="pd-stat-key">DOI</span><span class="pd-stat-val" style="font-size:10px">10.1021/acs.jcim.4c00625</span></div>
+          <div class="pd-stat-row"><span class="pd-stat-key">Published</span><span class="pd-stat-val">Jun 2024</span></div>
+          <div class="pd-stat-row"><span class="pd-stat-key">Journal</span><span class="pd-stat-val">ACS JCIM</span></div>
+          <div class="pd-stat-row"><span class="pd-stat-key">Pages</span><span class="pd-stat-val">4897–4911</span></div>
         </div>
       </div>
     </div>`
