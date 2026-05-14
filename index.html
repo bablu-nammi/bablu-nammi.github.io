@@ -271,6 +271,28 @@
     }
     .node.active .nring{animation:ringpulse 1.8s ease-out infinite;}
 
+    /* ── Orbital system ──────────────────────────────────── */
+    @keyframes orbitSpin    { to { transform: rotate( 360deg); } }
+    @keyframes orbitSpinRev { to { transform: rotate(-360deg); } }
+    .orbit-arm {
+      position:absolute; left:0; top:0;
+      width:0; height:0; overflow:visible;
+      transform-origin:0 0;
+    }
+    .orbit-at-r {
+      position:absolute; top:0;
+      width:0; height:0; overflow:visible;
+    }
+    .orbit-body {
+      width:0; height:0; overflow:visible;
+    }
+    .orbit-path-ring {
+      position:absolute; border-radius:50%;
+      transform:translate(-50%,-50%);
+      pointer-events:none;
+      border:1px solid rgba(255,255,255,0.045);
+    }
+
     /* ── PDF embed view ─────────────────────────────────── */
     .pdf-embed-wrap{display:flex;flex-direction:column;height:100%;gap:0;}
     .pdf-embed-header{
@@ -335,7 +357,7 @@
       100% { opacity:1; transform:translate(-50%,-50%) scale(1); }
     }
     .node { opacity:0; animation:nodeIn 0.75s cubic-bezier(0.34,1.56,0.64,1) both; }
-    .node:hover { animation-play-state:paused; transform:translate(-50%,-50%) scale(1.1) !important; }
+    .node:hover { transform:translate(-50%,-50%) scale(1.12) !important; }
 
     /* ── Float wrapper ───────────────────────────────────── */
     @keyframes nFloat {
@@ -837,101 +859,144 @@ function vw(){ return window.innerWidth; }
 function vh(){ return window.innerHeight; }
 function px(pct, dim){ return pct / 100 * dim; }
 
+function makeNode(key, n, delay){
+  const el = document.createElement('div');
+  el.id = `node-${key}`;
+  el.style.cssText = `position:absolute;left:0;top:0;transform:translate(-50%,-50%);`;
+  el.style.animationDelay = delay + 's';
+
+  if(n.type === 'root'){
+    el.className = 'node node-root';
+    el.innerHTML = `
+      <div class="nglow"></div>
+      <div class="nring" style="--np:${n.glow};background:linear-gradient(135deg,rgba(99,102,241,0.22),rgba(99,102,241,0.06));border-color:${n.color};box-shadow:0 0 52px rgba(99,102,241,0.28),inset 0 1px 0 rgba(255,255,255,0.05)">
+        <div class="root-init">
+          <div class="root-av">BN</div>
+          <div class="root-name">Bharani Nammi</div>
+          <div class="root-title">Deep Learning</div>
+        </div>
+      </div>`;
+  } else if(n.type === 'cat'){
+    el.className = 'node node-cat';
+    el.innerHTML = `
+      <div class="nglow" style="background:radial-gradient(circle,${n.glow},transparent 65%)"></div>
+      <div class="nring" style="--np:${n.glow};background:${n.color}14;border-color:${n.color}65;box-shadow:0 0 26px ${n.color}28">
+        <div class="ndot" style="background:${n.color}"></div>
+      </div>
+      <div class="nlabel">${n.label.replace('\n','<br>')}</div>
+      ${n.badge?`<span class="nbadge ${n.badgeClass}" style="border-color:${n.color}55;color:${n.color}">${n.badge}</span>`:''}`;
+  } else {
+    el.className = 'node node-leaf';
+    el.innerHTML = `
+      <div class="nglow" style="background:radial-gradient(circle,${n.glow},transparent 65%)"></div>
+      <div class="nring" style="--np:${n.glow};background:${n.color}12;border-color:${n.color}55;box-shadow:0 0 14px ${n.color}22">
+        <div class="ndot" style="background:${n.color}"></div>
+      </div>
+      <div class="nlabel">${n.label.replace('\n','<br>')}</div>`;
+  }
+  return el;
+}
+
 function renderTree(){
   const W = vw(), H = vh();
-  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
   svg.innerHTML = '';
+  wrap.innerHTML = '';
 
-  // Edges — draw main line + bright inner glow line
-  for(const [a, b, color] of EDGES){
-    const na = NODES[a], nb = NODES[b];
-    if(!na||!nb) continue;
-    const x1=px(na.x,W), y1=px(na.y,H);
-    const x2=px(nb.x,W), y2=px(nb.y,H);
-    const mx=(x1+x2)/2, my=(y1+y2)/2;
-    const dx=x2-x1, dy=y2-y1;
-    const cx=mx-dy*0.1, cy=my+dx*0.1;
-    const d=`M${x1},${y1} Q${cx},${cy} ${x2},${y2}`;
-    // Outer dim path
-    const path=document.createElementNS('http://www.w3.org/2000/svg','path');
-    path.setAttribute('d', d);
-    path.setAttribute('class','edge');
-    path.setAttribute('stroke', color+'50');
-    path.setAttribute('stroke-width','2');
-    svg.appendChild(path);
-    // Inner bright glow
-    const glow=document.createElementNS('http://www.w3.org/2000/svg','path');
-    glow.setAttribute('d', d);
-    glow.setAttribute('class','edge edge-glow');
-    glow.setAttribute('stroke', color+'bb');
-    glow.setAttribute('stroke-width','0.75');
-    svg.appendChild(glow);
-  }
+  // Responsive orbit radii
+  const OR = Math.min(W * 0.22, H * 0.28, 235); // planet orbit radius
+  const MR = Math.min(OR * 0.38, 88);             // moon orbit radius
 
-  // Float timing per node
-  const FLOAT = {
-    root: {fd:'7s', fdelay:'0s'},
-    papers:{fd:'5.2s',fdelay:'-1.3s'}, awards:{fd:'5.8s',fdelay:'-2.1s'},
-    exp:  {fd:'4.9s',fdelay:'-0.7s'}, edu:  {fd:'5.5s',fdelay:'-3.2s'},
-    p1:   {fd:'4.2s',fdelay:'-0.4s'}, p2:   {fd:'4.6s',fdelay:'-1.8s'},
-    p3:   {fd:'4.0s',fdelay:'-2.6s'}, a1:   {fd:'4.4s',fdelay:'-1.1s'},
-    a2:   {fd:'4.8s',fdelay:'-3.0s'},
+  // Planet definitions: [nodeKey, startAngleDeg, periodSec]
+  const PLANETS = [
+    { key:'papers', ang:215, dur:34 },
+    { key:'awards', ang:325, dur:27 },
+    { key:'exp',    ang: 42, dur:40 },
+    { key:'edu',    ang:142, dur:31 },
+  ];
+
+  // Moon definitions per planet
+  const MOONS = {
+    papers:[ {key:'p1',ang:0,dur:10}, {key:'p2',ang:120,dur:13}, {key:'p3',ang:240,dur:9} ],
+    awards:[ {key:'a1',ang:80,dur:8}, {key:'a2',ang:260,dur:11} ],
   };
 
-  // Nodes
-  wrap.innerHTML='';
-  const nodeOrder = Object.keys(NODES);
-  for(let i=0; i<nodeOrder.length; i++){
-    const key=nodeOrder[i], n=NODES[key];
-    const el = document.createElement('div');
-    const x  = px(n.x, W), y = px(n.y, H);
-    const ft = FLOAT[key]||{fd:'5s',fdelay:'0s'};
-    el.id = `node-${key}`;
-    el.style.left = x+'px';
-    el.style.top  = y+'px';
-    el.style.animationDelay = (i*0.1)+'s';
+  // ── Sun wrap (0×0 anchor at canvas center) ──────────────
+  const sunWrap = document.createElement('div');
+  sunWrap.style.cssText = `position:absolute;left:50%;top:50%;width:0;height:0;overflow:visible;`;
 
-    if(n.type==='root'){
-      el.className = 'node node-root';
-      el.innerHTML = `
-        <div class="nfloat" style="--fd:${ft.fd};--fdelay:${ft.fdelay};position:relative;">
-          <div class="nglow" style="width:220px;height:220px;top:-51px;left:-51px;position:absolute;background:radial-gradient(circle,${n.glow},transparent 65%)"></div>
-          <div class="norbit" style="width:155px;height:155px;"></div>
-          <div class="nring" style="--np:${n.glow};background:linear-gradient(135deg,rgba(99,102,241,0.22),rgba(99,102,241,0.06));border-color:${n.color};box-shadow:0 0 48px rgba(99,102,241,0.25),inset 0 1px 0 rgba(255,255,255,0.05)">
-            <div class="root-init">
-              <div class="root-av">BN</div>
-              <div class="root-name">Bharani Nammi</div>
-              <div class="root-title">Deep Learning</div>
-            </div>
-          </div>
-        </div>`;
-    } else if(n.type==='cat'){
-      el.className = 'node node-cat';
-      el.innerHTML = `
-        <div class="nfloat" style="--fd:${ft.fd};--fdelay:${ft.fdelay};position:relative;">
-          <div class="nglow" style="width:130px;height:130px;top:-29px;left:-29px;position:absolute;background:radial-gradient(circle,${n.glow},transparent 65%)"></div>
-          <div class="norbit" style="width:98px;height:98px;"></div>
-          <div class="nring" style="--np:${n.glow};background:${n.color}14;border-color:${n.color}60;box-shadow:0 0 24px ${n.color}22,0 0 2px ${n.color}66">
-            <div class="ndot" style="background:${n.color}"></div>
-          </div>
-        </div>
-        <div class="nlabel">${n.label.replace('\n','<br>')}</div>
-        ${n.badge?`<span class="nbadge ${n.badgeClass}" style="border-color:${n.color}55;color:${n.color}">${n.badge}</span>`:''}`;
-    } else {
-      el.className = 'node node-leaf';
-      el.innerHTML = `
-        <div class="nfloat" style="--fd:${ft.fd};--fdelay:${ft.fdelay};position:relative;">
-          <div class="nglow" style="width:88px;height:88px;top:-20px;left:-20px;position:absolute;background:radial-gradient(circle,${n.glow},transparent 65%)"></div>
-          <div class="nring" style="--np:${n.glow};background:${n.color}12;border-color:${n.color}50;box-shadow:0 0 14px ${n.color}18,0 0 2px ${n.color}55">
-            <div class="ndot" style="background:${n.color}"></div>
-          </div>
-        </div>
-        <div class="nlabel">${n.label.replace('\n','<br>')}</div>`;
+  // Planet orbit path ring (centred at sun)
+  const pRing = document.createElement('div');
+  pRing.className = 'orbit-path-ring';
+  pRing.style.cssText += `width:${OR*2}px;height:${OR*2}px;`;
+  sunWrap.appendChild(pRing);
+
+  // Root / Sun node
+  const rootEl = makeNode('root', NODES.root, 0);
+  rootEl.addEventListener('click', e=>{ e.stopPropagation(); openCard('root','root'); });
+  sunWrap.appendChild(rootEl);
+
+  // ── Planet orbit arms ────────────────────────────────────
+  PLANETS.forEach((p, pi) => {
+    const pN = NODES[p.key];
+    const armDelay = -((p.ang / 360) * p.dur);
+
+    const arm = document.createElement('div');
+    arm.className = 'orbit-arm';
+    arm.style.animation = `orbitSpin ${p.dur}s linear infinite ${armDelay}s`;
+
+    const atR = document.createElement('div');
+    atR.className = 'orbit-at-r';
+    atR.style.left = OR + 'px';
+
+    const body = document.createElement('div');
+    body.className = 'orbit-body';
+    body.style.animation = `orbitSpinRev ${p.dur}s linear infinite ${armDelay}s`;
+
+    // Moon orbit path ring (if planet has moons)
+    if(MOONS[p.key]){
+      const mRing = document.createElement('div');
+      mRing.className = 'orbit-path-ring';
+      mRing.style.cssText += `width:${MR*2}px;height:${MR*2}px;border-color:rgba(255,255,255,0.055);`;
+      body.appendChild(mRing);
     }
 
-    el.addEventListener('click', e => { e.stopPropagation(); openCard(key, key); });
-    wrap.appendChild(el);
-  }
+    // Planet node visual
+    const pEl = makeNode(p.key, pN, (pi+1)*0.14);
+    pEl.addEventListener('click', e=>{ e.stopPropagation(); openCard(p.key, p.key); });
+    body.appendChild(pEl);
+
+    // ── Moon orbit arms ──────────────────────────────────
+    (MOONS[p.key]||[]).forEach((m, mi) => {
+      const mN = NODES[m.key];
+      const mArmDelay = -((m.ang / 360) * m.dur);
+
+      const mArm = document.createElement('div');
+      mArm.className = 'orbit-arm';
+      mArm.style.animation = `orbitSpin ${m.dur}s linear infinite ${mArmDelay}s`;
+
+      const mAtR = document.createElement('div');
+      mAtR.className = 'orbit-at-r';
+      mAtR.style.left = MR + 'px';
+
+      const mBody = document.createElement('div');
+      mBody.className = 'orbit-body';
+      mBody.style.animation = `orbitSpinRev ${m.dur}s linear infinite ${mArmDelay}s`;
+
+      const mEl = makeNode(m.key, mN, (pi+1+mi)*0.12);
+      mEl.addEventListener('click', e=>{ e.stopPropagation(); openCard(m.key, m.key); });
+
+      mBody.appendChild(mEl);
+      mAtR.appendChild(mBody);
+      mArm.appendChild(mAtR);
+      body.appendChild(mArm);
+    });
+
+    atR.appendChild(body);
+    arm.appendChild(atR);
+    sunWrap.appendChild(arm);
+  });
+
+  wrap.appendChild(sunWrap);
 }
 
 // ── Card open / close ────────────────────────────────────────────────────
@@ -945,14 +1010,6 @@ function openCard(key, clickedKey){
   document.querySelectorAll('.node').forEach(n=>n.classList.remove('active'));
   document.getElementById(`node-${clickedKey}`)?.classList.add('active');
   document.getElementById(`node-${key}`)?.classList.add('active');
-
-  // Zoom canvas toward clicked node
-  const n = NODES[clickedKey] || NODES[key];
-  const W = vw(), H = vh();
-  const nx = px(n.x, W), ny = px(n.y, H);
-  const scale = n.type==='root' ? 1.6 : 2.8;
-  zc.style.transformOrigin = `${nx}px ${ny}px`;
-  zc.style.transform = `scale(${scale})`;
 
   // Fill card
   document.getElementById('cTitle').textContent = c.title;
@@ -974,11 +1031,7 @@ function closeCard(){
   document.body.classList.remove('zoomed-in');
   document.body.classList.remove('node-active');
   document.getElementById('cBody').className = 'card-body';
-  // small delay so backdrop fades first, then reset zoom
-  setTimeout(()=>{
-    zc.style.transform = 'scale(1)';
-    zc.style.transformOrigin = '50% 50%';
-  }, 120);
+  zc.style.transform = '';
   document.querySelectorAll('.node').forEach(n=>n.classList.remove('active'));
   document.getElementById('hint').classList.remove('hide');
   activeKey = null;
