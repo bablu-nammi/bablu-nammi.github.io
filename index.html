@@ -632,53 +632,24 @@ const CONTENT = {
 
   p2:{
     title:'CasGen — CRISPR Cas Protein Design', sub:'bioRxiv · 2025 · Genomics', subColor:'#06b6d4',
+    pdfEmbed:true,
     html:`
-    <div class="paper-detail">
-      <div class="paper-detail-left">
-        <div class="pd-venue-row">
+    <div class="pdf-embed-wrap">
+      <div class="pdf-embed-header">
+        <div class="pd-venue-row" style="margin-bottom:8px">
           <span class="pd-venue">bioRxiv</span><span class="pd-dot">·</span>
           <span class="pd-venue">Genomics</span><span class="pd-dot">·</span>
           <span class="pd-year">March 2025</span>
+          <a class="paper-link" style="margin-left:auto" href="https://www.biorxiv.org/content/10.1101/2025.02.28.640911v1" target="_blank">Open on bioRxiv ↗</a>
         </div>
-        <div class="pd-title">CasGen: A Regularized Generative Model for CRISPR Cas Protein Design with Classification and Margin-Based Optimization</div>
-        <div class="pd-authors">Bharani Nammi, V. M. Jayasinghe-Arachchige, S. S. Madugula, M. Artiles, C. N. Radler, T. Pham, J. Liu, S. Wang<br><span style="color:#3d4a6a;font-size:11px">University of Texas at Arlington</span></div>
-        <div class="pd-section-label">Abstract</div>
-        <div class="pd-abstract">CRISPR-associated (Cas) proteins have revolutionized genome editing, but most applications rely on a limited number of well-characterized Cas9 and Cas12 variants. We developed CasGen, a novel transformer-based deep generative model with margin-based latent space regularization to design novel Cas9 and Cas12 proteins. CasGen combines classification (to filter non-Cas sequences), Bayesian optimization of the latent space for functionally relevant designs, and structural validation using AlphaFold2/3. Generated proteins exhibit TM-scores between 0.70–0.85 and RMSD values below 2.00 Å versus known variants. Cas9 orthologs showed 28–55% sequence identity to known variants, demonstrating the model's potential to expand the genome editing toolkit with diverse, functionally-intact Cas proteins.</div>
-        <div class="pd-tags">
-          <span class="ptag">Generative Model</span>
-          <span class="ptag">CRISPR-Cas</span>
-          <span class="ptag">Protein Design</span>
-          <span class="ptag">AlphaFold2/3</span>
-          <span class="ptag">Bayesian Optimization</span>
-          <span class="ptag">Synthetic Biology</span>
-        </div>
+        <div class="pd-title" style="font-size:14px;margin-bottom:5px">CasGen: A Regularized Generative Model for CRISPR Cas Protein Design with Classification and Margin-Based Optimization</div>
+        <div class="pd-authors" style="margin-bottom:0">Bharani Nammi, V. M. Jayasinghe-Arachchige, S. S. Madugula, M. Artiles, C. N. Radler, T. Pham, J. Liu, S. Wang · <span style="color:#3d4a6a">University of Texas at Arlington</span></div>
       </div>
-      <div class="paper-detail-right">
-        <a class="pd-read-btn" href="https://www.biorxiv.org/content/10.1101/2025.02.28.640911v1.full.pdf" target="_blank">
-          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-          Read Full Paper (PDF)
-        </a>
-        <div class="pd-stat-box">
-          <div class="pd-stat-label">Structural Validation</div>
-          <div class="pd-stat-row"><span class="pd-stat-key">TM-Score range</span><span class="pd-stat-val">0.70 – 0.85</span></div>
-          <div class="pd-stat-row"><span class="pd-stat-key">RMSD</span><span class="pd-stat-val">&lt; 2.00 Å</span></div>
-          <div class="pd-stat-row"><span class="pd-stat-key">Cas9 identity</span><span class="pd-stat-val">28 – 55%</span></div>
-          <div class="pd-stat-row"><span class="pd-stat-key">Cas12a identity</span><span class="pd-stat-val">up to 48%</span></div>
-        </div>
-        <div class="pd-highlight">
-          <div class="pd-highlight-label">Key Innovation</div>
-          <div class="pd-highlight-text">First generative model combining margin-based latent space regularization with Bayesian optimization and AlphaFold structural validation for de novo Cas protein design.</div>
-        </div>
-        <div class="pd-stat-box">
-          <div class="pd-stat-label">Paper Info</div>
-          <div class="pd-stat-row"><span class="pd-stat-key">DOI</span><span class="pd-stat-val" style="font-size:10px">10.1101/2025.02.28.640911</span></div>
-          <div class="pd-stat-row"><span class="pd-stat-key">Published</span><span class="pd-stat-val">Mar 2025</span></div>
-          <div class="pd-stat-row"><span class="pd-stat-key">Server</span><span class="pd-stat-val">bioRxiv</span></div>
-        </div>
-      </div>
+      <iframe class="pdf-embed-frame"
+        src="/papers/CasGen_CRISPR_Cas_Protein_Design.pdf">
+      </iframe>
     </div>`
   },
-
   p3:{
     title:'Cas9 & Cas12 Feature Identification', sub:'J. Chem. Inf. Model. · 2024 · Published', subColor:'#06b6d4',
     html:`
