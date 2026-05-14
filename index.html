@@ -270,35 +270,46 @@
     }
     .node.active .nring{animation:ringpulse 1.8s ease-out infinite;}
 
-    /* ── PDF viewer mode ─────────────────────────────────── */
-    .card-body.pdf-mode{
-      padding:20px 24px;
-      overflow:hidden;
-      display:flex;flex-direction:column;
-      gap:16px;
+    /* ── Paper detail view ───────────────────────────────── */
+    .paper-detail{display:grid;grid-template-columns:1fr 340px;gap:28px;align-items:start;}
+    @media(max-width:760px){.paper-detail{grid-template-columns:1fr;}}
+    .paper-detail-left{}
+    .paper-detail-right{display:flex;flex-direction:column;gap:14px;}
+
+    .pd-venue-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:18px;}
+    .pd-venue{font-size:12px;font-weight:700;color:#06b6d4;text-transform:uppercase;letter-spacing:0.6px;}
+    .pd-dot{color:#1e2840;}
+    .pd-year{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#3d4a6a;}
+
+    .pd-title{font-size:18px;font-weight:800;color:#eef2ff;line-height:1.45;margin-bottom:14px;letter-spacing:-0.3px;}
+    .pd-authors{font-size:12.5px;color:#818cf8;font-weight:500;line-height:1.7;margin-bottom:20px;}
+
+    .pd-section-label{font-size:10px;font-weight:700;color:#3d4a6a;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
+    .pd-abstract{font-size:13.5px;color:#94a3b8;line-height:1.85;margin-bottom:24px;}
+
+    .pd-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:24px;}
+
+    .pd-read-btn{
+      display:inline-flex;align-items:center;gap:9px;
+      background:linear-gradient(135deg,rgba(6,182,212,0.15),rgba(6,182,212,0.06));
+      border:1px solid rgba(6,182,212,0.35);
+      color:#06b6d4;text-decoration:none;
+      padding:13px 20px;border-radius:11px;
+      font-family:inherit;font-size:13px;font-weight:700;
+      transition:all 0.2s;width:100%;justify-content:center;
     }
-    .pdf-meta{flex-shrink:0;}
-    .pdf-title{font-size:15px;font-weight:800;color:#eef2ff;line-height:1.45;margin-bottom:8px;}
-    .pdf-authors{font-size:12px;color:#818cf8;font-weight:500;margin-bottom:10px;}
-    .pdf-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
-    .pdf-frame{
-      flex:1;min-height:0;width:100%;
-      border:none;border-radius:10px;
-      background:#0a0d1c;
-    }
-    .pdf-fallback{
-      flex:1;min-height:0;
-      display:flex;flex-direction:column;align-items:center;justify-content:center;
-      gap:14px;background:#0a0d1c;border-radius:10px;
-    }
-    .pdf-fallback p{font-size:13px;color:#3d4a6a;}
-    .pdf-open-btn{
-      display:inline-flex;align-items:center;gap:8px;
-      background:rgba(99,102,241,0.12);border:1px solid rgba(99,102,241,0.3);
-      color:#818cf8;text-decoration:none;padding:11px 22px;border-radius:10px;
-      font-family:inherit;font-size:13px;font-weight:700;transition:all 0.2s;
-    }
-    .pdf-open-btn:hover{background:rgba(99,102,241,0.22);color:#c7d2fe;}
+    .pd-read-btn:hover{background:rgba(6,182,212,0.22);border-color:rgba(6,182,212,0.55);color:#67e8f9;}
+
+    .pd-stat-box{background:#070a16;border:1px solid #161e30;border-radius:12px;padding:18px;}
+    .pd-stat-label{font-size:10px;font-weight:700;color:#3d4a6a;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:12px;}
+    .pd-stat-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #0d1220;}
+    .pd-stat-row:last-child{border-bottom:none;}
+    .pd-stat-key{font-size:11.5px;color:#7c88a8;}
+    .pd-stat-val{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#eef2ff;font-weight:600;}
+
+    .pd-highlight{background:rgba(99,102,241,0.07);border:1px solid rgba(99,102,241,0.18);border-radius:10px;padding:14px;}
+    .pd-highlight-label{font-size:10px;font-weight:700;color:#818cf8;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;}
+    .pd-highlight-text{font-size:12.5px;color:#94a3b8;line-height:1.7;}
   </style>
 </head>
 <body>
@@ -593,48 +604,100 @@ const CONTENT = {
 
   p1:{
     title:'CRISPR-Cas Protein Classifier', sub:'bioRxiv · 2024 · Bioinformatics', subColor:'#06b6d4',
-    pdfMode:true,
-    pdfUrl:'https://www.biorxiv.org/content/10.1101/2024.03.02.583136v1.full.pdf',
-    pdfLink:'https://www.biorxiv.org/content/10.1101/2024.03.02.583136v1',
     html:`
-    <div class="pdf-meta">
-      <div class="pdf-title">Transformer-Based Deep Learning Model with Latent Space Regularization for CRISPR-Cas Protein Sequence Classification</div>
-      <div class="pdf-authors">B. Nammi, S. S. Madugula, P. Pujar, V. Arachchige, J. Lui, S. Wang</div>
-      <div class="pdf-row">
-        <span class="ptag">Transformer</span><span class="ptag">CRISPR-Cas</span>
-        <span class="ptag">Protein Classification</span><span class="ptag">ProtBert</span>
-        <span class="paper-year">2024</span>
-        <a class="paper-link" href="https://www.biorxiv.org/content/10.1101/2024.03.02.583136v1" target="_blank">
-          Open on bioRxiv ↗
-        </a>
+    <div class="paper-detail">
+      <div class="paper-detail-left">
+        <div class="pd-venue-row">
+          <span class="pd-venue">bioRxiv</span><span class="pd-dot">·</span>
+          <span class="pd-venue">Bioinformatics</span><span class="pd-dot">·</span>
+          <span class="pd-year">March 2024</span>
+        </div>
+        <div class="pd-title">Transformer-Based Deep Learning Model with Latent Space Regularization for CRISPR-Cas Protein Sequence Classification</div>
+        <div class="pd-authors">Bharani Nammi, S. S. Madugula, P. Pujar, V. Arachchige, J. Lui, S. Wang<br><span style="color:#3d4a6a;font-size:11px">University of Texas at Arlington</span></div>
+        <div class="pd-section-label">Abstract</div>
+        <div class="pd-abstract">The discovery of the CRISPR-Cas system has significantly advanced genome editing, offering vast applications in medical treatments and life sciences research. We developed two deep learning models: (1) a transformer encoder-based classification model trained from scratch with a novel margin-based loss function to maximize inter-class separability and intra-class compactness in protein sequence embedding latent space; and (2) a large protein language model fine-tuned on ProtBert, pre-trained on more than 200 million proteins. The Latent Space Regularized Max-Margin Transformer (LSRMT) model achieved classification accuracies of 99.81%, 99.81%, 99.06%, and 99.27% for CAS9 vs. Non-CAS, CAS12 vs. Non-CAS, CAS9 vs. CAS12, and multi-class tasks respectively — outperforming the fine-tuned state-of-the-art large protein model even when trained on a significantly smaller dataset.</div>
+        <div class="pd-tags">
+          <span class="ptag">Transformer Encoder</span>
+          <span class="ptag">CRISPR-Cas</span>
+          <span class="ptag">Protein Classification</span>
+          <span class="ptag">ProtBert</span>
+          <span class="ptag">Latent Space Regularization</span>
+          <span class="ptag">Deep Learning</span>
+        </div>
       </div>
-    </div>
-    <iframe class="pdf-frame"
-      src="https://docs.google.com/viewer?url=https%3A%2F%2Fwww.biorxiv.org%2Fcontent%2F10.1101%2F2024.03.02.583136v1.full.pdf&embedded=true"
-      allowfullscreen></iframe>`
+      <div class="paper-detail-right">
+        <a class="pd-read-btn" href="https://www.biorxiv.org/content/10.1101/2024.03.02.583136v1.full.pdf" target="_blank">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Read Full Paper (PDF)
+        </a>
+        <div class="pd-stat-box">
+          <div class="pd-stat-label">Key Results</div>
+          <div class="pd-stat-row"><span class="pd-stat-key">CAS9 vs Non-CAS</span><span class="pd-stat-val">99.81%</span></div>
+          <div class="pd-stat-row"><span class="pd-stat-key">CAS12 vs Non-CAS</span><span class="pd-stat-val">99.81%</span></div>
+          <div class="pd-stat-row"><span class="pd-stat-key">CAS9 vs CAS12</span><span class="pd-stat-val">99.06%</span></div>
+          <div class="pd-stat-row"><span class="pd-stat-key">Multi-class</span><span class="pd-stat-val">99.27%</span></div>
+        </div>
+        <div class="pd-highlight">
+          <div class="pd-highlight-label">Key Innovation</div>
+          <div class="pd-highlight-text">Novel margin-based loss function for latent space regularization — LSRMT outperforms fine-tuned large protein language models (ProtBert) on a significantly smaller dataset.</div>
+        </div>
+        <div class="pd-stat-box">
+          <div class="pd-stat-label">Paper Info</div>
+          <div class="pd-stat-row"><span class="pd-stat-key">DOI</span><span class="pd-stat-val" style="font-size:10px">10.1101/2024.03.02.583136</span></div>
+          <div class="pd-stat-row"><span class="pd-stat-key">Published</span><span class="pd-stat-val">Mar 2024</span></div>
+          <div class="pd-stat-row"><span class="pd-stat-key">Server</span><span class="pd-stat-val">bioRxiv</span></div>
+        </div>
+      </div>
+    </div>`
   },
 
   p2:{
     title:'CasGen — CRISPR Cas Protein Design', sub:'bioRxiv · 2025 · Genomics', subColor:'#06b6d4',
-    pdfMode:true,
-    pdfUrl:'https://www.biorxiv.org/content/10.1101/2025.02.28.640911v1.full.pdf',
-    pdfLink:'https://www.biorxiv.org/content/10.1101/2025.02.28.640911v1',
     html:`
-    <div class="pdf-meta">
-      <div class="pdf-title">CasGen: A Regularized Generative Model for CRISPR Cas Protein Design with Classification and Margin-Based Optimization</div>
-      <div class="pdf-authors">B. Nammi, V. M. Jayasinghe-Arachchige, S. S. Madugula, M. Artiles, C. N. Radler, T. Pham, J. Liu, S. Wang</div>
-      <div class="pdf-row">
-        <span class="ptag">Generative Model</span><span class="ptag">CRISPR-Cas</span>
-        <span class="ptag">Protein Design</span><span class="ptag">AlphaFold</span>
-        <span class="paper-year">2025</span>
-        <a class="paper-link" href="https://www.biorxiv.org/content/10.1101/2025.02.28.640911v1" target="_blank">
-          Open on bioRxiv ↗
-        </a>
+    <div class="paper-detail">
+      <div class="paper-detail-left">
+        <div class="pd-venue-row">
+          <span class="pd-venue">bioRxiv</span><span class="pd-dot">·</span>
+          <span class="pd-venue">Genomics</span><span class="pd-dot">·</span>
+          <span class="pd-year">March 2025</span>
+        </div>
+        <div class="pd-title">CasGen: A Regularized Generative Model for CRISPR Cas Protein Design with Classification and Margin-Based Optimization</div>
+        <div class="pd-authors">Bharani Nammi, V. M. Jayasinghe-Arachchige, S. S. Madugula, M. Artiles, C. N. Radler, T. Pham, J. Liu, S. Wang<br><span style="color:#3d4a6a;font-size:11px">University of Texas at Arlington</span></div>
+        <div class="pd-section-label">Abstract</div>
+        <div class="pd-abstract">CRISPR-associated (Cas) proteins have revolutionized genome editing, but most applications rely on a limited number of well-characterized Cas9 and Cas12 variants. We developed CasGen, a novel transformer-based deep generative model with margin-based latent space regularization to design novel Cas9 and Cas12 proteins. CasGen combines classification (to filter non-Cas sequences), Bayesian optimization of the latent space for functionally relevant designs, and structural validation using AlphaFold2/3. Generated proteins exhibit TM-scores between 0.70–0.85 and RMSD values below 2.00 Å versus known variants. Cas9 orthologs showed 28–55% sequence identity to known variants, demonstrating the model's potential to expand the genome editing toolkit with diverse, functionally-intact Cas proteins.</div>
+        <div class="pd-tags">
+          <span class="ptag">Generative Model</span>
+          <span class="ptag">CRISPR-Cas</span>
+          <span class="ptag">Protein Design</span>
+          <span class="ptag">AlphaFold2/3</span>
+          <span class="ptag">Bayesian Optimization</span>
+          <span class="ptag">Synthetic Biology</span>
+        </div>
       </div>
-    </div>
-    <iframe class="pdf-frame"
-      src="https://docs.google.com/viewer?url=https%3A%2F%2Fwww.biorxiv.org%2Fcontent%2F10.1101%2F2025.02.28.640911v1.full.pdf&embedded=true"
-      allowfullscreen></iframe>`
+      <div class="paper-detail-right">
+        <a class="pd-read-btn" href="https://www.biorxiv.org/content/10.1101/2025.02.28.640911v1.full.pdf" target="_blank">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Read Full Paper (PDF)
+        </a>
+        <div class="pd-stat-box">
+          <div class="pd-stat-label">Structural Validation</div>
+          <div class="pd-stat-row"><span class="pd-stat-key">TM-Score range</span><span class="pd-stat-val">0.70 – 0.85</span></div>
+          <div class="pd-stat-row"><span class="pd-stat-key">RMSD</span><span class="pd-stat-val">&lt; 2.00 Å</span></div>
+          <div class="pd-stat-row"><span class="pd-stat-key">Cas9 identity</span><span class="pd-stat-val">28 – 55%</span></div>
+          <div class="pd-stat-row"><span class="pd-stat-key">Cas12a identity</span><span class="pd-stat-val">up to 48%</span></div>
+        </div>
+        <div class="pd-highlight">
+          <div class="pd-highlight-label">Key Innovation</div>
+          <div class="pd-highlight-text">First generative model combining margin-based latent space regularization with Bayesian optimization and AlphaFold structural validation for de novo Cas protein design.</div>
+        </div>
+        <div class="pd-stat-box">
+          <div class="pd-stat-label">Paper Info</div>
+          <div class="pd-stat-row"><span class="pd-stat-key">DOI</span><span class="pd-stat-val" style="font-size:10px">10.1101/2025.02.28.640911</span></div>
+          <div class="pd-stat-row"><span class="pd-stat-key">Published</span><span class="pd-stat-val">Mar 2025</span></div>
+          <div class="pd-stat-row"><span class="pd-stat-key">Server</span><span class="pd-stat-val">bioRxiv</span></div>
+        </div>
+      </div>
+    </div>`
   },
 
   a1:{
@@ -814,11 +877,7 @@ function openCard(key, clickedKey){
   const body = document.getElementById('cBody');
   body.innerHTML = c.html;
 
-  if(c.pdfMode){
-    body.className = 'card-body pdf-mode';
-  } else {
-    body.className = 'card-body';
-  }
+  body.className = 'card-body';
 
   document.getElementById('hint').classList.add('hide');
   document.body.classList.add('zoomed-in');
