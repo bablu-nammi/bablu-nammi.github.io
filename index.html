@@ -997,6 +997,57 @@ function vw(){ return window.innerWidth; }
 function vh(){ return window.innerHeight; }
 function px(pct, dim){ return pct / 100 * dim; }
 
+// ── Node builder ─────────────────────────────────────────────────────────
+function makeNode(key, n, delay){
+  const el = document.createElement('div');
+  el.id = 'node-'+key;
+  el.style.cssText = 'position:absolute;left:0;top:0;transform:translate(-50%,-50%);';
+  el.style.animationDelay = delay+'s';
+  if(n.type==='root'){
+    el.className='node node-root';
+    el.innerHTML=`<div class="nglow"></div>
+      <div class="nring" style="--np:${n.glow};background:linear-gradient(135deg,rgba(99,102,241,0.22),rgba(99,102,241,0.06));border-color:${n.color};box-shadow:0 0 52px rgba(99,102,241,0.28),inset 0 1px 0 rgba(255,255,255,0.05)">
+        <div class="root-init"><div class="root-av">BN</div><div class="root-name">Bharani Nammi</div><div class="root-title">Deep Learning</div></div>
+      </div>`;
+  } else if(n.type==='cat'){
+    el.className='node node-cat';
+    el.innerHTML=`<div class="nglow" style="background:radial-gradient(circle,${n.glow},transparent 65%)"></div>
+      <div class="nring" style="--np:${n.glow};background:${n.color}14;border-color:${n.color}65;box-shadow:0 0 26px ${n.color}28">
+        <div class="ndot" style="background:${n.color}"></div>
+      </div>
+      <div class="nlabel">${n.label.replace('\n','<br>')}</div>`;
+  } else {
+    el.className='node node-leaf';
+    el.innerHTML=`<div class="nglow" style="background:radial-gradient(circle,${n.glow},transparent 65%)"></div>
+      <div class="nring" style="--np:${n.glow};background:${n.color}12;border-color:${n.color}55;box-shadow:0 0 14px ${n.color}22">
+        <div class="ndot" style="background:${n.color}"></div>
+      </div>
+      <div class="nlabel">${n.label.replace('\n','<br>')}</div>`;
+  }
+  return el;
+}
+
+function mkOrbitArm(dur, ang, radius){
+  const delay = -((ang/360)*dur);
+  const arm = document.createElement('div');
+  arm.className='orbit-arm';
+  arm.style.animation=`orbitSpin ${dur}s linear infinite ${delay}s`;
+  const atR = document.createElement('div');
+  atR.className='orbit-at-r'; atR.style.left=radius+'px';
+  const body = document.createElement('div');
+  body.className='orbit-body';
+  body.style.animation=`orbitSpinRev ${dur}s linear infinite ${delay}s`;
+  atR.appendChild(body); arm.appendChild(atR);
+  return {arm, body};
+}
+
+function mkRing(r, color){
+  const d = document.createElement('div');
+  d.className='orbit-path-ring';
+  d.style.cssText+=`width:${r*2}px;height:${r*2}px;${color?'border-color:'+color+';':''}`;
+  return d;
+}
+
 // ── Zoom state ───────────────────────────────────────────────────────────
 let zoomedPlanet = null;
 
