@@ -852,15 +852,15 @@ const CONTENT = {
     html:`
     <div class="pdf-embed-wrap">
       <div class="ptabs">
-        <button class="ptab active" onclick="switchPaperTab('p1-pdf',this)">📄 Full Paper</button>
-        <button class="ptab" onclick="switchPaperTab('p1-overview',this)">📋 Overview</button>
+        <button class="ptab" onclick="switchPaperTab('p1-pdf',this)">Full Paper</button>
+        <button class="ptab active" onclick="switchPaperTab('p1-overview',this)">Overview</button>
       </div>
-      <div id="p1-pdf" class="ptab-panel active">
+      <div id="p1-pdf" class="ptab-panel">
         <iframe class="pdf-embed-frame"
           src="/papers/Robust_CRISPR_Cas_Protein_Identification_using_Max_Margin_Regularized_Transformer_Models-2.pdf">
         </iframe>
       </div>
-      <div id="p1-overview" class="ptab-panel ptab-overview">
+      <div id="p1-overview" class="ptab-panel ptab-overview active">
         <div class="pd-venue-row">
           <span class="pd-venue">bioRxiv</span><span class="pd-dot">·</span>
           <span class="pd-venue">Bioinformatics</span><span class="pd-dot">·</span>
@@ -902,15 +902,15 @@ const CONTENT = {
     html:`
     <div class="pdf-embed-wrap">
       <div class="ptabs">
-        <button class="ptab active" onclick="switchPaperTab('p2-pdf',this)">📄 Full Paper</button>
-        <button class="ptab" onclick="switchPaperTab('p2-overview',this)">📋 Overview</button>
+        <button class="ptab" onclick="switchPaperTab('p2-pdf',this)">Full Paper</button>
+        <button class="ptab active" onclick="switchPaperTab('p2-overview',this)">Overview</button>
       </div>
-      <div id="p2-pdf" class="ptab-panel active">
+      <div id="p2-pdf" class="ptab-panel">
         <iframe class="pdf-embed-frame"
           src="/papers/CasGen_CRISPR_Cas_Protein_Design.pdf">
         </iframe>
       </div>
-      <div id="p2-overview" class="ptab-panel ptab-overview">
+      <div id="p2-overview" class="ptab-panel ptab-overview active">
         <div class="pd-venue-row">
           <span class="pd-venue">bioRxiv</span><span class="pd-dot">·</span>
           <span class="pd-venue">Genomics</span><span class="pd-dot">·</span>
