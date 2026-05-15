@@ -346,6 +346,25 @@
     .pd-highlight-label{font-size:10px;font-weight:700;color:#818cf8;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;}
     .pd-highlight-text{font-size:12.5px;color:#94a3b8;line-height:1.7;}
 
+    /* ── Paper tabs ───────────────────────────────────────── */
+    .ptabs{display:flex;gap:4px;margin-bottom:16px;flex-shrink:0;
+      background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);
+      border-radius:10px;padding:4px;}
+    .ptab{flex:1;padding:8px 0;font-family:inherit;font-size:12px;font-weight:700;
+      border:none;border-radius:7px;cursor:pointer;transition:all 0.2s;
+      background:transparent;color:#6b7280;}
+    .ptab.active{background:rgba(6,182,212,0.15);color:#06b6d4;
+      box-shadow:0 1px 6px rgba(6,182,212,0.15);}
+    .ptab:hover:not(.active){background:rgba(255,255,255,0.04);color:#94a3b8;}
+    .ptab-panel{display:none;flex:1;min-height:0;}
+    .ptab-panel.active{display:flex;flex-direction:column;}
+    .ptab-overview{overflow-y:auto;flex-direction:column;gap:18px;
+      scrollbar-width:thin;scrollbar-color:#1a2236 transparent;}
+    body.light .ptabs{background:rgba(0,0,0,0.03);border-color:rgba(0,0,0,0.07);}
+    body.light .ptab{color:#9ca3af;}
+    body.light .ptab.active{background:rgba(6,182,212,0.1);color:#0891b2;}
+    body.light .ptab:hover:not(.active){background:rgba(0,0,0,0.04);color:#4b5563;}
+
     /* ── Legend ──────────────────────────────────────────── */
     #legend{
       position:fixed;left:24px;top:50%;transform:translateY(-50%);
@@ -832,19 +851,48 @@ const CONTENT = {
     pdfEmbed:true,
     html:`
     <div class="pdf-embed-wrap">
-      <div class="pdf-embed-header">
-        <div class="pd-venue-row" style="margin-bottom:8px">
+      <div class="ptabs">
+        <button class="ptab active" onclick="switchPaperTab('p1-pdf',this)">📄 Full Paper</button>
+        <button class="ptab" onclick="switchPaperTab('p1-overview',this)">📋 Overview</button>
+      </div>
+      <div id="p1-pdf" class="ptab-panel active">
+        <iframe class="pdf-embed-frame"
+          src="/papers/Robust_CRISPR_Cas_Protein_Identification_using_Max_Margin_Regularized_Transformer_Models-2.pdf">
+        </iframe>
+      </div>
+      <div id="p1-overview" class="ptab-panel ptab-overview">
+        <div class="pd-venue-row">
           <span class="pd-venue">bioRxiv</span><span class="pd-dot">·</span>
           <span class="pd-venue">Bioinformatics</span><span class="pd-dot">·</span>
           <span class="pd-year">March 2024</span>
-          <a class="paper-link" style="margin-left:auto" href="https://www.biorxiv.org/content/10.1101/2024.03.02.583136v1" target="_blank">Open on bioRxiv ↗</a>
+          <a class="paper-link" style="margin-left:auto" href="https://www.biorxiv.org/content/10.1101/2024.03.02.583136v1" target="_blank">bioRxiv ↗</a>
         </div>
-        <div class="pd-title" style="font-size:14px;margin-bottom:5px">Transformer-Based Deep Learning Model with Latent Space Regularization for CRISPR-Cas Protein Sequence Classification</div>
-        <div class="pd-authors" style="margin-bottom:0">Bharani Nammi, S. S. Madugula, P. Pujar, V. Arachchige, J. Lui, S. Wang · <span style="color:#3d4a6a">University of Texas at Arlington</span></div>
+        <div class="pd-title">Robust CRISPR-Cas Protein Identification using Max Margin Regularized Transformer Models</div>
+        <div class="pd-authors">Bharani Nammi, S. S. Madugula, P. Pujar, V. Arachchige, J. Liu, S. Wang<br><span style="color:#3d4a6a;font-size:11px">University of Texas at Arlington</span></div>
+        <div class="pd-section-label">Abstract</div>
+        <div class="pd-abstract">Introduces a transformer-based deep learning model with max-margin latent space regularization for robust CRISPR-Cas protein sequence classification. The model enforces margin constraints in the embedding space to improve inter-class separation across diverse Cas protein families. Evaluated on curated CRISPR-Cas protein datasets, the approach achieves high classification accuracy and generalizes well to novel Cas variants, demonstrating the value of combining attention mechanisms with geometric regularization for protein function prediction.</div>
+        <div class="pd-tags">
+          <span class="ptag">Transformer</span><span class="ptag">CRISPR-Cas</span>
+          <span class="ptag">Max-Margin</span><span class="ptag">Latent Space</span>
+          <span class="ptag">Protein Classification</span><span class="ptag">Deep Learning</span>
+        </div>
+        <div class="pd-stat-box">
+          <div class="pd-stat-label">Model Details</div>
+          <div class="pd-stat-row"><span class="pd-stat-key">Architecture</span><span class="pd-stat-val">Transformer</span></div>
+          <div class="pd-stat-row"><span class="pd-stat-key">Regularization</span><span class="pd-stat-val">Max-Margin</span></div>
+          <div class="pd-stat-row"><span class="pd-stat-key">Task</span><span class="pd-stat-val">Cas classification</span></div>
+          <div class="pd-stat-row"><span class="pd-stat-key">Status</span><span class="pd-stat-val">bioRxiv 2024</span></div>
+          <div class="pd-stat-row"><span class="pd-stat-key">DOI</span><span class="pd-stat-val" style="font-size:10px">10.1101/2024.03.02.583136</span></div>
+        </div>
+        <div class="pd-highlight">
+          <div class="pd-highlight-label">Key Contribution</div>
+          <div class="pd-highlight-text">Max-margin regularization applied to transformer latent space enforces discriminative class boundaries — significantly improving robustness when classifying diverse CRISPR-Cas protein families from sequence alone.</div>
+        </div>
+        <a class="pd-read-btn" href="https://www.biorxiv.org/content/10.1101/2024.03.02.583136v1" target="_blank">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Read on bioRxiv
+        </a>
       </div>
-      <iframe class="pdf-embed-frame"
-        src="/papers/Robust_CRISPR_Cas_Protein_Identification_using_Max_Margin_Regularized_Transformer_Models-2.pdf">
-      </iframe>
     </div>`
   },
 
@@ -853,19 +901,48 @@ const CONTENT = {
     pdfEmbed:true,
     html:`
     <div class="pdf-embed-wrap">
-      <div class="pdf-embed-header">
-        <div class="pd-venue-row" style="margin-bottom:8px">
+      <div class="ptabs">
+        <button class="ptab active" onclick="switchPaperTab('p2-pdf',this)">📄 Full Paper</button>
+        <button class="ptab" onclick="switchPaperTab('p2-overview',this)">📋 Overview</button>
+      </div>
+      <div id="p2-pdf" class="ptab-panel active">
+        <iframe class="pdf-embed-frame"
+          src="/papers/CasGen_CRISPR_Cas_Protein_Design.pdf">
+        </iframe>
+      </div>
+      <div id="p2-overview" class="ptab-panel ptab-overview">
+        <div class="pd-venue-row">
           <span class="pd-venue">bioRxiv</span><span class="pd-dot">·</span>
           <span class="pd-venue">Genomics</span><span class="pd-dot">·</span>
           <span class="pd-year">March 2025</span>
-          <a class="paper-link" style="margin-left:auto" href="https://www.biorxiv.org/content/10.1101/2025.02.28.640911v1" target="_blank">Open on bioRxiv ↗</a>
+          <a class="paper-link" style="margin-left:auto" href="https://www.biorxiv.org/content/10.1101/2025.02.28.640911v1" target="_blank">bioRxiv ↗</a>
         </div>
-        <div class="pd-title" style="font-size:14px;margin-bottom:5px">CasGen: A Regularized Generative Model for CRISPR Cas Protein Design with Classification and Margin-Based Optimization</div>
-        <div class="pd-authors" style="margin-bottom:0">Bharani Nammi, V. M. Jayasinghe-Arachchige, S. S. Madugula, M. Artiles, C. N. Radler, T. Pham, J. Liu, S. Wang · <span style="color:#3d4a6a">University of Texas at Arlington</span></div>
+        <div class="pd-title">CasGen: A Regularized Generative Model for CRISPR Cas Protein Design with Classification and Margin-Based Optimization</div>
+        <div class="pd-authors">Bharani Nammi, V. M. Jayasinghe-Arachchige, S. S. Madugula, M. Artiles, C. N. Radler, T. Pham, J. Liu, S. Wang<br><span style="color:#3d4a6a;font-size:11px">University of Texas at Arlington</span></div>
+        <div class="pd-section-label">Abstract</div>
+        <div class="pd-abstract">Presents CasGen, a regularized generative model for de novo CRISPR-Cas protein design. The framework combines a generative backbone with classification objectives and margin-based optimization to produce novel Cas protein sequences with targeted functional properties. By jointly training for generation quality and discriminative accuracy, CasGen bridges the gap between generative AI and precision genome-editing tool development — enabling the design of novel Cas variants beyond those found in nature.</div>
+        <div class="pd-tags">
+          <span class="ptag">Generative Model</span><span class="ptag">CRISPR Design</span>
+          <span class="ptag">Margin Optimization</span><span class="ptag">Protein Engineering</span>
+          <span class="ptag">Deep Learning</span><span class="ptag">Genomics</span>
+        </div>
+        <div class="pd-stat-box">
+          <div class="pd-stat-label">Model Details</div>
+          <div class="pd-stat-row"><span class="pd-stat-key">Model</span><span class="pd-stat-val">CasGen</span></div>
+          <div class="pd-stat-row"><span class="pd-stat-key">Task</span><span class="pd-stat-val">Protein design</span></div>
+          <div class="pd-stat-row"><span class="pd-stat-key">Optimization</span><span class="pd-stat-val">Classification + Margin</span></div>
+          <div class="pd-stat-row"><span class="pd-stat-key">Status</span><span class="pd-stat-val">bioRxiv 2025</span></div>
+          <div class="pd-stat-row"><span class="pd-stat-key">DOI</span><span class="pd-stat-val" style="font-size:10px">10.1101/2025.02.28.640911</span></div>
+        </div>
+        <div class="pd-highlight">
+          <div class="pd-highlight-label">Key Contribution</div>
+          <div class="pd-highlight-text">CasGen generates novel, functionally-targeted CRISPR-Cas protein sequences by jointly optimizing generative, classification, and margin-based objectives — enabling AI-driven design of gene-editing tools beyond natural protein diversity.</div>
+        </div>
+        <a class="pd-read-btn" href="https://www.biorxiv.org/content/10.1101/2025.02.28.640911v1" target="_blank">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Read on bioRxiv
+        </a>
       </div>
-      <iframe class="pdf-embed-frame"
-        src="/papers/CasGen_CRISPR_Cas_Protein_Design.pdf">
-      </iframe>
     </div>`
   },
   p3:{
@@ -1225,6 +1302,15 @@ document.addEventListener('keydown', e=>{
   }
 });
 window.addEventListener('resize', renderTree);
+
+// ── Paper tab switcher (called from inline onclick) ───────────────────────
+function switchPaperTab(panelId, btn){
+  const wrap = btn.closest('.pdf-embed-wrap');
+  wrap.querySelectorAll('.ptab').forEach(t=>t.classList.remove('active'));
+  wrap.querySelectorAll('.ptab-panel').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  wrap.querySelector('#'+panelId).classList.add('active');
+}
 
 renderTree();
 </script>
