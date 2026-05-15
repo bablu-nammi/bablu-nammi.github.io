@@ -105,36 +105,34 @@
     .node-leaf .ndot{width:6px;height:6px;}
     .node-leaf .nlabel{font-size:9.5px;max-width:68px;white-space:normal;text-align:center;letter-spacing:0.3px;}
 
-    /* ── Zoom backdrop ──────────────────────────────────── */
+    /* ── Click-catcher (invisible, no darken) ───────────── */
     #zoom-backdrop{
       position:fixed;inset:0;z-index:40;
-      background:rgba(2,4,14,0.72);
       opacity:0;pointer-events:none;
-      transition:opacity 0.5s;
-      backdrop-filter:blur(3px);
+      transition:opacity 0.3s;
     }
     body.zoomed-in #zoom-backdrop{opacity:1;pointer-events:auto;}
 
-    /* ── Content card ───────────────────────────────────── */
+    /* ── Right-side drawer ──────────────────────────────── */
     #content-card{
       position:fixed;
-      top:50%;left:50%;
-      transform:translate(-50%,-50%) scale(0.96);
+      right:0;top:0;
+      width:420px;max-width:92vw;
+      height:100vh;
+      transform:translateX(100%);
       opacity:0;pointer-events:none;
-      width:88vw;
-      height:88vh;
-      background:rgba(3,5,15,0.98);
-      border:1px solid rgba(255,255,255,0.07);
-      border-radius:20px;
+      background:rgba(4,6,18,0.97);
+      border-left:1px solid rgba(255,255,255,0.07);
+      border-radius:18px 0 0 18px;
       z-index:51;
-      transition:opacity 0.4s 0.1s, transform 0.4s 0.1s;
+      transition:transform 0.38s cubic-bezier(0.32,0.72,0,1), opacity 0.28s;
       display:flex;flex-direction:column;
       overflow:hidden;
-      box-shadow:0 40px 120px rgba(0,0,0,0.8),0 0 0 1px rgba(99,102,241,0.1);
+      box-shadow:-24px 0 80px rgba(0,0,0,0.55), 0 0 0 1px rgba(99,102,241,0.08);
     }
     body.zoomed-in #content-card{
       opacity:1;pointer-events:auto;
-      transform:translate(-50%,-50%) scale(1);
+      transform:translateX(0);
     }
 
     .card-topbar{
@@ -381,11 +379,18 @@
     body.light .leg-item:hover{color:#1e2030;}
     body.light .leg-section{color:#9ca3af;}
     /* ── Legend detail mode (planet view) ────────── */
-    #legend.leg-detail{max-width:240px;}
-    .leg-item-d{align-items:flex-start;gap:10px;flex-direction:row;padding:6px 0;}
+    #legend.leg-detail{max-width:250px;}
+    .leg-summary{
+      font-size:11px;color:#7c88a8;line-height:1.6;
+      margin-top:4px;margin-bottom:2px;
+      border-left:2px solid rgba(255,255,255,0.1);
+      padding-left:8px;
+    }
+    .leg-item-d{align-items:flex-start;gap:10px;flex-direction:row;padding:6px 0;cursor:pointer;}
     .leg-item-text{display:flex;flex-direction:column;gap:3px;}
     .leg-name{font-size:12px;font-weight:700;color:#c4cde8;line-height:1.2;}
     .leg-desc{font-size:10.5px;font-weight:400;color:#6b7280;line-height:1.4;}
+    body.light .leg-summary{color:#5a6a8a;border-left-color:rgba(0,0,0,0.1);}
     body.light .leg-name{color:#2d3555;}
     body.light .leg-desc{color:#8492b4;}
 
@@ -468,7 +473,7 @@
         linear-gradient(90deg,rgba(99,102,241,0.07)1px,transparent 1px);
     }
     body.light .orbit-path-ring{border-color:rgba(0,0,0,0.09);}
-    body.light #zoom-backdrop{background:rgba(220,225,255,0.75);}
+    body.light #zoom-backdrop{background:transparent;}
     body.light #sig{color:#1e2030;}
     body.light #sig em{color:#6366f1;}
     body.light #hint{background:rgba(255,255,255,0.85);border-color:rgba(0,0,0,0.07);color:#6b7280;}
@@ -497,9 +502,9 @@
 
     /* Light card */
     body.light #content-card{
-      background:rgba(255,255,255,0.97);
-      border-color:rgba(0,0,0,0.07);
-      box-shadow:0 32px 80px rgba(0,0,0,0.12),0 0 0 1px rgba(99,102,241,0.08);
+      background:rgba(252,252,255,0.98);
+      border-color:rgba(0,0,0,0.08);
+      box-shadow:-16px 0 48px rgba(0,0,0,0.10), 0 0 0 1px rgba(99,102,241,0.06);
     }
     body.light .card-topbar{background:rgba(0,0,0,0.02);border-bottom-color:rgba(0,0,0,0.06);}
     body.light .back-btn{background:rgba(99,102,241,0.08);border-color:rgba(99,102,241,0.2);color:#6366f1;}
@@ -594,24 +599,28 @@ const NODES = {
     type:'cat', label:'Research\nPapers',
     x:26, y:20, color:'#06b6d4', glow:'rgba(6,182,212,0.4)',
     badge:'3 Papers', badgeClass:'badge-papers',
+    summary:'3 peer-reviewed publications in AI-driven bioinformatics — covering transformer-based protein classification, generative protein design, and ML-based feature extraction for CRISPR-Cas systems.',
     children:['p1','p2','p3'],
   },
   awards:{
     type:'cat', label:'Awards\n& Wins',
     x:74, y:20, color:'#f59e0b', glow:'rgba(245,158,11,0.4)',
     badge:'2× Winner', badgeClass:'badge-gold',
+    summary:'2× hackathon winner, building AI and AR-powered applications in healthcare and insurance — winning against teams from universities across the Dallas–Fort Worth region.',
     children:['a1','a2'],
   },
   exp:{
     type:'cat', label:'Experience',
     x:78, y:72, color:'#8b5cf6', glow:'rgba(139,92,246,0.4)',
     badge:null, badgeClass:'',
+    summary:'5+ years building production ML systems, deep learning models, and AR applications — spanning AI research at UTA and industry engineering roles.',
     children:[],
   },
   edu:{
     type:'cat', label:'Education',
     x:22, y:72, color:'#10b981', glow:'rgba(16,185,129,0.4)',
     badge:null, badgeClass:'',
+    summary:'MS Computer Science, UT Arlington (2023) — deep learning & AI research focus. BS Computer Science, UT Dallas (2020).',
     children:[],
   },
   p1:{ type:'leaf', label:'CRISPR\nClassifier',    x:9,  y:8,  color:'#67e8f9', glow:'rgba(103,232,249,0.3)', parent:'papers', desc:'Transformer + margin regularization for CRISPR-Cas protein classification · bioRxiv 2024' },
@@ -1081,9 +1090,13 @@ function updateLegend(){
     leg.className='leg-detail';
     const pN = NODES[viewState];
     const ms = MOONS[viewState]||[];
+    const summaryHtml = pN.summary
+      ? `<div class="leg-summary">${pN.summary}</div>` : '';
     leg.innerHTML =
       '<div class="leg-back" onclick="switchView(\'root\')">← Solar System</div>'
       +'<div class="leg-section">'+pN.label.replace('\n',' ')+'</div>'
+      + summaryHtml
+      +(ms.length ? '<div class="leg-section" style="margin-top:12px">In this orbit</div>' : '')
       + ms.map(m=>{
           const mn=NODES[m.key];
           return `<div class="leg-item leg-item-d" onclick="openCard('${m.key}','${m.key}')">
@@ -1150,10 +1163,10 @@ function renderPlanetView(planetKey, W, H){
   pEl.style.cursor='default';
   sw.appendChild(pEl);
 
-  const durations=[10,13,9,8,11,7,12];
+  // inner orbit = fast, outer = slow (like real planets)
   ms.forEach((m,mi)=>{
     const r=baseR + mi*gapR;
-    const dur=durations[mi % durations.length];
+    const dur=7 + mi*5;   // 7s, 12s, 17s, …
     const {arm,body}=mkOrbitArm(dur,m.ang,r);
     const mEl=makeNode(m.key,NODES[m.key],(mi+1)*0.15);
     mEl.addEventListener('click',e=>{e.stopPropagation();openCard(m.key,m.key);});
