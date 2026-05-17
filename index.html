@@ -11,99 +11,24 @@
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
     html,body{width:100%;height:100%;overflow:hidden;background:#03050e;font-family:'Inter',system-ui,sans-serif;}
 
-    /* ── Background ─────────────────────────────────────── */
-    #bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
-    .orb{position:absolute;border-radius:50%;filter:blur(120px);opacity:0.09;animation:drift 14s ease-in-out infinite alternate;}
-    .orb1{width:800px;height:800px;background:#6366f1;top:-300px;right:-200px;}
-    .orb2{width:600px;height:600px;background:#06b6d4;bottom:-200px;left:-200px;animation-delay:-7s;}
-    .orb3{width:400px;height:400px;background:#f59e0b;bottom:10%;right:20%;animation-delay:-3s;opacity:0.05;}
-    @keyframes drift{from{transform:translate(0,0)}to{transform:translate(50px,30px)}}
-    #bg::after{
-      content:'';position:absolute;inset:0;
-      background-image:linear-gradient(rgba(99,102,241,0.035)1px,transparent 1px),
-        linear-gradient(90deg,rgba(99,102,241,0.035)1px,transparent 1px);
-      background-size:60px 60px;
-    }
-
-    /* ── Tree canvas ────────────────────────────────────── */
-    #tree{position:fixed;inset:0;z-index:10;}
-    .zoom-canvas{
-      position:absolute;inset:0;
-      transition:transform 0.8s cubic-bezier(0.4,0,0.2,1);
-      will-change:transform;
-    }
-
-    /* ── SVG connections ────────────────────────────────── */
-    #svg-layer{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible;}
-    .edge{fill:none;stroke-width:1.5;stroke-dasharray:7 5;animation:dashflow 3s linear infinite;}
-    @keyframes dashflow{to{stroke-dashoffset:-48;}}
-
-    /* ── Nodes ──────────────────────────────────────────── */
-    .node{
-      position:absolute;transform:translate(-50%,-50%);
-      cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:9px;
-      transition:filter 0.25s,transform 0.25s;
-    }
-    .node:hover{transform:translate(-50%,-50%) scale(1.06);}
-
-    .nglow{
-      position:absolute;border-radius:50%;opacity:0;
-      transition:opacity 0.35s;pointer-events:none;z-index:0;
-    }
-    .node:hover .nglow{opacity:1;}
-
-    .nring{
-      border-radius:50%;display:flex;align-items:center;justify-content:center;
-      border:1.5px solid;position:relative;z-index:1;flex-shrink:0;
-      transition:box-shadow 0.3s,transform 0.3s,border-color 0.3s;
-    }
-
-    /* Root */
-    .node-root .nring{
-      width:118px;height:118px;
-      background:linear-gradient(135deg,rgba(99,102,241,0.2),rgba(99,102,241,0.05));
-      border-color:#6366f1;
-      box-shadow:0 0 40px rgba(99,102,241,0.2),inset 0 1px 0 rgba(255,255,255,0.04);
-    }
-    .node-root .nglow{width:200px;height:200px;top:-41px;left:-41px;background:radial-gradient(circle,rgba(99,102,241,0.25),transparent 65%);}
-    .node-root:hover .nring{box-shadow:0 0 60px rgba(99,102,241,0.4),inset 0 1px 0 rgba(255,255,255,0.06);}
-    .root-init{display:flex;flex-direction:column;align-items:center;gap:4px;}
-    .root-av{width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#4f46e5);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:white;letter-spacing:-0.5px;}
-    .root-name{font-size:12px;font-weight:800;color:#eef2ff;letter-spacing:-0.3px;white-space:nowrap;}
-    .root-title{font-size:8.5px;font-weight:600;color:#818cf8;text-transform:uppercase;letter-spacing:0.9px;white-space:nowrap;}
-
-    /* Category nodes */
-    .node-cat .nring{width:72px;height:72px;}
-    .node-cat .nglow{width:120px;height:120px;top:-24px;left:-24px;}
-
-    /* Center dot */
-    .ndot{
-      width:8px;height:8px;border-radius:50%;opacity:0.7;
-      transition:opacity 0.2s,transform 0.2s;
-    }
-    .node:hover .ndot{opacity:1;transform:scale(1.3);}
-
-    /* Labels hidden by default, appear on hover / active */
-    .nlabel{
-      font-size:11px;font-weight:700;color:#7c88a8;
-      text-align:center;line-height:1.35;white-space:nowrap;
-      text-transform:uppercase;letter-spacing:0.6px;
-      opacity:0;transform:translateY(5px);
-      transition:opacity 0.22s, transform 0.22s, color 0.22s;
+    /* ── Three.js container ─────────────────────────────── */
+    #three-container { position:fixed; inset:0; z-index:10; transition:opacity 0.3s; }
+    .label3d {
+      font-family:'Inter',sans-serif; font-size:10px; font-weight:700;
+      color:#c4cde8; text-align:center; line-height:1.35; white-space:nowrap;
+      text-transform:uppercase; letter-spacing:0.6px;
+      opacity:0; transform:translateY(4px);
+      transition:opacity 0.22s, transform 0.22s;
       pointer-events:none;
+      text-shadow:0 1px 6px rgba(3,5,14,0.9);
+      padding:2px 6px; border-radius:4px;
+      background:rgba(3,5,14,0.35);
     }
-    .node:hover .nlabel{opacity:1;transform:translateY(0);color:#c7d2fe;}
-    .node.active .nlabel{opacity:1;transform:translateY(0);color:#eef2ff;}
-    .node.active .nring{border-width:2px;}
+    .label3d.visible { opacity:1; transform:translateY(0); }
 
-    /* Badges hidden in orbit view — shown only in content cards */
-    .nbadge{display:none;}
-
-    /* Leaf nodes — smaller and cleaner */
-    .node-leaf .nring{width:38px;height:38px;}
-    .node-leaf .nglow{width:64px;height:64px;top:-13px;left:-13px;}
-    .node-leaf .ndot{width:6px;height:6px;}
-    .node-leaf .nlabel{font-size:9.5px;max-width:68px;white-space:normal;text-align:center;letter-spacing:0.3px;}
+    /* Keep dark for space even in light mode */
+    body { background:#03050e; }
+    body.light { background:#03050e; }
 
     /* ── Click-catcher (invisible, no darken) ───────────── */
     #zoom-backdrop{
@@ -260,35 +185,45 @@
     }
     #sig em{color:#818cf8;font-style:normal;}
 
-    /* ── Active node pulse ring ──────────────────────────── */
-    @keyframes ringpulse{
-      0%{box-shadow:0 0 0 0 var(--np,rgba(99,102,241,0.5));}
-      70%{box-shadow:0 0 0 12px transparent;}
-      100%{box-shadow:0 0 0 0 transparent;}
-    }
-    .node.active .nring{animation:ringpulse 1.8s ease-out infinite;}
-
-    /* ── Orbital system ──────────────────────────────────── */
-    @keyframes orbitSpin    { to { transform: rotate( 360deg); } }
-    @keyframes orbitSpinRev { to { transform: rotate(-360deg); } }
-    .orbit-arm {
-      position:absolute; left:0; top:0;
-      width:0; height:0; overflow:visible;
-      transform-origin:0 0;
-    }
-    .orbit-at-r {
-      position:absolute; top:0;
-      width:0; height:0; overflow:visible;
-    }
-    .orbit-body {
-      width:0; height:0; overflow:visible;
-    }
-    .orbit-path-ring {
-      position:absolute; border-radius:50%;
-      transform:translate(-50%,-50%);
+    /* ── Legend ──────────────────────────────────────────── */
+    #legend{
+      position:fixed;left:24px;top:50%;transform:translateY(-50%);
+      z-index:200;display:flex;flex-direction:column;gap:10px;
       pointer-events:none;
-      border:1px solid rgba(255,255,255,0.045);
     }
+    .leg-section{font-size:9.5px;font-weight:800;color:#9ca3af;
+      text-transform:uppercase;letter-spacing:1.2px;margin-bottom:2px;}
+    .leg-item{
+      display:flex;align-items:center;gap:9px;
+      font-size:12px;font-weight:600;color:#6b7280;
+      transition:color 0.2s;
+      pointer-events:auto;cursor:pointer;
+    }
+    .leg-item:hover{color:#c4cde8;}
+    .leg-dot{
+      width:9px;height:9px;border-radius:50%;flex-shrink:0;
+      box-shadow:0 0 6px var(--ldc,transparent);
+    }
+    .leg-back{
+      display:flex;align-items:center;gap:7px;
+      font-size:11.5px;font-weight:700;color:#6366f1;
+      background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.18);
+      padding:7px 13px;border-radius:10px;cursor:pointer;
+      pointer-events:auto;transition:all 0.2s;margin-bottom:6px;
+    }
+    .leg-back:hover{background:rgba(99,102,241,0.16);color:#4338ca;}
+    /* ── Legend detail mode (planet view) ────────── */
+    #legend.leg-detail{max-width:250px;}
+    .leg-summary{
+      font-size:11px;color:#7c88a8;line-height:1.6;
+      margin-top:4px;margin-bottom:2px;
+      border-left:2px solid rgba(255,255,255,0.1);
+      padding-left:8px;
+    }
+    .leg-item-d{align-items:flex-start;gap:10px;flex-direction:row;padding:6px 0;cursor:pointer;}
+    .leg-item-text{display:flex;flex-direction:column;gap:3px;}
+    .leg-name{font-size:12px;font-weight:700;color:#c4cde8;line-height:1.2;}
+    .leg-desc{font-size:10.5px;font-weight:400;color:#6b7280;line-height:1.4;}
 
     /* ── PDF embed view ─────────────────────────────────── */
     .pdf-embed-wrap{display:flex;flex-direction:column;height:100%;gap:0;}
@@ -360,110 +295,6 @@
     .ptab-panel.active{display:flex;flex-direction:column;}
     .ptab-overview{overflow-y:auto;flex-direction:column;gap:18px;
       scrollbar-width:thin;scrollbar-color:#1a2236 transparent;}
-    body.light .ptabs{background:rgba(0,0,0,0.03);border-color:rgba(0,0,0,0.07);}
-    body.light .ptab{color:#9ca3af;}
-    body.light .ptab.active{background:rgba(6,182,212,0.1);color:#0891b2;}
-    body.light .ptab:hover:not(.active){background:rgba(0,0,0,0.04);color:#4b5563;}
-
-    /* ── Legend ──────────────────────────────────────────── */
-    #legend{
-      position:fixed;left:24px;top:50%;transform:translateY(-50%);
-      z-index:200;display:flex;flex-direction:column;gap:10px;
-      pointer-events:none;
-    }
-    .leg-section{font-size:9.5px;font-weight:800;color:#9ca3af;
-      text-transform:uppercase;letter-spacing:1.2px;margin-bottom:2px;}
-    .leg-item{
-      display:flex;align-items:center;gap:9px;
-      font-size:12px;font-weight:600;color:#6b7280;
-      transition:color 0.2s;
-      pointer-events:auto;cursor:pointer;
-    }
-    .leg-item:hover{color:#1e2030;}
-    .leg-dot{
-      width:9px;height:9px;border-radius:50%;flex-shrink:0;
-      box-shadow:0 0 6px var(--ldc,transparent);
-    }
-    .leg-back{
-      display:flex;align-items:center;gap:7px;
-      font-size:11.5px;font-weight:700;color:#6366f1;
-      background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.18);
-      padding:7px 13px;border-radius:10px;cursor:pointer;
-      pointer-events:auto;transition:all 0.2s;margin-bottom:6px;
-    }
-    .leg-back:hover{background:rgba(99,102,241,0.16);color:#4338ca;}
-    body.light .leg-item{color:#6b7280;}
-    body.light .leg-item:hover{color:#1e2030;}
-    body.light .leg-section{color:#9ca3af;}
-    /* ── Legend detail mode (planet view) ────────── */
-    #legend.leg-detail{max-width:250px;}
-    .leg-summary{
-      font-size:11px;color:#7c88a8;line-height:1.6;
-      margin-top:4px;margin-bottom:2px;
-      border-left:2px solid rgba(255,255,255,0.1);
-      padding-left:8px;
-    }
-    .leg-item-d{align-items:flex-start;gap:10px;flex-direction:row;padding:6px 0;cursor:pointer;}
-    .leg-item-text{display:flex;flex-direction:column;gap:3px;}
-    .leg-name{font-size:12px;font-weight:700;color:#c4cde8;line-height:1.2;}
-    .leg-desc{font-size:10.5px;font-weight:400;color:#6b7280;line-height:1.4;}
-    body.light .leg-summary{color:#5a6a8a;border-left-color:rgba(0,0,0,0.1);}
-    body.light .leg-name{color:#2d3555;}
-    body.light .leg-desc{color:#8492b4;}
-
-    /* ── Planet-view center node ─────────────────────────── */
-    .planet-center .nring{width:90px!important;height:90px!important;}
-    .planet-center .nlabel{opacity:1!important;transform:none!important;
-      font-size:12px!important;font-weight:800!important;}
-    body.light .planet-center .nlabel{color:#1e2030!important;}
-
-    /* ── View transition ────────────────────────────────── */
-    #nodes-wrap{position:absolute;inset:0;transition:opacity 0.28s ease;}
-
-    /* ── Node entrance pop ───────────────────────────────── */
-    @keyframes nodeIn {
-      0%   { opacity:0; transform:translate(-50%,-50%) scale(0.35); }
-      65%  { opacity:1; transform:translate(-50%,-50%) scale(1.1); }
-      100% { opacity:1; transform:translate(-50%,-50%) scale(1); }
-    }
-    .node { opacity:0; animation:nodeIn 0.75s cubic-bezier(0.34,1.56,0.64,1) both; }
-    .node:hover { transform:translate(-50%,-50%) scale(1.12) !important; }
-
-    /* ── Float wrapper ───────────────────────────────────── */
-    @keyframes nFloat {
-      0%,100% { transform:translateY(0px); }
-      50%     { transform:translateY(-7px); }
-    }
-    .nfloat {
-      display:flex; align-items:center; justify-content:center;
-      position:relative; flex-shrink:0;
-    }
-    .nfloat { animation:nFloat var(--fd,5s) ease-in-out infinite var(--fdelay,0s); }
-    .node:hover .nfloat { animation-play-state:paused; }
-
-    /* ── Orbit ring on category nodes ───────────────────── */
-    @keyframes orbitSpin { to { transform:rotate(360deg); } }
-    .norbit {
-      position:absolute; border-radius:50%;
-      border:1.5px dashed rgba(255,255,255,0.07);
-      animation:orbitSpin 18s linear infinite;
-      pointer-events:none;
-      transform:translate(-50%,-50%);
-      top:50%; left:50%;
-      transition:border-color 0.3s;
-    }
-    .node:hover .norbit { border-color:rgba(255,255,255,0.18); }
-    .node.active .norbit { border-color:rgba(255,255,255,0.25); animation-duration:6s; }
-
-    /* ── Inactive node dim when card is open ─────────────── */
-    body.node-active .node {
-      opacity:0.28; filter:saturate(0.15);
-      transition:opacity 0.5s, filter 0.5s;
-    }
-    body.node-active .node.active { opacity:1; filter:none; }
-    body.node-active .node:hover  { opacity:0.75; filter:saturate(0.6); }
-
-    /* (old centered-card overrides removed — now using right-side drawer) */
 
     /* ── Theme toggle button ─────────────────────────────── */
     #theme-toggle{
@@ -476,42 +307,7 @@
     }
     #theme-toggle:hover{background:rgba(255,255,255,0.12);color:#eef2ff;}
 
-    /* ── Light mode ──────────────────────────────────────── */
-    body.light{background:#eef1ff;}
-    body.light #bg .orb{opacity:0.08;}
-    body.light #bg::after{
-      background-image:linear-gradient(rgba(99,102,241,0.07)1px,transparent 1px),
-        linear-gradient(90deg,rgba(99,102,241,0.07)1px,transparent 1px);
-    }
-    body.light .orbit-path-ring{border-color:rgba(0,0,0,0.09);}
-    body.light #zoom-backdrop{background:transparent;}
-    body.light #sig{color:#1e2030;}
-    body.light #sig em{color:#6366f1;}
-    body.light #hint{background:rgba(255,255,255,0.85);border-color:rgba(0,0,0,0.07);color:#6b7280;}
-    body.light #theme-toggle{background:rgba(0,0,0,0.05);border-color:rgba(0,0,0,0.1);color:#4b5563;}
-    body.light #theme-toggle:hover{background:rgba(0,0,0,0.1);color:#1e2030;}
-
-    /* Light nodes */
-    body.light .nring{
-      background:rgba(255,255,255,0.92) !important;
-      box-shadow:0 4px 24px rgba(0,0,0,0.10),0 0 0 0 transparent !important;
-    }
-    body.light .node:hover .nring{box-shadow:0 8px 32px rgba(0,0,0,0.14) !important;}
-    body.light .node-root .nring{
-      background:linear-gradient(135deg,#fff,#f0f2ff) !important;
-      box-shadow:0 6px 40px rgba(99,102,241,0.2) !important;
-    }
-    body.light .nlabel{color:#374151;}
-    body.light .node:hover .nlabel{opacity:1;transform:translateY(0);color:#1e2030;}
-    body.light .node.active .nlabel{opacity:1;transform:translateY(0);color:#1e2030;}
-    body.light .root-name{color:#1e2030;}
-    body.light .root-title{color:#6366f1;}
-    body.light .root-av{background:linear-gradient(135deg,#6366f1,#4f46e5);}
-    body.light .nglow{opacity:0.15 !important;}
-    body.light .node:hover .nglow{opacity:0.35 !important;}
-    body.light .nbadge{background:rgba(255,255,255,0.8) !important;}
-
-    /* Light card */
+    /* Light card (UI chrome only — canvas stays dark) */
     body.light #content-card{
       background:rgba(250,251,255,0.99);
       border-color:rgba(0,0,0,0.09);
@@ -553,30 +349,29 @@
     body.light .pd-highlight-text{color:#374151;}
     body.light .papers-drop{background:#f3f4f6;border-color:rgba(99,102,241,0.25);}
     body.light .pdf-embed-header{border-bottom-color:rgba(0,0,0,0.06);}
-
-    /* Light active dim */
-    body.light.node-active .node{opacity:0.25;filter:saturate(0.1);}
-    body.light.node-active .node.active{opacity:1;filter:none;}
-    body.light.node-active .node:hover{opacity:0.7;filter:none;}
+    body.light #hint{background:rgba(255,255,255,0.85);border-color:rgba(0,0,0,0.07);color:#6b7280;}
+    body.light #theme-toggle{background:rgba(0,0,0,0.05);border-color:rgba(0,0,0,0.1);color:#4b5563;}
+    body.light #theme-toggle:hover{background:rgba(0,0,0,0.1);color:#1e2030;}
+    body.light .leg-item{color:#6b7280;}
+    body.light .leg-item:hover{color:#1e2030;}
+    body.light .leg-section{color:#9ca3af;}
+    body.light .leg-summary{color:#5a6a8a;border-left-color:rgba(0,0,0,0.1);}
+    body.light .leg-name{color:#2d3555;}
+    body.light .leg-desc{color:#8492b4;}
+    body.light .ptabs{background:rgba(0,0,0,0.03);border-color:rgba(0,0,0,0.07);}
+    body.light .ptab{color:#9ca3af;}
+    body.light .ptab.active{background:rgba(6,182,212,0.1);color:#0891b2;}
+    body.light .ptab:hover:not(.active){background:rgba(0,0,0,0.04);color:#4b5563;}
+    body.light #sig{color:#eef2ff;}
+    body.light #sig em{color:#818cf8;}
   </style>
 </head>
 <body class="light">
 
-<div id="bg">
-  <div class="orb orb1"></div>
-  <div class="orb orb2"></div>
-  <div class="orb orb3"></div>
-</div>
-
 <div id="sig">BN<em>.</em></div>
 <button id="theme-toggle" title="Toggle light/dark mode">🌑</button>
 
-<div id="tree">
-  <div class="zoom-canvas" id="zc">
-    <svg id="svg-layer"></svg>
-    <div id="nodes-wrap"></div>
-  </div>
-</div>
+<div id="three-container"></div>
 
 <div id="zoom-backdrop"></div>
 
@@ -595,9 +390,21 @@
 </div>
 
 <div id="legend"></div>
-<div id="hint">✦ Click a node to explore</div>
+<div id="hint">✦ Click a planet to explore · drag to orbit</div>
 
-<script>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
 // ── Node definitions ─────────────────────────────────────────────────────
 const NODES = {
   root:{
@@ -640,18 +447,6 @@ const NODES = {
   a1:{ type:'leaf', label:'insARance',             x:63, y:7,  color:'#fbbf24', glow:'rgba(251,191,36,0.3)', parent:'awards', desc:'AR app overlaying insurance info on real objects · Facebook Hackathon Winner 2020' },
   a2:{ type:'leaf', label:'WeCare',                x:82, y:7,  color:'#fbbf24', glow:'rgba(251,191,36,0.3)', parent:'awards', desc:'AI-powered post-accident info exchange app · Hackathon Winner 2020' },
 };
-
-const EDGES = [
-  ['root','papers','#6366f1'],
-  ['root','awards','#6366f1'],
-  ['root','exp','#6366f1'],
-  ['root','edu','#6366f1'],
-  ['papers','p1','#06b6d4'],
-  ['papers','p2','#06b6d4'],
-  ['papers','p3','#06b6d4'],
-  ['awards','a1','#f59e0b'],
-  ['awards','a2','#f59e0b'],
-];
 
 // ── Content ──────────────────────────────────────────────────────────────
 const CONTENT = {
@@ -1067,85 +862,281 @@ const CONTENT = {
   },
 };
 
-// ── Moon definitions (global) ─────────────────────────────────────────────
+// ── Moon definitions (kept for reference) ─────────────────────────────────
 const MOONS = {
   papers:[ {key:'p1',ang:0,dur:10}, {key:'p2',ang:120,dur:13}, {key:'p3',ang:240,dur:9} ],
   awards:[ {key:'a1',ang:80,dur:8}, {key:'a2',ang:260,dur:11} ],
 };
 
-// ── Render tree ──────────────────────────────────────────────────────────
-const tree = document.getElementById('tree');
-const zc   = document.getElementById('zc');
-const svg  = document.getElementById('svg-layer');
-const wrap = document.getElementById('nodes-wrap');
+// ── Three.js orbital params ───────────────────────────────────────────────
+const PLANET_ORBITS = {
+  edu:    { r:4.5,  tilt: 3,  speed:0.28, startAng:2.48 },
+  papers: { r:7.0,  tilt:-5,  speed:0.20, startAng:3.76 },
+  awards: { r:9.5,  tilt: 4,  speed:0.14, startAng:5.67 },
+  exp:    { r:12.0, tilt:-3,  speed:0.10, startAng:0.73 },
+};
 
-function vw(){ return window.innerWidth; }
-function vh(){ return window.innerHeight; }
-function px(pct, dim){ return pct / 100 * dim; }
+const MOON_ORBITS = {
+  papers: [
+    { key:'p1', r:1.8, speed:0.9,  startAng:0    },
+    { key:'p2', r:2.8, speed:0.58, startAng:2.09 },
+    { key:'p3', r:3.8, speed:0.40, startAng:4.19 },
+  ],
+  awards: [
+    { key:'a1', r:1.8, speed:0.8,  startAng:1.4  },
+    { key:'a2', r:2.8, speed:0.50, startAng:4.5  },
+  ],
+};
 
-// ── Node builder ─────────────────────────────────────────────────────────
-function makeNode(key, n, delay){
-  const el = document.createElement('div');
-  el.id = 'node-'+key;
-  el.style.cssText = 'position:absolute;left:0;top:0;transform:translate(-50%,-50%);';
-  el.style.animationDelay = delay+'s';
-  if(n.type==='root'){
-    el.className='node node-root';
-    el.innerHTML=`<div class="nglow"></div>
-      <div class="nring" style="--np:${n.glow};background:linear-gradient(135deg,rgba(99,102,241,0.22),rgba(99,102,241,0.06));border-color:${n.color};box-shadow:0 0 52px rgba(99,102,241,0.28),inset 0 1px 0 rgba(255,255,255,0.05)">
-        <div class="root-init"><div class="root-av">BN</div><div class="root-name">Bharani Nammi</div><div class="root-title">Deep Learning</div></div>
-      </div>`;
-  } else if(n.type==='cat'){
-    el.className='node node-cat';
-    el.innerHTML=`<div class="nglow" style="background:radial-gradient(circle,${n.glow},transparent 65%)"></div>
-      <div class="nring" style="--np:${n.glow};background:${n.color}14;border-color:${n.color}65;box-shadow:0 0 26px ${n.color}28">
-        <div class="ndot" style="background:${n.color}"></div>
-      </div>
-      <div class="nlabel">${n.label.replace('\n','<br>')}</div>`;
-  } else {
-    el.className='node node-leaf';
-    el.innerHTML=`<div class="nglow" style="background:radial-gradient(circle,${n.glow},transparent 65%)"></div>
-      <div class="nring" style="--np:${n.glow};background:${n.color}12;border-color:${n.color}55;box-shadow:0 0 14px ${n.color}22">
-        <div class="ndot" style="background:${n.color}"></div>
-      </div>
-      <div class="nlabel">${n.label.replace('\n','<br>')}</div>`;
+// ── Scene setup ───────────────────────────────────────────────────────────
+const W = window.innerWidth, H = window.innerHeight;
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(55, W/H, 0.1, 500);
+camera.position.set(0, 12, 26);
+
+const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:false });
+renderer.setSize(W, H);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setClearColor(0x03050e, 1);
+document.getElementById('three-container').appendChild(renderer.domElement);
+
+const labelRenderer = new CSS2DRenderer();
+labelRenderer.setSize(W, H);
+labelRenderer.domElement.style.cssText = 'position:absolute;top:0;left:0;pointer-events:none;z-index:11;';
+document.getElementById('three-container').appendChild(labelRenderer.domElement);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true; controls.dampingFactor = 0.08;
+controls.minDistance = 4; controls.maxDistance = 45;
+controls.target.set(0,0,0);
+
+// ── Lights + stars ────────────────────────────────────────────────────────
+scene.add(new THREE.AmbientLight(0x334466, 2.5));
+const sunLight = new THREE.PointLight(0xffffff, 5, 70);
+scene.add(sunLight);
+
+const starPos = new Float32Array(9000*3);
+for(let i=0;i<starPos.length;i++) starPos[i]=(Math.random()-0.5)*300;
+const starGeo = new THREE.BufferGeometry();
+starGeo.setAttribute('position', new THREE.BufferAttribute(starPos,3));
+const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({color:0xffffff,size:0.18,transparent:true,opacity:0.55}));
+scene.add(stars);
+
+// ── Helper functions ──────────────────────────────────────────────────────
+function hexNum(hex){ return parseInt(hex.replace('#',''),16); }
+
+function makeSphere(radius, hexColor, emissiveInt=0){
+  return new THREE.Mesh(
+    new THREE.SphereGeometry(radius,32,32),
+    new THREE.MeshPhongMaterial({
+      color:hexNum(hexColor), emissive:hexNum(hexColor),
+      emissiveIntensity:emissiveInt, shininess:40
+    })
+  );
+}
+
+function makeGlowShell(radius, hexColor, opacity=0.12){
+  return new THREE.Mesh(
+    new THREE.SphereGeometry(radius,16,16),
+    new THREE.MeshBasicMaterial({color:hexNum(hexColor),transparent:true,opacity,side:THREE.BackSide})
+  );
+}
+
+function makeOrbitRing(radius, tiltDeg, hexColor){
+  const pts=[];
+  for(let i=0;i<=128;i++){
+    const a=(i/128)*Math.PI*2;
+    pts.push(new THREE.Vector3(Math.cos(a)*radius,0,Math.sin(a)*radius));
   }
-  return el;
+  const line=new THREE.LineLoop(
+    new THREE.BufferGeometry().setFromPoints(pts),
+    new THREE.LineBasicMaterial({color:hexNum(hexColor),transparent:true,opacity:0.22})
+  );
+  line.rotation.x=(tiltDeg*Math.PI)/180;
+  return line;
 }
 
-function mkOrbitArm(dur, ang, radius){
-  const delay = -((ang/360)*dur);
-  const arm = document.createElement('div');
-  arm.className='orbit-arm';
-  arm.style.animation=`orbitSpin ${dur}s linear infinite ${delay}s`;
-  const atR = document.createElement('div');
-  atR.className='orbit-at-r'; atR.style.left=radius+'px';
-  const body = document.createElement('div');
-  body.className='orbit-body';
-  body.style.animation=`orbitSpinRev ${dur}s linear infinite ${delay}s`;
-  atR.appendChild(body); arm.appendChild(atR);
-  return {arm, body};
+function makeLabel(text, yOffset=0){
+  const div=document.createElement('div');
+  div.className='label3d';
+  div.innerHTML=text.replace('\n','<br>');
+  const obj=new CSS2DObject(div);
+  obj.position.set(0,yOffset,0);
+  return obj;
 }
 
-function mkRing(r, color){
-  const d = document.createElement('div');
-  d.className='orbit-path-ring';
-  d.style.cssText+=`width:${r*2}px;height:${r*2}px;${color?'border-color:'+color+';':''}`;
-  return d;
+// ── World group ───────────────────────────────────────────────────────────
+const worldGroup = new THREE.Group();
+scene.add(worldGroup);
+
+const pivots = {};
+const bodyMeshes = {};
+const labelObjs = {};
+
+function clearWorld(){
+  while(worldGroup.children.length) worldGroup.remove(worldGroup.children[0]);
+  Object.keys(pivots).forEach(k=>delete pivots[k]);
+  Object.keys(bodyMeshes).forEach(k=>delete bodyMeshes[k]);
+  Object.keys(labelObjs).forEach(k=>delete labelObjs[k]);
 }
 
-// ── View state (drill-down) ───────────────────────────────────────────────
-let viewState = 'root'; // 'root' | planet key
+// ── Build root scene ──────────────────────────────────────────────────────
+function buildRootScene(){
+  clearWorld();
+
+  const sun = makeSphere(1.35,'#6366f1',0.55);
+  sun.userData={key:'root',type:'sun'};
+  sun.add(makeGlowShell(1.9,'#6366f1',0.18));
+  sun.add(makeGlowShell(2.8,'#6366f1',0.06));
+  const sunLbl=makeLabel('Bharani\nNammi',2.1);
+  sun.add(sunLbl); labelObjs['root']=sunLbl;
+  sunLbl.element.classList.add('visible');
+  worldGroup.add(sun); bodyMeshes['root']=sun;
+
+  Object.entries(PLANET_ORBITS).forEach(([key,orb])=>{
+    const nd=NODES[key];
+    worldGroup.add(makeOrbitRing(orb.r, orb.tilt, nd.color));
+
+    const pivot=new THREE.Object3D();
+    pivot.rotation.x=(orb.tilt*Math.PI)/180;
+    pivot.rotation.y=orb.startAng;
+    pivot.userData.orbitSpeed=orb.speed;
+    worldGroup.add(pivot); pivots[key]=pivot;
+
+    const planet=makeSphere(0.55, nd.color, 0.28);
+    planet.position.set(orb.r,0,0);
+    planet.userData={key,type:'planet'};
+    planet.add(makeGlowShell(0.88,nd.color,0.22));
+    pivot.add(planet); bodyMeshes[key]=planet;
+
+    const lbl=makeLabel(nd.label, 1.0);
+    planet.add(lbl); labelObjs[key]=lbl;
+  });
+}
+
+// ── Build planet scene ────────────────────────────────────────────────────
+function buildPlanetScene(planetKey){
+  clearWorld();
+  const nd=NODES[planetKey];
+  const moonList=MOON_ORBITS[planetKey]||[];
+
+  const planet=makeSphere(0.95,nd.color,0.38);
+  planet.userData={key:planetKey,type:'planet-center'};
+  planet.add(makeGlowShell(1.4,nd.color,0.22));
+  planet.add(makeGlowShell(2.1,nd.color,0.08));
+  const pLbl=makeLabel(nd.label,1.5);
+  planet.add(pLbl); labelObjs[planetKey]=pLbl;
+  pLbl.element.classList.add('visible');
+  worldGroup.add(planet); bodyMeshes[planetKey]=planet;
+
+  moonList.forEach(m=>{
+    const mn=NODES[m.key];
+    worldGroup.add(makeOrbitRing(m.r,0,mn.color));
+
+    const pivot=new THREE.Object3D();
+    pivot.rotation.y=m.startAng;
+    pivot.userData.orbitSpeed=m.speed;
+    worldGroup.add(pivot); pivots[m.key]=pivot;
+
+    const moon=makeSphere(0.3,mn.color,0.32);
+    moon.position.set(m.r,0,0);
+    moon.userData={key:m.key,type:'moon'};
+    moon.add(makeGlowShell(0.52,mn.color,0.28));
+    pivot.add(moon); bodyMeshes[m.key]=moon;
+
+    const lbl=makeLabel(mn.label,0.65);
+    moon.add(lbl); labelObjs[m.key]=lbl;
+  });
+}
+
+// ── View switching ────────────────────────────────────────────────────────
+let viewState='root';
+const container=document.getElementById('three-container');
 
 function switchView(key){
-  wrap.style.opacity = '0';
+  container.style.opacity='0';
   setTimeout(()=>{
-    viewState = key;
-    renderTree();
-    requestAnimationFrame(()=>{ wrap.style.opacity = '1'; });
-  }, 300);
+    viewState=key;
+    if(key==='root'){
+      buildRootScene();
+      camera.position.set(0,12,26);
+      controls.target.set(0,0,0);
+    } else {
+      buildPlanetScene(key);
+      camera.position.set(0,6,12);
+      controls.target.set(0,0,0);
+    }
+    controls.update();
+    updateLegend();
+    requestAnimationFrame(()=>{ container.style.opacity='1'; });
+  },300);
+}
+window.switchView=switchView;
+
+// ── Hover + click ─────────────────────────────────────────────────────────
+const raycaster=new THREE.Raycaster();
+const mouse2=new THREE.Vector2();
+let hoveredKey=null;
+
+function getClickables(){ return Object.values(bodyMeshes); }
+
+renderer.domElement.addEventListener('mousemove',e=>{
+  const r=renderer.domElement.getBoundingClientRect();
+  mouse2.x=((e.clientX-r.left)/r.width)*2-1;
+  mouse2.y=-((e.clientY-r.top)/r.height)*2+1;
+  raycaster.setFromCamera(mouse2,camera);
+  const hits=raycaster.intersectObjects(getClickables(),true);
+  let newKey=null;
+  if(hits.length){
+    let obj=hits[0].object;
+    while(obj && !obj.userData.key) obj=obj.parent;
+    if(obj) newKey=obj.userData.key;
+  }
+  if(newKey!==hoveredKey){
+    if(hoveredKey && labelObjs[hoveredKey] && !labelObjs[hoveredKey].element.classList.contains('always-visible')){
+      labelObjs[hoveredKey].element.classList.remove('visible');
+    }
+    hoveredKey=newKey;
+    if(hoveredKey && labelObjs[hoveredKey]){
+      labelObjs[hoveredKey].element.classList.add('visible');
+    }
+    renderer.domElement.style.cursor=hoveredKey?'pointer':'grab';
+  }
+});
+
+let mdPos={x:0,y:0};
+renderer.domElement.addEventListener('mousedown',e=>{mdPos={x:e.clientX,y:e.clientY};});
+renderer.domElement.addEventListener('click',e=>{
+  if(Math.hypot(e.clientX-mdPos.x,e.clientY-mdPos.y)>5) return;
+  const r=renderer.domElement.getBoundingClientRect();
+  mouse2.x=((e.clientX-r.left)/r.width)*2-1;
+  mouse2.y=-((e.clientY-r.top)/r.height)*2+1;
+  raycaster.setFromCamera(mouse2,camera);
+  const hits=raycaster.intersectObjects(getClickables(),true);
+  if(!hits.length) return;
+  let obj=hits[0].object;
+  while(obj && !obj.userData.key) obj=obj.parent;
+  if(!obj) return;
+  const {key,type}=obj.userData;
+  if(type==='sun') openCard('root','root');
+  else if(type==='planet'&&MOON_ORBITS[key]) switchView(key);
+  else if(type==='planet') openCard(key,key);
+  else if(type==='moon') openCard(key,key);
+  else if(type==='planet-center') openCard(key,key);
+});
+
+// ── Animate loop ──────────────────────────────────────────────────────────
+const clock=new THREE.Clock();
+function animate(){
+  requestAnimationFrame(animate);
+  const d=clock.getDelta();
+  Object.values(pivots).forEach(p=>{ p.rotation.y+=p.userData.orbitSpeed*d; });
+  controls.update();
+  renderer.render(scene,camera);
+  labelRenderer.render(scene,camera);
 }
 
+// ── Legend ────────────────────────────────────────────────────────────────
 function updateLegend(){
   const leg = document.getElementById('legend');
   if(viewState === 'root'){
@@ -1158,7 +1149,7 @@ function updateLegend(){
   } else {
     leg.className='leg-detail';
     const pN = NODES[viewState];
-    const ms = MOONS[viewState]||[];
+    const ms = MOON_ORBITS[viewState]||[];
     const summaryHtml = pN.summary
       ? `<div class="leg-summary">${pN.summary}</div>` : '';
     leg.innerHTML =
@@ -1179,91 +1170,12 @@ function updateLegend(){
   }
 }
 
-// ── Root view: sun + 4 planets orbiting ──────────────────────────────────
-function renderRootView(W, H){
-  const sMin=Math.min(W,H), inner=sMin*0.115, gap=sMin*0.115;
-  const OR=[inner, inner+gap, inner+gap*2, inner+gap*3];
-
-  const PLANETS=[
-    {key:'edu',   ang:142, dur:22, or:OR[0]},
-    {key:'papers',ang:215, dur:30, or:OR[1]},
-    {key:'awards',ang:325, dur:40, or:OR[2]},
-    {key:'exp',   ang: 42, dur:50, or:OR[3]},
-  ];
-
-  const sw=document.createElement('div');
-  sw.style.cssText='position:absolute;left:50%;top:50%;width:0;height:0;overflow:visible;';
-  OR.forEach(r=>sw.appendChild(mkRing(r)));
-
-  const rootEl=makeNode('root',NODES.root,0);
-  rootEl.addEventListener('click',e=>{e.stopPropagation();openCard('root','root');});
-  sw.appendChild(rootEl);
-
-  PLANETS.forEach((p,pi)=>{
-    const {arm,body}=mkOrbitArm(p.dur,p.ang,p.or);
-    const pEl=makeNode(p.key,NODES[p.key],(pi+1)*0.14);
-    if(MOONS[p.key]){
-      pEl.addEventListener('click',e=>{e.stopPropagation();switchView(p.key);});
-    } else {
-      pEl.addEventListener('click',e=>{e.stopPropagation();openCard(p.key,p.key);});
-    }
-    body.appendChild(pEl);
-    sw.appendChild(arm);
-  });
-
-  wrap.appendChild(sw);
-}
-
-// ── Planet view: selected planet at center, moons on separate orbits ──────
-function renderPlanetView(planetKey, W, H){
-  const sMin=Math.min(W,H);
-  const baseR=sMin*0.17, gapR=sMin*0.10;
-  const pN=NODES[planetKey];
-  const ms=MOONS[planetKey]||[];
-
-  const sw=document.createElement('div');
-  sw.style.cssText='position:absolute;left:50%;top:50%;width:0;height:0;overflow:visible;';
-
-  // draw a ring for each moon at its own radius
-  ms.forEach((_,mi)=> sw.appendChild(mkRing(baseR + mi*gapR)));
-
-  const pEl=makeNode(planetKey,pN,0);
-  pEl.classList.add('planet-center');
-  pEl.style.cursor='default';
-  sw.appendChild(pEl);
-
-  // inner orbit = fast, outer = slow (like real planets)
-  ms.forEach((m,mi)=>{
-    const r=baseR + mi*gapR;
-    const dur=7 + mi*5;   // 7s, 12s, 17s, …
-    const {arm,body}=mkOrbitArm(dur,m.ang,r);
-    const mEl=makeNode(m.key,NODES[m.key],(mi+1)*0.15);
-    mEl.addEventListener('click',e=>{e.stopPropagation();openCard(m.key,m.key);});
-    body.appendChild(mEl);
-    sw.appendChild(arm);
-  });
-
-  wrap.appendChild(sw);
-}
-
-// ── Render dispatcher ─────────────────────────────────────────────────────
-function renderTree(){
-  svg.innerHTML=''; wrap.innerHTML='';
-  const W=vw(), H=vh();
-  if(viewState==='root') renderRootView(W,H);
-  else renderPlanetView(viewState,W,H);
-  updateLegend();
-}
-
-// ── Card open / close ────────────────────────────────────────────────────
+// ── Card open / close ─────────────────────────────────────────────────────
 let activeKey = null;
 
 function openCard(key, clickedKey){
   const c = CONTENT[key];
   if(!c) return;
-  document.querySelectorAll('.node').forEach(n=>n.classList.remove('active'));
-  document.getElementById(`node-${clickedKey}`)?.classList.add('active');
-  document.getElementById(`node-${key}`)?.classList.add('active');
   document.getElementById('cTitle').textContent = c.title;
   document.getElementById('cSub').textContent   = c.sub;
   document.getElementById('cSub').style.color   = c.subColor || '#7c88a8';
@@ -1272,19 +1184,28 @@ function openCard(key, clickedKey){
   body.className = c.pdfEmbed ? 'card-body pdf-embed' : 'card-body';
   document.getElementById('hint').classList.add('hide');
   document.body.classList.add('zoomed-in');
-  document.body.classList.add('node-active');
   activeKey = key;
 }
+window.openCard=openCard;
 
 function closeCard(){
   document.body.classList.remove('zoomed-in');
-  document.body.classList.remove('node-active');
   document.getElementById('cBody').className = 'card-body';
-  document.querySelectorAll('.node').forEach(n=>n.classList.remove('active'));
   document.getElementById('hint').classList.remove('hide');
   activeKey = null;
 }
 
+// ── Paper tab switcher ────────────────────────────────────────────────────
+function switchPaperTab(panelId, btn){
+  const wrap = btn.closest('.pdf-embed-wrap');
+  wrap.querySelectorAll('.ptab').forEach(t=>t.classList.remove('active'));
+  wrap.querySelectorAll('.ptab-panel').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  wrap.querySelector('#'+panelId).classList.add('active');
+}
+window.switchPaperTab=switchPaperTab;
+
+// ── Event listeners ───────────────────────────────────────────────────────
 document.getElementById('backBtn').addEventListener('click', closeCard);
 document.getElementById('theme-toggle').addEventListener('click', ()=>{
   const isLight = document.body.classList.toggle('light');
@@ -1301,18 +1222,17 @@ document.addEventListener('keydown', e=>{
     else if(viewState!=='root') switchView('root');
   }
 });
-window.addEventListener('resize', renderTree);
 
-// ── Paper tab switcher (called from inline onclick) ───────────────────────
-function switchPaperTab(panelId, btn){
-  const wrap = btn.closest('.pdf-embed-wrap');
-  wrap.querySelectorAll('.ptab').forEach(t=>t.classList.remove('active'));
-  wrap.querySelectorAll('.ptab-panel').forEach(p=>p.classList.remove('active'));
-  btn.classList.add('active');
-  wrap.querySelector('#'+panelId).classList.add('active');
-}
+window.addEventListener('resize',()=>{
+  const W=window.innerWidth,H=window.innerHeight;
+  camera.aspect=W/H; camera.updateProjectionMatrix();
+  renderer.setSize(W,H); labelRenderer.setSize(W,H);
+});
 
-renderTree();
+// ── Init ──────────────────────────────────────────────────────────────────
+buildRootScene();
+updateLegend();
+animate();
 </script>
 </body>
 </html>
