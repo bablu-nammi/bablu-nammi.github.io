@@ -25,6 +25,7 @@
       background:rgba(3,5,14,0.35);
     }
     .label3d.visible { opacity:1; transform:translateY(0); }
+.label3d.label-light { color:#1e2a5e; background:rgba(221,228,245,0.88); text-shadow:none; }
 
     /* Keep dark for space even in light mode */
     body { background:#03050e; }
@@ -888,6 +889,12 @@ const MOON_ORBITS = {
   ],
 };
 
+// ── Per-planet visual config ──────────────────────────────────────────────
+const PLANET_SIZES  = { edu:0.48, papers:0.65, awards:0.57, exp:0.52 };
+const PLANET_SHINE  = { edu:80,   papers:60,   awards:45,   exp:90   };
+const PLANET_SPIN   = { edu:0.38, papers:0.22, awards:0.30, exp:0.16 }; // rad/s self-spin
+const SUN_SPIN      = 0.06;
+
 // ── Scene setup ───────────────────────────────────────────────────────────
 const W = window.innerWidth, H = window.innerHeight;
 const scene = new THREE.Scene();
@@ -911,7 +918,8 @@ controls.minDistance = 4; controls.maxDistance = 45;
 controls.target.set(0,0,0);
 
 // ── Lights + stars ────────────────────────────────────────────────────────
-scene.add(new THREE.AmbientLight(0x334466, 2.5));
+const ambientLight = new THREE.AmbientLight(0x334466, 2.5);
+scene.add(ambientLight);
 const sunLight = new THREE.PointLight(0xffffff, 5, 70);
 scene.add(sunLight);
 
@@ -919,20 +927,32 @@ const starPos = new Float32Array(9000*3);
 for(let i=0;i<starPos.length;i++) starPos[i]=(Math.random()-0.5)*300;
 const starGeo = new THREE.BufferGeometry();
 starGeo.setAttribute('position', new THREE.BufferAttribute(starPos,3));
-const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({color:0xffffff,size:0.18,transparent:true,opacity:0.55}));
+const starMat = new THREE.PointsMaterial({color:0xffffff,size:0.18,transparent:true,opacity:0.55});
+const stars = new THREE.Points(starGeo, starMat);
 scene.add(stars);
 
 // ── Helper functions ──────────────────────────────────────────────────────
 function hexNum(hex){ return parseInt(hex.replace('#',''),16); }
 
-function makeSphere(radius, hexColor, emissiveInt=0){
+function makeSphere(radius, hexColor, emissiveInt=0, shininess=40){
   return new THREE.Mesh(
-    new THREE.SphereGeometry(radius,32,32),
+    new THREE.SphereGeometry(radius,48,48),
     new THREE.MeshPhongMaterial({
       color:hexNum(hexColor), emissive:hexNum(hexColor),
-      emissiveIntensity:emissiveInt, shininess:40
+      emissiveIntensity:emissiveInt, shininess
     })
   );
+}
+
+function makePlanetRing(innerR, outerR, hexColor, tiltDeg=28){
+  const geo = new THREE.RingGeometry(innerR, outerR, 64);
+  const mat = new THREE.MeshBasicMaterial({
+    color:hexNum(hexColor), side:THREE.DoubleSide,
+    transparent:true, opacity:0.55
+  });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.rotation.x = (tiltDeg * Math.PI)/180;
+  return mesh;
 }
 
 function makeGlowShell(radius, hexColor, opacity=0.12){
@@ -1003,13 +1023,16 @@ function buildRootScene(){
     pivot.userData.orbitSpeed=orb.speed;
     worldGroup.add(pivot); pivots[key]=pivot;
 
-    const planet=makeSphere(0.55, nd.color, 0.28);
+    const sz=PLANET_SIZES[key]||0.55;
+    const planet=makeSphere(sz, nd.color, 0.28, PLANET_SHINE[key]||40);
     planet.position.set(orb.r,0,0);
     planet.userData={key,type:'planet'};
-    planet.add(makeGlowShell(0.88,nd.color,0.22));
+    planet.add(makeGlowShell(sz*1.55, nd.color, 0.2));
+    // Saturn-style ring on Experience planet
+    if(key==='exp') planet.add(makePlanetRing(sz*1.35, sz*2.1, nd.color, 30));
     pivot.add(planet); bodyMeshes[key]=planet;
 
-    const lbl=makeLabel(nd.label, 1.0);
+    const lbl=makeLabel(nd.label, sz+0.55);
     planet.add(lbl); labelObjs[key]=lbl;
   });
 }
@@ -1130,7 +1153,14 @@ const clock=new THREE.Clock();
 function animate(){
   requestAnimationFrame(animate);
   const d=clock.getDelta();
+  // orbital revolution
   Object.values(pivots).forEach(p=>{ p.rotation.y+=p.userData.orbitSpeed*d; });
+  // self-spin on each planet/moon body
+  Object.entries(bodyMeshes).forEach(([key,mesh])=>{
+    const spin = PLANET_SPIN[key];
+    if(spin) mesh.rotation.y += spin * d;
+    if(key==='root') mesh.rotation.y += SUN_SPIN * d;
+  });
   controls.update();
   renderer.render(scene,camera);
   labelRenderer.render(scene,camera);
@@ -1207,9 +1237,29 @@ window.switchPaperTab=switchPaperTab;
 
 // ── Event listeners ───────────────────────────────────────────────────────
 document.getElementById('backBtn').addEventListener('click', closeCard);
+function applyTheme(isLight){
+  if(isLight){
+    renderer.setClearColor(0xdde4f5, 1);
+    starMat.color.set(0x8899cc); starMat.opacity=0.18; starMat.size=0.10;
+    ambientLight.color.set(0x99aabb); ambientLight.intensity=5;
+    sunLight.intensity=2;
+  } else {
+    renderer.setClearColor(0x03050e, 1);
+    starMat.color.set(0xffffff); starMat.opacity=0.55; starMat.size=0.18;
+    ambientLight.color.set(0x334466); ambientLight.intensity=2.5;
+    sunLight.intensity=5;
+  }
+  starMat.needsUpdate=true;
+  // update CSS label style
+  document.querySelectorAll('.label3d').forEach(l=>{
+    l.classList.toggle('label-light', isLight);
+  });
+}
+
 document.getElementById('theme-toggle').addEventListener('click', ()=>{
   const isLight = document.body.classList.toggle('light');
   document.getElementById('theme-toggle').textContent = isLight ? '\u{1F311}' : '\u{1F319}';
+  applyTheme(isLight);
 });
 document.getElementById('zoom-backdrop').addEventListener('click', ()=>{
   if(document.body.classList.contains('zoomed-in')) closeCard();
@@ -1230,6 +1280,8 @@ window.addEventListener('resize',()=>{
 });
 
 // ── Init ──────────────────────────────────────────────────────────────────
+// Apply theme that matches initial body class
+applyTheme(document.body.classList.contains('light'));
 buildRootScene();
 updateLegend();
 animate();
