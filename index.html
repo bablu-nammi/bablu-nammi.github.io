@@ -956,14 +956,107 @@ scene.add(stars);
 // ── Helper functions ──────────────────────────────────────────────────────
 function hexNum(hex){ return parseInt(hex.replace('#',''),16); }
 
-function makeSphere(radius, hexColor, emissiveInt=0, shininess=40){
-  return new THREE.Mesh(
-    new THREE.SphereGeometry(radius,48,48),
-    new THREE.MeshPhongMaterial({
-      color:hexNum(hexColor), emissive:hexNum(hexColor),
-      emissiveIntensity:emissiveInt, shininess
-    })
-  );
+function hexToRgba(hex,a){
+  const h=hex.replace('#','');
+  return `rgba(${parseInt(h.slice(0,2),16)},${parseInt(h.slice(2,4),16)},${parseInt(h.slice(4,6),16)},${a})`;
+}
+
+// ── Procedural canvas textures ────────────────────────────────────────────
+const _texCache={};
+const _texConfigs={
+  edu:    {base:'#041e17',bands:['#10b981','#059669','#0d9488','#0f766e','#1d4ed8','#065f46'],type:'ocean'},
+  papers: {base:'#030b1a',bands:['#06b6d4','#0891b2','#67e8f9','#164e63','#a5f3fc','#0e7490'],type:'gas'},
+  awards: {base:'#1c0a00',bands:['#f59e0b','#d97706','#fbbf24','#92400e','#fef3c7','#b45309'],type:'gas',spot:true},
+  exp:    {base:'#130a1f',bands:['#8b5cf6','#6d28d9','#a78bfa','#4c1d95','#7c3aed','#5b21b6'],type:'rocky'},
+  p1:     {base:'#051520',bands:['#67e8f9','#22d3ee','#a5f3fc'],type:'moon'},
+  p2:     {base:'#04150f',bands:['#34d399','#10b981','#a7f3d0'],type:'moon'},
+  p3:     {base:'#0d0a20',bands:['#a78bfa','#8b5cf6','#ddd6fe'],type:'moon'},
+  a1:     {base:'#1c0900',bands:['#fbbf24','#f59e0b','#fef08a'],type:'moon'},
+  a2:     {base:'#1c0500',bands:['#fb923c','#f97316','#fed7aa'],type:'moon'},
+};
+function makePlanetTexture(key){
+  if(_texCache[key]) return _texCache[key];
+  const cfg=_texConfigs[key]; if(!cfg) return null;
+  const S=256,c=document.createElement('canvas');
+  c.width=c.height=S;
+  const ctx=c.getContext('2d');
+  ctx.fillStyle=cfg.base; ctx.fillRect(0,0,S,S);
+  if(cfg.type==='gas'||cfg.type==='ocean'){
+    const nB=cfg.type==='gas'?14:10;
+    for(let i=0;i<nB;i++){
+      const yB=(i/nB)*S, h=S/nB+4;
+      const col=cfg.bands[i%cfg.bands.length];
+      const alpha=0.38+Math.abs(Math.sin(i*1.3))*0.3;
+      ctx.fillStyle=hexToRgba(col,alpha);
+      ctx.beginPath();
+      ctx.moveTo(0,yB+Math.sin(i*2.1)*9);
+      ctx.bezierCurveTo(S/3,yB+Math.sin(i*1.5)*16,2*S/3,yB+Math.sin(i*2.7)*12,S,yB+Math.sin(i*1.9)*10);
+      ctx.lineTo(S,yB+h+10); ctx.lineTo(0,yB+h+10); ctx.closePath(); ctx.fill();
+    }
+    if(cfg.spot){
+      const grd=ctx.createRadialGradient(S*.65,S*.42,0,S*.65,S*.42,26);
+      grd.addColorStop(0,'rgba(254,243,199,0.55)');
+      grd.addColorStop(0.55,'rgba(251,191,36,0.25)');
+      grd.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=grd;
+      ctx.beginPath(); ctx.ellipse(S*.65,S*.42,24,15,0.15,0,Math.PI*2); ctx.fill();
+    }
+  } else if(cfg.type==='rocky'){
+    for(let j=0;j<2200;j++){
+      const px=Math.random()*S,py=Math.random()*S,pr=1+Math.random()*4;
+      const col=cfg.bands[Math.floor(Math.random()*cfg.bands.length)];
+      ctx.fillStyle=hexToRgba(col,0.2+Math.random()*0.35);
+      ctx.beginPath(); ctx.arc(px,py,pr,0,Math.PI*2); ctx.fill();
+    }
+    for(let i=0;i<12;i++){
+      const cx=15+Math.random()*(S-30),cy=15+Math.random()*(S-30),cr=5+Math.random()*14;
+      const grd=ctx.createRadialGradient(cx-cr*.25,cy-cr*.25,0,cx,cy,cr);
+      grd.addColorStop(0,'rgba(0,0,0,0.65)'); grd.addColorStop(0.65,'rgba(0,0,0,0.12)');
+      grd.addColorStop(0.85,'rgba(220,200,255,0.1)'); grd.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=grd; ctx.beginPath(); ctx.arc(cx,cy,cr,0,Math.PI*2); ctx.fill();
+    }
+  } else {
+    for(let i=0;i<7;i++){
+      const y=(i/7)*S,h=S/7;
+      ctx.fillStyle=hexToRgba(cfg.bands[i%cfg.bands.length],0.32+Math.random()*0.22);
+      ctx.fillRect(0,y,S,h);
+    }
+    for(let i=0;i<6;i++){
+      const cx=10+Math.random()*(S-20),cy=10+Math.random()*(S-20),cr=3+Math.random()*8;
+      const grd=ctx.createRadialGradient(cx,cy,0,cx,cy,cr);
+      grd.addColorStop(0,'rgba(0,0,0,0.5)'); grd.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=grd; ctx.beginPath(); ctx.arc(cx,cy,cr,0,Math.PI*2); ctx.fill();
+    }
+  }
+  const tex=new THREE.CanvasTexture(c);
+  _texCache[key]=tex; return tex;
+}
+
+// ── Orbit trail arc (added as child of pivot, always trails behind planet) ─
+function makeTrailArc(radius, hexColor){
+  const N=52, arcLen=1.15;
+  const positions=new Float32Array((N+1)*3);
+  const colors=new Float32Array((N+1)*3);
+  const col=new THREE.Color(hexNum(hexColor));
+  for(let i=0;i<=N;i++){
+    const t=i/N;
+    const a=-(arcLen*(1-t)); // from -arcLen→0 (planet is always at angle 0 in pivot local space)
+    positions[i*3]=Math.cos(a)*radius; positions[i*3+1]=0; positions[i*3+2]=Math.sin(a)*radius;
+    colors[i*3]=col.r*t*0.85; colors[i*3+1]=col.g*t*0.85; colors[i*3+2]=col.b*t*0.85;
+  }
+  const geo=new THREE.BufferGeometry();
+  geo.setAttribute('position',new THREE.BufferAttribute(positions,3));
+  geo.setAttribute('color',new THREE.BufferAttribute(colors,3));
+  return new THREE.Line(geo,new THREE.LineBasicMaterial({vertexColors:true,transparent:true,opacity:0.6}));
+}
+
+function makeSphere(radius, hexColor, emissiveInt=0, shininess=40, texKey=null){
+  const mat=new THREE.MeshPhongMaterial({
+    color:hexNum(hexColor), emissive:hexNum(hexColor),
+    emissiveIntensity:emissiveInt, shininess
+  });
+  if(texKey){ const tx=makePlanetTexture(texKey); if(tx) mat.map=tx; }
+  return new THREE.Mesh(new THREE.SphereGeometry(radius,48,48),mat);
 }
 
 function makePlanetRing(innerR, outerR, hexColor, tiltDeg=28){
@@ -982,6 +1075,12 @@ function makeGlowShell(radius, hexColor, opacity=0.12){
     new THREE.SphereGeometry(radius,16,16),
     new THREE.MeshBasicMaterial({color:hexNum(hexColor),transparent:true,opacity,side:THREE.BackSide})
   );
+}
+// animated version — registers for pulsing in the render loop
+function makeAnimGlow(radius,hexColor,opacity,freq,phase){
+  const shell=makeGlowShell(radius,hexColor,opacity);
+  glowRefs.push({shell,baseOpacity:opacity,amp:opacity*0.45,freq,phase});
+  return shell;
 }
 
 function makeOrbitRing(radius, tiltDeg, hexColor){
@@ -1014,6 +1113,7 @@ scene.add(worldGroup);
 const pivots = {};
 const bodyMeshes = {};
 const labelObjs = {};
+const glowRefs = []; // {shell, baseOpacity, amp, freq, phase}
 
 function clearWorld(){
   // Explicitly remove CSS2DObject DOM elements so they don't linger
@@ -1024,23 +1124,27 @@ function clearWorld(){
   Object.keys(pivots).forEach(k=>delete pivots[k]);
   Object.keys(bodyMeshes).forEach(k=>delete bodyMeshes[k]);
   Object.keys(labelObjs).forEach(k=>delete labelObjs[k]);
+  glowRefs.length=0; // clear animated glows
   hoveredKey=null; // reset hover state so no stale labels persist
 }
 
 // ── Build root scene ──────────────────────────────────────────────────────
+const PLANET_TILT_AX={edu:8,papers:-14,awards:11,exp:-6}; // axial tilt degrees
+const PLANET_GLOW_FREQ={edu:0.6,papers:0.85,awards:0.5,exp:0.7};
+
 function buildRootScene(){
   clearWorld();
 
-  const sun = makeSphere(1.35,'#6366f1',0.55);
+  const sun=makeSphere(1.35,'#6366f1',0.55);
   sun.userData={key:'root',type:'sun',selfSpin:SUN_SPIN};
-  sun.add(makeGlowShell(1.9,'#6366f1',0.18));
-  sun.add(makeGlowShell(2.8,'#6366f1',0.06));
+  sun.add(makeAnimGlow(1.9,'#6366f1',0.22,1.1,0));
+  sun.add(makeAnimGlow(2.9,'#6366f1',0.07,0.7,1.2));
   const sunLbl=makeLabel('Bharani\nNammi',2.1);
   sun.add(sunLbl); labelObjs['root']=sunLbl;
   sunLbl.element.classList.add('visible');
   worldGroup.add(sun); bodyMeshes['root']=sun;
 
-  Object.entries(PLANET_ORBITS).forEach(([key,orb])=>{
+  Object.entries(PLANET_ORBITS).forEach(([key,orb],pi)=>{
     const nd=NODES[key];
     worldGroup.add(makeOrbitRing(orb.r, orb.tilt, nd.color));
 
@@ -1050,12 +1154,17 @@ function buildRootScene(){
     pivot.userData.orbitSpeed=orb.speed;
     worldGroup.add(pivot); pivots[key]=pivot;
 
+    // trail arc — child of pivot so it auto-follows orbital motion
+    pivot.add(makeTrailArc(orb.r, nd.color));
+
     const sz=PLANET_SIZES[key]||0.55;
-    const planet=makeSphere(sz, nd.color, 0.28, PLANET_SHINE[key]||40);
+    const planet=makeSphere(sz, nd.color, 0.28, PLANET_SHINE[key]||40, key);
     planet.position.set(orb.r,0,0);
+    planet.rotation.z=(PLANET_TILT_AX[key]||0)*Math.PI/180;
     planet.userData={key,type:'planet'};
-    planet.add(makeGlowShell(sz*1.55, nd.color, 0.2));
-    // Saturn-style ring on Experience planet
+    const freq=PLANET_GLOW_FREQ[key]||0.65;
+    planet.add(makeAnimGlow(sz*1.55, nd.color, 0.22, freq, pi*1.3));
+    planet.add(makeAnimGlow(sz*2.2,  nd.color, 0.07, freq*0.6, pi*0.8));
     if(key==='exp') planet.add(makePlanetRing(sz*1.35, sz*2.1, nd.color, 30));
     pivot.add(planet); bodyMeshes[key]=planet;
 
@@ -1070,10 +1179,11 @@ function buildPlanetScene(planetKey){
   const nd=NODES[planetKey];
   const moonList=MOON_ORBITS[planetKey]||[];
 
-  const planet=makeSphere(0.95,nd.color,0.38);
-  planet.userData={key:planetKey,type:'planet-center'};
-  planet.add(makeGlowShell(1.4,nd.color,0.22));
-  planet.add(makeGlowShell(2.1,nd.color,0.08));
+  const planet=makeSphere(0.95,nd.color,0.38,60,planetKey);
+  planet.userData={key:planetKey,type:'planet-center',selfSpin:PLANET_SPIN[planetKey]||0.2};
+  planet.rotation.z=(PLANET_TILT_AX[planetKey]||0)*Math.PI/180;
+  planet.add(makeAnimGlow(1.42,nd.color,0.26,0.8,0));
+  planet.add(makeAnimGlow(2.15,nd.color,0.09,0.5,0.9));
   const pLbl=makeLabel(nd.label,1.5);
   planet.add(pLbl); labelObjs[planetKey]=pLbl;
   pLbl.element.classList.add('visible');
@@ -1081,6 +1191,7 @@ function buildPlanetScene(planetKey){
 
   const moonSzBase=[0.33,0.26,0.30];
   const moonSpinBase=[0.65,1.0,0.5];
+  const moonFreqs=[0.9,1.2,0.7];
   moonList.forEach((m,mi)=>{
     const mn=NODES[m.key];
     const sz=moonSzBase[mi%moonSzBase.length];
@@ -1091,10 +1202,13 @@ function buildPlanetScene(planetKey){
     pivot.userData.orbitSpeed=m.speed;
     worldGroup.add(pivot); pivots[m.key]=pivot;
 
-    const moon=makeSphere(sz,mn.color,0.35,70);
+    // trail arc on each moon
+    pivot.add(makeTrailArc(m.r, mn.color));
+
+    const moon=makeSphere(sz,mn.color,0.35,70,m.key);
     moon.position.set(m.r,0,0);
     moon.userData={key:m.key,type:'moon',selfSpin:moonSpinBase[mi%moonSpinBase.length]};
-    moon.add(makeGlowShell(sz*1.65,mn.color,0.28));
+    moon.add(makeAnimGlow(sz*1.65,mn.color,0.30,moonFreqs[mi%moonFreqs.length],mi*1.1));
     pivot.add(moon); bodyMeshes[m.key]=moon;
 
     const lbl=makeLabel(mn.label,sz+0.45);
@@ -1185,14 +1299,21 @@ const clock=new THREE.Clock();
 function animate(){
   requestAnimationFrame(animate);
   const d=clock.getDelta();
+  const t=clock.getElapsedTime();
   // orbital revolution
   Object.values(pivots).forEach(p=>{ p.rotation.y+=p.userData.orbitSpeed*d; });
-  // self-spin: moons use userData.selfSpin, planets use PLANET_SPIN
+  // self-spin
   Object.values(bodyMeshes).forEach(mesh=>{
     const spin = mesh.userData.selfSpin ?? PLANET_SPIN[mesh.userData.key] ?? 0;
     if(spin) mesh.rotation.y += spin * d;
     if(mesh.userData.key==='root') mesh.rotation.y += SUN_SPIN * d;
   });
+  // animated glow pulse
+  glowRefs.forEach(({shell,baseOpacity,amp,freq,phase})=>{
+    shell.material.opacity=baseOpacity+amp*Math.sin(t*freq+phase);
+  });
+  // star slow drift
+  stars.rotation.y+=0.000035;
   controls.update();
   renderer.render(scene,camera);
   labelRenderer.render(scene,camera);
