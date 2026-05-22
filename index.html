@@ -1197,8 +1197,8 @@ function addCityCluster(parent,r,hexColor,th,ph,n,s){
     const tt=th+dth, pp=ph+dph;
     const nx=Math.sin(pp)*Math.cos(tt), ny=Math.cos(pp), nz=Math.sin(pp)*Math.sin(tt);
     const norm=new THREE.Vector3(nx,ny,nz).normalize();
-    const h=(0.018+Math.random()*.03)*s;
-    const w=(0.009+Math.random()*.01)*s;
+    const h=(0.07+Math.random()*.1)*s;
+    const w=(0.03+Math.random()*.03)*s;
     let geo;
     const style=i%4;
     if(style===0)      geo=new THREE.BoxGeometry(w,h,w);             // tower
@@ -1212,8 +1212,8 @@ function addCityCluster(parent,r,hexColor,th,ph,n,s){
   }
   // Faint city-glow blob at cluster centre
   const cGlow=new THREE.Mesh(
-    new THREE.SphereGeometry(.05*s,6,6),
-    new THREE.MeshBasicMaterial({color:hexNum(hexColor),transparent:true,opacity:.14,
+    new THREE.SphereGeometry(.18*s,6,6),
+    new THREE.MeshBasicMaterial({color:hexNum(hexColor),transparent:true,opacity:.2,
       blending:THREE.AdditiveBlending,depthWrite:false}));
   cGlow.position.set(
     Math.sin(ph)*Math.cos(th)*r,
@@ -1365,7 +1365,7 @@ function buildRootScene(){
     planet.add(makeAnimGlow(sz*1.55, nd.color, 0.22, freq, pi*1.3));
     planet.add(makeAnimGlow(sz*2.2,  nd.color, 0.07, freq*0.6, pi*0.8));
     if(key==='exp') planet.add(makePlanetRing(sz*1.35, sz*2.1, nd.color, 30));
-    addCities(planet, sz, nd.color, sz/0.55); // scale buildings to planet size
+    addCities(planet, sz, nd.color, sz/0.3); // scale buildings to planet size
     pivot.add(planet); bodyMeshes[key]=planet;
 
     const lbl=makeLabel(nd.label, sz+0.55);
@@ -1394,7 +1394,7 @@ function buildPlanetScene(planetKey){
   planet.rotation.z=(PLANET_TILT_AX[planetKey]||0)*Math.PI/180;
   planet.add(makeAnimGlow(1.42,nd.color,0.26,0.8,0));
   planet.add(makeAnimGlow(2.15,nd.color,0.09,0.5,0.9));
-  addCities(planet, 0.95, nd.color, 1.9); // larger scale in close-up view
+  addCities(planet, 0.95, nd.color, 3.5); // larger scale in close-up view
   const pLbl=makeLabel(nd.label,1.5);
   planet.add(pLbl); labelObjs[planetKey]=pLbl;
   pLbl.element.classList.add('visible');
