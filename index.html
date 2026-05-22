@@ -921,7 +921,7 @@ const SUN_SPIN      = 0.06;
 const W = window.innerWidth, H = window.innerHeight;
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(55, W/H, 0.1, 500);
-camera.position.set(0, 12, 26);
+camera.position.set(0, 38, 82); // intro fly-in start
 
 const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:false });
 renderer.setSize(W, H);
@@ -938,6 +938,7 @@ const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true; controls.dampingFactor = 0.08;
 controls.minDistance = 4; controls.maxDistance = 45;
 controls.target.set(0,0,0);
+controls.enabled = false; // disabled until intro fly-in completes
 
 // ── Lights + stars ────────────────────────────────────────────────────────
 const ambientLight = new THREE.AmbientLight(0x334466, 2.5);
@@ -952,6 +953,25 @@ starGeo.setAttribute('position', new THREE.BufferAttribute(starPos,3));
 const starMat = new THREE.PointsMaterial({color:0xffffff,size:0.18,transparent:true,opacity:0.55});
 const stars = new THREE.Points(starGeo, starMat);
 scene.add(stars);
+
+// ── Nebula (persistent coloured particle cloud in deep background) ────────
+(()=>{
+  const N=900,pos=new Float32Array(N*3),col=new Float32Array(N*3);
+  const nc=[new THREE.Color(0x6366f1),new THREE.Color(0x06b6d4),new THREE.Color(0x8b5cf6),new THREE.Color(0xf59e0b)];
+  for(let i=0;i<N;i++){
+    const th=Math.random()*Math.PI*2,ph=Math.acos(2*Math.random()-1),r=38+Math.random()*58;
+    pos[i*3]=r*Math.sin(ph)*Math.cos(th); pos[i*3+1]=r*Math.sin(ph)*Math.sin(th); pos[i*3+2]=r*Math.cos(ph);
+    const c=nc[Math.floor(Math.random()*nc.length)],b=0.12+Math.random()*0.28;
+    col[i*3]=c.r*b; col[i*3+1]=c.g*b; col[i*3+2]=c.b*b;
+  }
+  const geo=new THREE.BufferGeometry();
+  geo.setAttribute('position',new THREE.BufferAttribute(pos,3));
+  geo.setAttribute('color',new THREE.BufferAttribute(col,3));
+  scene.add(new THREE.Points(geo,new THREE.PointsMaterial({
+    vertexColors:true,size:0.45,transparent:true,opacity:0.38,
+    blending:THREE.AdditiveBlending,depthWrite:false
+  })));
+})();
 
 // ── Helper functions ──────────────────────────────────────────────────────
 function hexNum(hex){ return parseInt(hex.replace('#',''),16); }
@@ -1050,6 +1070,58 @@ function makeTrailArc(radius, hexColor){
   return new THREE.Line(geo,new THREE.LineBasicMaterial({vertexColors:true,transparent:true,opacity:0.6}));
 }
 
+// ── Solar corona particle system ──────────────────────────────────────────
+function makeSolarCorona(){
+  const N=240;
+  const pos=new Float32Array(N*3),data=[];
+  for(let i=0;i<N;i++){
+    const th=Math.random()*Math.PI*2,ph=Math.acos(2*Math.random()-1);
+    const life=Math.random(),r=1.35+life*2.6;
+    pos[i*3]=r*Math.sin(ph)*Math.cos(th);
+    pos[i*3+1]=r*Math.sin(ph)*Math.sin(th);
+    pos[i*3+2]=r*Math.cos(ph);
+    data.push({th,ph,life,speed:0.22+Math.random()*0.5});
+  }
+  const geo=new THREE.BufferGeometry();
+  geo.setAttribute('position',new THREE.BufferAttribute(pos,3));
+  const pts=new THREE.Points(geo,new THREE.PointsMaterial({
+    color:0xff9030,size:0.09,transparent:true,opacity:0.8,
+    blending:THREE.AdditiveBlending,depthWrite:false
+  }));
+  pts.userData.cd=data;
+  return pts;
+}
+
+// ── Asteroid belt ─────────────────────────────────────────────────────────
+function makeAsteroidBelt(){
+  const N=750;
+  const pos=new Float32Array(N*3);
+  for(let i=0;i<N;i++){
+    const ang=Math.random()*Math.PI*2,r=11.0+Math.random()*2.2,y=(Math.random()-0.5)*0.65;
+    pos[i*3]=Math.cos(ang)*r; pos[i*3+1]=y; pos[i*3+2]=Math.sin(ang)*r;
+  }
+  const geo=new THREE.BufferGeometry();
+  geo.setAttribute('position',new THREE.BufferAttribute(pos,3));
+  return new THREE.Points(geo,new THREE.PointsMaterial({
+    color:0x8899aa,size:0.11,transparent:true,opacity:0.42,depthWrite:false
+  }));
+}
+
+// ── Spawn a shooting star (added directly to scene, fades and is removed) ─
+function spawnShootingStar(){
+  const sx=(Math.random()-0.5)*120,sy=20+Math.random()*30,sz=(Math.random()-0.5)*60;
+  const dx=(Math.random()-0.5)*0.4,dy=-(0.5+Math.random()*0.5),dz=(Math.random()-0.5)*0.3;
+  const len=10+Math.random()*14;
+  const dir=new THREE.Vector3(dx,dy,dz).normalize();
+  const start=new THREE.Vector3(sx,sy,sz);
+  const end=start.clone().addScaledVector(dir,len);
+  const geo=new THREE.BufferGeometry().setFromPoints([start,end]);
+  const mat=new THREE.LineBasicMaterial({color:0xe8eeff,transparent:true,opacity:0.85});
+  const line=new THREE.Line(geo,mat);
+  line.userData.life=1; line.userData.decay=0.6+Math.random()*0.5;
+  scene.add(line); shootingStars.push(line);
+}
+
 function makeSphere(radius, hexColor, emissiveInt=0, shininess=40, texKey=null){
   const mat=new THREE.MeshPhongMaterial({
     color:hexNum(hexColor), emissive:hexNum(hexColor),
@@ -1115,6 +1187,17 @@ const bodyMeshes = {};
 const labelObjs = {};
 const glowRefs = []; // {shell, baseOpacity, amp, freq, phase}
 
+// ── 3D animation state ────────────────────────────────────────────────────
+// Fly-in
+const INTRO_DUR=3.4;
+const introEndPos=new THREE.Vector3(0,12,26);
+let introT=0, introActive=true;
+// Corona + belt refs (in worldGroup, auto-cleared on scene switch)
+let coronaRef=null, asteroidBeltRef=null;
+// Shooting stars
+const shootingStars=[];
+let nextShotTime=6;
+
 function clearWorld(){
   // Explicitly remove CSS2DObject DOM elements so they don't linger
   Object.values(labelObjs).forEach(lbl=>{
@@ -1125,6 +1208,7 @@ function clearWorld(){
   Object.keys(bodyMeshes).forEach(k=>delete bodyMeshes[k]);
   Object.keys(labelObjs).forEach(k=>delete labelObjs[k]);
   glowRefs.length=0; // clear animated glows
+  coronaRef=null; asteroidBeltRef=null; // reset 3D effect refs
   hoveredKey=null; // reset hover state so no stale labels persist
 }
 
@@ -1134,6 +1218,10 @@ const PLANET_GLOW_FREQ={edu:0.6,papers:0.85,awards:0.5,exp:0.7};
 
 function buildRootScene(){
   clearWorld();
+
+  // asteroid belt + corona live in worldGroup so they clear on planet-view switch
+  asteroidBeltRef=makeAsteroidBelt(); worldGroup.add(asteroidBeltRef);
+  coronaRef=makeSolarCorona(); worldGroup.add(coronaRef);
 
   const sun=makeSphere(1.35,'#6366f1',0.55);
   sun.userData={key:'root',type:'sun',selfSpin:SUN_SPIN};
@@ -1225,6 +1313,7 @@ function switchView(key){
   renderer.domElement.style.cursor='grab';
   container.style.opacity='0';
   setTimeout(()=>{
+    introActive=false; controls.enabled=true; // ensure controls are live after any transition
     viewState=key;
     if(key==='root'){
       buildRootScene();
@@ -1300,20 +1389,60 @@ function animate(){
   requestAnimationFrame(animate);
   const d=clock.getDelta();
   const t=clock.getElapsedTime();
-  // orbital revolution
+
+  // ── Camera fly-in intro ──────────────────────────────────────────────
+  if(introActive){
+    introT=Math.min(introT+d/INTRO_DUR,1);
+    const ease=1-Math.pow(1-introT,4); // quartic ease-out
+    camera.position.lerpVectors(new THREE.Vector3(0,38,82),introEndPos,ease);
+    if(introT>=1){ introActive=false; controls.enabled=true; }
+  }
+
+  // ── Orbital revolution + self-spin ───────────────────────────────────
   Object.values(pivots).forEach(p=>{ p.rotation.y+=p.userData.orbitSpeed*d; });
-  // self-spin
   Object.values(bodyMeshes).forEach(mesh=>{
-    const spin = mesh.userData.selfSpin ?? PLANET_SPIN[mesh.userData.key] ?? 0;
-    if(spin) mesh.rotation.y += spin * d;
-    if(mesh.userData.key==='root') mesh.rotation.y += SUN_SPIN * d;
+    const spin=mesh.userData.selfSpin??PLANET_SPIN[mesh.userData.key]??0;
+    if(spin) mesh.rotation.y+=spin*d;
+    if(mesh.userData.key==='root') mesh.rotation.y+=SUN_SPIN*d;
   });
-  // animated glow pulse
+
+  // ── Animated glow pulse ───────────────────────────────────────────────
   glowRefs.forEach(({shell,baseOpacity,amp,freq,phase})=>{
     shell.material.opacity=baseOpacity+amp*Math.sin(t*freq+phase);
   });
-  // star slow drift
+
+  // ── Solar corona particles ────────────────────────────────────────────
+  if(coronaRef){
+    const pa=coronaRef.userData.cd;
+    const posAttr=coronaRef.geometry.attributes.position;
+    for(let i=0;i<pa.length;i++){
+      pa[i].life+=pa[i].speed*d*0.35;
+      if(pa[i].life>1){ pa[i].life=0; pa[i].th=Math.random()*Math.PI*2; pa[i].ph=Math.acos(2*Math.random()-1); }
+      const r=1.35+pa[i].life*2.7;
+      posAttr.setXYZ(i,
+        r*Math.sin(pa[i].ph)*Math.cos(pa[i].th),
+        r*Math.sin(pa[i].ph)*Math.sin(pa[i].th),
+        r*Math.cos(pa[i].ph));
+    }
+    posAttr.needsUpdate=true;
+    coronaRef.material.opacity=0.7+0.15*Math.sin(t*1.8);
+  }
+
+  // ── Asteroid belt slow rotation ───────────────────────────────────────
+  if(asteroidBeltRef) asteroidBeltRef.rotation.y+=0.00008;
+
+  // ── Shooting stars ────────────────────────────────────────────────────
+  if(t>nextShotTime){ spawnShootingStar(); nextShotTime=t+9+Math.random()*14; }
+  for(let i=shootingStars.length-1;i>=0;i--){
+    const s=shootingStars[i];
+    s.userData.life-=s.userData.decay*d;
+    s.material.opacity=Math.max(0,s.userData.life*0.85);
+    if(s.userData.life<=0){ scene.remove(s); s.geometry.dispose(); s.material.dispose(); shootingStars.splice(i,1); }
+  }
+
+  // ── Star slow drift + nebula counter-drift ────────────────────────────
   stars.rotation.y+=0.000035;
+
   controls.update();
   renderer.render(scene,camera);
   labelRenderer.render(scene,camera);
