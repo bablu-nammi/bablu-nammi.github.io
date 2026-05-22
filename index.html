@@ -1122,6 +1122,69 @@ function spawnShootingStar(){
   scene.add(line); shootingStars.push(line);
 }
 
+// ── Spaceship system ──────────────────────────────────────────────────────
+function makeSpaceship(){
+  const g=new THREE.Group();
+  const hullMat=new THREE.MeshPhongMaterial({color:0xbbd0ff,emissive:0x1133bb,emissiveIntensity:0.55,shininess:160});
+  // Body — tip in +Z so lookAt(nextPos) points nose forward
+  const hull=new THREE.Mesh(new THREE.ConeGeometry(0.055,0.22,5),hullMat);
+  hull.rotation.x=Math.PI/2;
+  g.add(hull);
+  // Side wings
+  const wingMat=new THREE.MeshPhongMaterial({color:0x7788bb,emissive:0x0a1a55,emissiveIntensity:0.3,shininess:80});
+  [-1,1].forEach(side=>{
+    const w=new THREE.Mesh(new THREE.ConeGeometry(0.02,0.1,3),wingMat);
+    w.rotation.z=side*Math.PI/2;
+    w.position.set(side*0.065,0,-0.04);
+    g.add(w);
+  });
+  // Engine exhaust glow (at the back, -Z)
+  const ex=new THREE.Mesh(new THREE.SphereGeometry(0.038,8,8),
+    new THREE.MeshBasicMaterial({color:0x4488ff,transparent:true,opacity:0.95,blending:THREE.AdditiveBlending,depthWrite:false}));
+  ex.position.z=-0.13;
+  g.userData.exhaust=ex; g.add(ex);
+  // Pre-allocated trail line (30 points, updated every frame)
+  const TN=30,tp=new Float32Array(TN*3),tc=new Float32Array(TN*3);
+  const tg=new THREE.BufferGeometry();
+  tg.setAttribute('position',new THREE.BufferAttribute(tp,3));
+  tg.setAttribute('color',new THREE.BufferAttribute(tc,3));
+  g.userData.trailLine=new THREE.Line(tg,new THREE.LineBasicMaterial({
+    vertexColors:true,transparent:true,opacity:0.6,blending:THREE.AdditiveBlending,depthWrite:false}));
+  g.userData.trailPts=[];
+  return g;
+}
+
+function bezier3(p0,p1,p2,p3,t){
+  const u=1-t;
+  return p0.clone().multiplyScalar(u*u*u)
+    .add(p1.clone().multiplyScalar(3*u*u*t))
+    .add(p2.clone().multiplyScalar(3*u*t*t))
+    .add(p3.clone().multiplyScalar(t*t*t));
+}
+
+function initShipRoute(ship,stagger=0){
+  const keys=Object.keys(bodyMeshes).filter(k=>k!=='root'&&bodyMeshes[k]);
+  if(keys.length<2){ship.userData.active=false;return;}
+  const si=Math.floor(Math.random()*keys.length);
+  let di; do{di=Math.floor(Math.random()*keys.length);}while(di===si);
+  const s0=new THREE.Vector3(),d0=new THREE.Vector3();
+  bodyMeshes[keys[si]].getWorldPosition(s0);
+  bodyMeshes[keys[di]].getWorldPosition(d0);
+  const dist=s0.distanceTo(d0);
+  // Arc control points — curve up and out into space
+  const arc=new THREE.Vector3(
+    (Math.random()-.5)*dist*.5,
+    (Math.random()*.35+.18)*dist,
+    (Math.random()-.5)*dist*.5);
+  ship.userData={...ship.userData,
+    active:true, t:stagger, speed:.038+Math.random()*.03,
+    srcPos:s0, dstKey:keys[di],
+    cp1:s0.clone().add(arc),
+    cp2:d0.clone().add(arc.clone().negate()),
+    trailPts:[]};
+  ship.position.copy(s0);
+}
+
 function makeSphere(radius, hexColor, emissiveInt=0, shininess=40, texKey=null){
   const mat=new THREE.MeshPhongMaterial({
     color:hexNum(hexColor), emissive:hexNum(hexColor),
@@ -1197,6 +1260,9 @@ let coronaRef=null, asteroidBeltRef=null;
 // Shooting stars
 const shootingStars=[];
 let nextShotTime=6;
+// Spaceships
+const ships=[];
+const SHIP_N=3;
 
 function clearWorld(){
   // Explicitly remove CSS2DObject DOM elements so they don't linger
@@ -1258,6 +1324,16 @@ function buildRootScene(){
 
     const lbl=makeLabel(nd.label, sz+0.55);
     planet.add(lbl); labelObjs[key]=lbl;
+  });
+
+  // Spaceships — create once, re-add to worldGroup each root build
+  if(ships.length===0){
+    for(let i=0;i<SHIP_N;i++) ships.push(makeSpaceship());
+  }
+  ships.forEach((s,i)=>{
+    worldGroup.add(s);
+    worldGroup.add(s.userData.trailLine);
+    initShipRoute(s, i/SHIP_N); // stagger so ships are spread across their journeys
   });
 }
 
@@ -1440,7 +1516,45 @@ function animate(){
     if(s.userData.life<=0){ scene.remove(s); s.geometry.dispose(); s.material.dispose(); shootingStars.splice(i,1); }
   }
 
-  // ── Star slow drift + nebula counter-drift ────────────────────────────
+  // ── Spaceships (root view only) ───────────────────────────────────────
+  if(viewState==='root'){
+    const _tv=new THREE.Vector3();
+    ships.forEach(ship=>{
+      if(!ship.userData.active) return;
+      const dstMesh=bodyMeshes[ship.userData.dstKey];
+      if(!dstMesh){ initShipRoute(ship); return; }
+      ship.userData.t=Math.min(ship.userData.t+ship.userData.speed*d,1);
+      dstMesh.getWorldPosition(_tv);
+      const tt=ship.userData.t, tN=Math.min(tt+.009,1);
+      const pos=bezier3(ship.userData.srcPos,ship.userData.cp1,ship.userData.cp2,_tv,tt);
+      const posN=bezier3(ship.userData.srcPos,ship.userData.cp1,ship.userData.cp2,_tv,tN);
+      ship.position.copy(pos);
+      if(posN.distanceTo(pos)>1e-4) ship.lookAt(posN);
+      // Engine exhaust pulse
+      if(ship.userData.exhaust){
+        ship.userData.exhaust.material.opacity=0.75+0.28*Math.sin(t*15+tt*35);
+        ship.userData.exhaust.scale.setScalar(0.8+0.45*Math.sin(t*11+tt*20));
+      }
+      // Update trail buffer
+      ship.userData.trailPts.unshift(pos.clone());
+      if(ship.userData.trailPts.length>29) ship.userData.trailPts.pop();
+      const tl=ship.userData.trailLine;
+      if(tl){
+        const pa=tl.geometry.attributes.position,ca=tl.geometry.attributes.color;
+        const NN=pa.count,col=new THREE.Color(0x3377ff);
+        for(let j=0;j<NN;j++){
+          const pt=ship.userData.trailPts[j]||pos;
+          const a=Math.max(0,(1-j/NN)*0.65);
+          pa.setXYZ(j,pt.x,pt.y,pt.z);
+          ca.setXYZ(j,col.r*a,col.g*a,col.b*a);
+        }
+        pa.needsUpdate=true; ca.needsUpdate=true;
+      }
+      if(ship.userData.t>=1) initShipRoute(ship);
+    });
+  }
+
+  // ── Star slow drift ───────────────────────────────────────────────────
   stars.rotation.y+=0.000035;
 
   controls.update();
