@@ -1519,6 +1519,7 @@ const bodyMeshes = {};
 const labelObjs = {};
 const glowRefs = []; // {shell, baseOpacity, amp, freq, phase}
 const eruptionSystems = []; // volcano particle emitters
+const waterRefs = []; // {mesh, amp, freq, spd}
 
 // ── 3D animation state ────────────────────────────────────────────────────
 // Fly-in
@@ -1545,8 +1546,32 @@ function clearWorld(){
   Object.keys(labelObjs).forEach(k=>delete labelObjs[k]);
   glowRefs.length=0;       // clear animated glows
   eruptionSystems.length=0; // clear volcano particles
+  waterRefs.length=0;       // clear animated water meshes
   coronaRef=null; asteroidBeltRef=null; // reset 3D effect refs
   hoveredKey=null; // reset hover state so no stale labels persist
+}
+
+// ── Animated water mesh ───────────────────────────────────────────────────
+const WATER_CFGS={
+  edu:    {color:0x1155cc,emissive:0x001844,emissiveInt:.40, op:.70, amp:.028,freq:4.2,spd:1.10},
+  papers: {color:0x22aacc,emissive:0x002233,emissiveInt:.35, op:.62, amp:.020,freq:5.8,spd:0.55},
+  awards: {color:0xff5500,emissive:0x3d1000,emissiveInt:.50, op:.68, amp:.034,freq:3.6,spd:1.90},
+  exp:    {color:0x7722cc,emissive:0x1a0040,emissiveInt:.40, op:.60, amp:.028,freq:4.8,spd:1.40},
+};
+function makeWaterSphere(r, key, scaleFactor){
+  const cfg=WATER_CFGS[key]; if(!cfg) return null;
+  const segs=48;
+  const geo=new THREE.SphereGeometry(r*1.007,segs,segs);
+  const orig=new Float32Array(geo.attributes.position.array);
+  const mat=new THREE.MeshPhongMaterial({
+    color:cfg.color, emissive:cfg.emissive, emissiveIntensity:cfg.emissiveInt,
+    transparent:true, opacity:cfg.op, shininess:120, depthWrite:false,
+  });
+  const mesh=new THREE.Mesh(geo,mat);
+  mesh.userData.origPos=orig;
+  const s=scaleFactor||1;
+  waterRefs.push({mesh, amp:cfg.amp*s, freq:cfg.freq, spd:cfg.spd});
+  return mesh;
 }
 
 // ── Build root scene ──────────────────────────────────────────────────────
@@ -1587,13 +1612,9 @@ function buildRootScene(){
     planet.position.set(orb.r,0,0);
     planet.rotation.z=(PLANET_TILT_AX[key]||0)*Math.PI/180;
     planet.userData={key,type:'planet'};
-    const freq=PLANET_GLOW_FREQ[key]||0.65;
-    planet.add(makeAnimGlow(sz*1.55, nd.color, 0.22, freq, pi*1.3));
-    planet.add(makeAnimGlow(sz*2.2,  nd.color, 0.07, freq*0.6, pi*0.8));
     if(key==='exp') planet.add(makePlanetRing(sz*1.35, sz*2.1, nd.color, 30));
-    addCities(planet, sz, nd.color, sz/0.3);
-    addTerrain(planet, key, sz, sz/0.42);
-    addClouds(planet, key, sz, sz/0.42);
+    const water=makeWaterSphere(sz, key, sz/0.42);
+    if(water) planet.add(water);
     pivot.add(planet); bodyMeshes[key]=planet;
 
     const lbl=makeLabel(nd.label, sz+0.55);
@@ -1620,11 +1641,8 @@ function buildPlanetScene(planetKey){
   const planet=makeSphere(0.95,nd.color,0.38,60,planetKey);
   planet.userData={key:planetKey,type:'planet-center',selfSpin:PLANET_SPIN[planetKey]||0.2};
   planet.rotation.z=(PLANET_TILT_AX[planetKey]||0)*Math.PI/180;
-  planet.add(makeAnimGlow(1.42,nd.color,0.26,0.8,0));
-  planet.add(makeAnimGlow(2.15,nd.color,0.09,0.5,0.9));
-  addCities(planet, 0.95, nd.color, 3.5);
-  addTerrain(planet, planetKey, 0.95, 2.1);
-  addClouds(planet, planetKey, 0.95, 2.2);
+  const waterP=makeWaterSphere(0.95, planetKey, 2.0);
+  if(waterP) planet.add(waterP);
   const pLbl=makeLabel(nd.label,1.5);
   planet.add(pLbl); labelObjs[planetKey]=pLbl;
   pLbl.element.classList.add('visible');
@@ -1776,6 +1794,24 @@ function animate(){
         craterTop.y+norm.y*arc+spread[i*3+1]*life[i]*2,
         craterTop.z+norm.z*arc+spread[i*3+2]*life[i]*2
       );
+    }
+    pa.needsUpdate=true;
+  });
+
+  // ── Animated water surface (vertex displacement) ──────────────────────
+  waterRefs.forEach(({mesh,amp,freq,spd})=>{
+    const pa=mesh.geometry.attributes.position;
+    const orig=mesh.userData.origPos;
+    const N=pa.count;
+    for(let i=0;i<N;i++){
+      const ox=orig[i*3],oy=orig[i*3+1],oz=orig[i*3+2];
+      const len=Math.sqrt(ox*ox+oy*oy+oz*oz);
+      const wave=
+        Math.sin(ox*freq        + t*spd      )*Math.cos(oy*freq*.82  + t*spd*.75)*0.50+
+        Math.sin(oy*freq*1.1    + t*spd*.90  )*Math.cos(oz*freq*.92  + t*spd*1.1)*0.32+
+        Math.sin(oz*freq*1.3    + t*spd*1.2  )*Math.cos(ox*freq*.70  + t*spd*.60)*0.18;
+      const sc=(len+wave*amp)/len;
+      pa.setXYZ(i,ox*sc,oy*sc,oz*sc);
     }
     pa.needsUpdate=true;
   });
