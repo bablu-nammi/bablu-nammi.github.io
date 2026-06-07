@@ -438,42 +438,43 @@ const NODES = {
   papers:{
     type:'cat', label:'Research\nPapers',
     x:26, y:20, color:'#06b6d4', glow:'rgba(6,182,212,0.4)',
-    badge:'3 Papers', badgeClass:'badge-papers',
-    summary:'3 peer-reviewed publications in AI-driven bioinformatics — covering transformer-based protein classification, generative protein design, and ML-based feature extraction for CRISPR-Cas systems.',
+    badge:'3 Papers + Patent', badgeClass:'badge-papers',
+    summary:'First-author IEEE TCBB journal paper, 3 total peer-reviewed publications, and a WIPO-published patent (WO2026089800) for AI-designed gene-editing proteins — a first in the United States.',
     children:['p1','p2','p3'],
   },
   awards:{
     type:'cat', label:'Awards\n& Wins',
     x:74, y:20, color:'#f59e0b', glow:'rgba(245,158,11,0.4)',
-    badge:'2× Winner', badgeClass:'badge-gold',
-    summary:'2× hackathon winner, building AI and AR-powered applications in healthcare and insurance — winning against teams from universities across the Dallas–Fort Worth region.',
-    children:['a1','a2'],
+    badge:'3× Podium', badgeClass:'badge-gold',
+    summary:'Three-time national competition podium finisher: INFORMS Data Mining Challenge 2nd (2024) and 3rd (2025), IISE ESD Analytics Competition 2nd (2026) — competing against 100+ international teams.',
+    children:['a1','a2','a3'],
   },
   exp:{
     type:'cat', label:'Experience',
     x:78, y:72, color:'#8b5cf6', glow:'rgba(139,92,246,0.4)',
-    badge:null, badgeClass:'',
-    summary:'5+ years building production ML systems, deep learning models, and AR applications — spanning AI research at UTA and industry engineering roles.',
+    badge:'5+ Years', badgeClass:'',
+    summary:'5+ years building deep learning systems end to end — transformer architectures, generative protein design, RAG pipelines, and the MLOps infrastructure to deploy them at scale.',
     children:[],
   },
   edu:{
     type:'cat', label:'Education',
     x:22, y:72, color:'#10b981', glow:'rgba(16,185,129,0.4)',
     badge:null, badgeClass:'',
-    summary:'MS Computer Science, UT Arlington (2023) — deep learning & AI research focus. BS Computer Science, UT Dallas (2020).',
+    summary:'MS Computer Science, UT Arlington (2023) — deep learning & AI research focus, CRISPR protein classification thesis. BS Computer Science, UT Dallas (2020).',
     children:[],
   },
-  p1:{ type:'leaf', label:'CRISPR\nClassifier',    x:9,  y:8,  color:'#67e8f9', glow:'rgba(103,232,249,0.3)', parent:'papers', desc:'Transformer + margin regularization for CRISPR-Cas protein classification · bioRxiv 2024' },
-  p2:{ type:'leaf', label:'CasGen',               x:23, y:3,  color:'#67e8f9', glow:'rgba(103,232,249,0.3)', parent:'papers', desc:'Generative model for de novo CRISPR-Cas protein design · bioRxiv 2025' },
-  p3:{ type:'leaf', label:'Cas9 & Cas12\nFeature',x:38, y:8,  color:'#67e8f9', glow:'rgba(103,232,249,0.3)', parent:'papers', desc:'ML-based feature identification distinguishing Cas9 & Cas12 proteins · ACS 2024' },
-  a1:{ type:'leaf', label:'insARance',             x:63, y:7,  color:'#fbbf24', glow:'rgba(251,191,36,0.3)', parent:'awards', desc:'AR app overlaying insurance info on real objects · Facebook Hackathon Winner 2020' },
-  a2:{ type:'leaf', label:'WeCare',                x:82, y:7,  color:'#fbbf24', glow:'rgba(251,191,36,0.3)', parent:'awards', desc:'AI-powered post-accident info exchange app · Hackathon Winner 2020' },
+  p1:{ type:'leaf', label:'IEEE TCBB\n2026',        x:9,  y:8,  color:'#67e8f9', glow:'rgba(103,232,249,0.3)', parent:'papers', desc:'Max-Margin Regularized Transformer for CRISPR-Cas protein classification · IEEE TCBB 2026 · First Author' },
+  p2:{ type:'leaf', label:'CasGen',                 x:23, y:3,  color:'#67e8f9', glow:'rgba(103,232,249,0.3)', parent:'papers', desc:'Generative model for de novo CRISPR-Cas protein design · bioRxiv 2025 · Co-First Author' },
+  p3:{ type:'leaf', label:'Cas9 & Cas12\nFeature',  x:38, y:8,  color:'#67e8f9', glow:'rgba(103,232,249,0.3)', parent:'papers', desc:'ML-based feature identification distinguishing Cas9 & Cas12 proteins · ACS J. Chem. Inf. Model. 2024' },
+  a1:{ type:'leaf', label:'IISE ESD\n2nd 2026',     x:63, y:7,  color:'#fbbf24', glow:'rgba(251,191,36,0.3)', parent:'awards', desc:'Bayesian neural network with custom neural priors · IISE ESD Analytics Competition 2nd Place 2026' },
+  a2:{ type:'leaf', label:'INFORMS\n2nd 2024',      x:75, y:4,  color:'#fbbf24', glow:'rgba(251,191,36,0.3)', parent:'awards', desc:'Multimodal transformer for TikTok engagement prediction · INFORMS Data Mining Challenge 2nd of 100+ teams 2024' },
+  a3:{ type:'leaf', label:'INFORMS\n3rd 2025',      x:87, y:7,  color:'#fbbf24', glow:'rgba(251,191,36,0.3)', parent:'awards', desc:'County-level power outage forecasting from 108 weather features · INFORMS Data Mining Challenge 3rd Place 2025' },
 };
 
 // ── Content ──────────────────────────────────────────────────────────────
 const CONTENT = {
   root:{
-    title:'Bharani Nammi', sub:'Deep Learning Engineer & Researcher', subColor:'#818cf8',
+    title:'Bharani Nammi', sub:'Senior AI/ML Engineer & Researcher', subColor:'#818cf8',
     html:`
     <div class="about-layout">
       <div class="about-left">
@@ -481,40 +482,41 @@ const CONTENT = {
           <div class="about-avatar">BN</div>
           <div class="about-meta">
             <div class="about-name">Bharani Nammi</div>
-            <div class="about-role">Deep Learning Engineer & AI Researcher</div>
+            <div class="about-role">Senior AI/ML Engineer & Researcher</div>
             <div class="about-locs">
               <span class="loc-chip">📍 Dallas, TX</span>
               <span class="loc-chip">MS CS · UTA</span>
-              <span class="loc-chip">Open to Research Roles</span>
+              <span class="loc-chip">AWS ML Specialty</span>
             </div>
           </div>
         </div>
         <div class="about-bio">
-          I build production-grade deep learning systems — from time series forecasting
-          and computer vision to augmented reality. My work spans the full pipeline:
-          ideation, research, training on GPU clusters, and deployment at scale.
-          Passionate about pushing the frontier of applied AI and publishing novel findings.
+          Senior AI/ML engineer and researcher with 5+ years building deep learning systems
+          end to end — novel transformer and generative architectures, fine-tuning of large
+          language and protein models, RAG pipelines, and the MLOps infrastructure to deploy them.
+          First-author IEEE journal publication, three papers total, and a WIPO-published patent
+          for AI-designed gene-editing proteins, a first in the United States.
         </div>
       </div>
       <div class="about-right">
         <div class="about-stats">
-          <div class="ast"><div class="ast-v">6+</div><div class="ast-l">Years in AI/ML</div></div>
-          <div class="ast"><div class="ast-v">2×</div><div class="ast-l">Hackathon Winner</div></div>
-          <div class="ast"><div class="ast-v">9</div><div class="ast-l">Hackathons</div></div>
-          <div class="ast"><div class="ast-v">MS</div><div class="ast-l">CS · UTA</div></div>
+          <div class="ast"><div class="ast-v">5+</div><div class="ast-l">Years in AI/ML</div></div>
+          <div class="ast"><div class="ast-v">3×</div><div class="ast-l">Comp. Podium</div></div>
+          <div class="ast"><div class="ast-v">3+</div><div class="ast-l">Publications</div></div>
+          <div class="ast"><div class="ast-v">1</div><div class="ast-l">Patent (WIPO)</div></div>
         </div>
         <div class="about-links">
           <a href="mailto:nammi.bharani@gmail.com" class="alink">
             <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,12 2,6"/></svg>
             Email
           </a>
-          <a href="https://github.com/bablu-nammi" target="_blank" class="alink">
+          <a href="https://linkedin.com/in/bharaninammi" target="_blank" class="alink">
+            <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>
+            LinkedIn
+          </a>
+          <a href="https://github.com/nammi-bharani" target="_blank" class="alink">
             <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg>
             GitHub
-          </a>
-          <a href="https://devpost.com/nammi" target="_blank" class="alink">
-            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            Devpost
           </a>
         </div>
       </div>
@@ -522,193 +524,185 @@ const CONTENT = {
   },
 
   papers:{
-    title:'Research Papers', sub:'3 publications in deep learning, bioinformatics & AI', subColor:'#06b6d4',
+    title:'Research Papers & Patent', sub:'IEEE journal · 3 publications · WIPO patent', subColor:'#06b6d4',
     html:`
     <div class="two-col" id="papersGrid">
 
-      <div class="paper-card" style="cursor:default">
-        <div class="paper-title">Transformer + Latent Space Regularization for CRISPR-Cas Protein Classification</div>
-        <div class="paper-authors">B. Nammi et al.</div>
-        <div class="paper-venue">bioRxiv · Bioinformatics · 2024</div>
-        <div class="paper-abstract">Novel margin-based loss for latent space regularization. LSRMT achieves 99.81% on CAS9 vs Non-CAS — outperforming fine-tuned ProtBert on a smaller dataset.</div>
+      <div class="paper-card" style="cursor:default;border-color:rgba(6,182,212,0.4)">
+        <div class="paper-title">Robust CRISPR-Cas Protein Identification using Max-Margin Regularized Transformer Models</div>
+        <div class="paper-authors">Nammi, B. et al. — <span style="color:#67e8f9">First Author</span></div>
+        <div class="paper-venue">IEEE Trans. Computational Biology &amp; Bioinformatics (TCBB) · 2026</div>
+        <div class="paper-abstract">Novel transformer with max-margin latent-space regularization achieves 98.7% classification accuracy on a 13,494-feature protein dataset — outperforming existing methods by 12%.</div>
         <div class="paper-footer">
-          <div class="paper-tags"><span class="ptag">Transformer</span><span class="ptag">CRISPR-Cas</span><span class="ptag">ProtBert</span></div>
-          <span class="paper-year">2024</span>
+          <div class="paper-tags"><span class="ptag">Transformer</span><span class="ptag">IEEE TCBB</span><span class="ptag">Max-Margin</span></div>
+          <span class="paper-year nbadge badge-papers" style="font-size:10px;padding:2px 7px">Peer-Reviewed</span>
         </div>
       </div>
 
       <div class="paper-card" style="cursor:default">
-        <div class="paper-title">CasGen: Generative Model for CRISPR Cas Protein Design</div>
-        <div class="paper-authors">B. Nammi et al.</div>
-        <div class="paper-venue">bioRxiv · Genomics · 2025</div>
-        <div class="paper-abstract">Transformer-based generative model with Bayesian latent space optimization. Generated proteins validated with AlphaFold2/3 — TM-scores 0.70–0.85, RMSD &lt; 2Å.</div>
+        <div class="paper-title">CasGen: A Regularized Generative Model for CRISPR Cas Protein Design</div>
+        <div class="paper-authors">Nammi, B.*, Vindi, M.* et al. — <span style="color:#67e8f9">Co-First Author</span></div>
+        <div class="paper-venue">bioRxiv · 2025</div>
+        <div class="paper-abstract">First-of-its-kind generative AI system (CasGen) for de novo synthetic CRISPR-Cas protein design. Validated via AlphaFold structural analysis; credited in wet-lab breakthrough results.</div>
         <div class="paper-footer">
-          <div class="paper-tags"><span class="ptag">Generative</span><span class="ptag">AlphaFold</span><span class="ptag">Bayesian Opt</span></div>
+          <div class="paper-tags"><span class="ptag">Generative AI</span><span class="ptag">AlphaFold</span><span class="ptag">CRISPR</span></div>
           <span class="paper-year">2025</span>
         </div>
       </div>
 
       <div class="paper-card" style="cursor:default">
-        <div class="paper-title">Family-Specific Features in Cas9 & Cas12: A Machine Learning Approach</div>
-        <div class="paper-authors">S. S. Madugula, B. Nammi et al.</div>
+        <div class="paper-title">Identification of Family-Specific Features in Cas9 and Cas12 Proteins</div>
+        <div class="paper-authors">Madugula, S.S., Pujar, P., Nammi, B. et al.</div>
         <div class="paper-venue">J. Chem. Inf. Model. · ACS · 2024</div>
         <div class="paper-abstract">Random Forest on 13,494 protein features. Cas9 classifier 95% acc, Cas12 92% acc, multi-class F1 ~0.98. Identified conserved catalytic tripeptides (PWN, PYY, HHA, DHI).</div>
         <div class="paper-footer">
           <div class="paper-tags"><span class="ptag">Random Forest</span><span class="ptag">Protein Features</span><span class="ptag">ACS</span></div>
-          <span class="paper-year">2024</span>
+          <span class="paper-year nbadge badge-papers" style="font-size:10px;padding:2px 7px">Peer-Reviewed</span>
+        </div>
+      </div>
+
+      <div class="paper-card" style="cursor:default;border-color:rgba(251,191,36,0.4);background:rgba(251,191,36,0.04)">
+        <div class="paper-title">Patent: AI-Designed Gene-Editing Proteins Validated for Functional Activity</div>
+        <div class="paper-authors">Neoclease, Inc. — <span style="color:#fbbf24">WIPO Published · WO2026089800</span></div>
+        <div class="paper-venue">World Intellectual Property Organization (WIPO) · 2026 · 1 Additional Pending</div>
+        <div class="paper-abstract">First AI-designed gene-editing proteins in the United States to pass wet-lab validation — demonstrating real-world functional activity. A first-of-its-kind achievement in computational biology.</div>
+        <div class="paper-footer">
+          <div class="paper-tags"><span class="ptag">Patent</span><span class="ptag">Wet-Lab Validated</span><span class="ptag">Gene Editing</span></div>
+          <span class="paper-year nbadge" style="font-size:10px;padding:2px 7px;background:rgba(251,191,36,0.2);color:#fbbf24;border-color:rgba(251,191,36,0.4)">WIPO</span>
         </div>
       </div>
 
     </div>
-    <p style="font-size:11.5px;color:#3d4a6a;margin-top:16px;text-align:center">Click individual paper nodes on the tree for full details ↗</p>`
+    <p style="font-size:11.5px;color:#3d4a6a;margin-top:16px;text-align:center">Click individual paper nodes on the solar system for full details ↗</p>`
   },
 
   awards:{
-    title:'Awards & Recognition', sub:'Hackathon wins and competition history', subColor:'#f59e0b',
+    title:'Awards & Recognition', sub:'National competition podium finishes · Back-to-back years', subColor:'#f59e0b',
     html:`
     <div class="two-col awards-grid">
 
       <div class="award-card win" style="--ac:linear-gradient(90deg,#f59e0b,#fbbf24)">
         <div class="award-top">
           <div class="award-title-wrap">
-            <div class="award-event">Facebook AR Hackathon 2020</div>
-            <div class="award-project">insARance — Augmented Reality Insurance App</div>
+            <div class="award-event">IISE ESD Data Analytics Competition 2026</div>
+            <div class="award-project">Bayesian Neural Network with Custom Neural Priors</div>
           </div>
-          <span class="award-badge badge-gold">Winner</span>
+          <span class="award-badge badge-gold">2nd Place</span>
         </div>
-        <div class="award-desc">Built an AR application that overlays real-time insurance information on physical objects using the camera. Won against teams from top universities across the region.</div>
-        <div class="award-year">2020 · Facebook-sponsored</div>
+        <div class="award-desc">Designed a Bayesian neural network with custom neural priors (Gaussian, hierarchical, and sparsity-inducing) for calibrated uncertainty quantification, encoding domain knowledge directly into the model architecture.</div>
+        <div class="award-year">2026 · IISE Engineering &amp; Systems Division</div>
       </div>
 
       <div class="award-card win" style="--ac:linear-gradient(90deg,#f59e0b,#fbbf24)">
         <div class="award-top">
           <div class="award-title-wrap">
-            <div class="award-event">Hackathon Win · 2020</div>
-            <div class="award-project">WeCare — Post-Accident Information App</div>
+            <div class="award-event">INFORMS Data Mining Challenge 2024</div>
+            <div class="award-project">Short Video Popularity Prediction (TikTok)</div>
           </div>
-          <span class="award-badge badge-gold">Winner</span>
+          <span class="award-badge badge-gold">2nd Place</span>
         </div>
-        <div class="award-desc">Streamlined information exchange between parties after vehicle accidents — reducing friction and improving accuracy of incident documentation using AI-assisted data capture.</div>
-        <div class="award-year">2020</div>
+        <div class="award-desc">Built a multimodal transformer pipeline fusing video, audio, text, and metadata to predict TikTok engagement (views, likes, comments, shares). Ranked 2nd out of 100+ international teams.</div>
+        <div class="award-year">2024 · INFORMS Data Mining Society · 100+ International Teams</div>
       </div>
 
-      <div class="award-card" style="--ac:linear-gradient(90deg,#6366f1,#818cf8)">
+      <div class="award-card win" style="--ac:linear-gradient(90deg,#fb923c,#fbbf24)">
         <div class="award-top">
           <div class="award-title-wrap">
-            <div class="award-event">Microsoft Azure Hack</div>
-            <div class="award-project">Accessibility Challenge</div>
+            <div class="award-event">INFORMS Data Mining Challenge 2025</div>
+            <div class="award-project">Power Outage Forecasting (County-Level)</div>
           </div>
-          <span class="award-badge badge-part">Participant</span>
+          <span class="award-badge badge-gold">3rd Place</span>
         </div>
-        <div class="award-year">2020–21</div>
-      </div>
-
-      <div class="award-card" style="--ac:linear-gradient(90deg,#6366f1,#818cf8)">
-        <div class="award-top">
-          <div class="award-title-wrap">
-            <div class="award-event">T-Mobile Hacktober</div>
-            <div class="award-project">Innovation Challenge</div>
-          </div>
-          <span class="award-badge badge-part">Participant</span>
-        </div>
-        <div class="award-year">2019, 2020 · Richardson, TX</div>
-      </div>
-
-      <div class="award-card" style="--ac:linear-gradient(90deg,#6366f1,#818cf8)">
-        <div class="award-top">
-          <div class="award-title-wrap">
-            <div class="award-event">Facebook AI Hack · HackDFW · HackUTD</div>
-            <div class="award-project">9 total hackathons competed — Texas circuit</div>
-          </div>
-          <span class="award-badge badge-part">Participant</span>
-        </div>
-        <div class="award-year">2018 – 2021</div>
+        <div class="award-desc">Modeled county-level power outages from 108 hourly weather features over 24- and 48-hour horizons (RMSE objective). Back-to-back INFORMS podium finish.</div>
+        <div class="award-year">2025 · INFORMS Data Mining Society</div>
       </div>
 
     </div>`
   },
 
   exp:{
-    title:'Experience', sub:'Professional work history', subColor:'#8b5cf6',
+    title:'Experience', sub:'5+ years building deep learning systems end to end', subColor:'#8b5cf6',
     html:`
     <div class="two-col exp-timeline">
       <div class="exp-card">
         <div class="exp-top">
           <div>
-            <div class="exp-role">Senior AI / ML Engineer</div>
-            <div class="exp-co">[ Share your LinkedIn — I'll fill this in ]</div>
+            <div class="exp-role">AI Research Engineer</div>
+            <div class="exp-co">Neoclease · Boston, MA (Remote)</div>
           </div>
           <div class="exp-period">2023 — Present</div>
         </div>
-        <div class="exp-desc">Building production deep learning systems for enterprise. Specializing in time series forecasting, predictive analytics, and large-scale model deployment on GPU infrastructure.</div>
+        <div class="exp-desc">Architected transformer-based generative models for de novo protein sequence design on 50K+ curated sequences. Delivered wet-lab validated AI-designed gene-editing proteins — a first-of-its-kind in the US (patent WO2026089800). Pioneered a novel margin-based latent-space regularization technique cutting biologically invalid outputs by 40%. Compressed model development cycles by 75% via custom MLOps infrastructure.</div>
         <div class="exp-stack">
-          <span class="etag">PyTorch</span><span class="etag">Deep Learning</span>
-          <span class="etag">Time Series</span><span class="etag">Python</span><span class="etag">GPU</span>
+          <span class="etag">Transformers</span><span class="etag">Generative AI</span>
+          <span class="etag">PyTorch</span><span class="etag">MLOps</span><span class="etag">Protein Design</span>
         </div>
       </div>
       <div class="exp-card">
         <div class="exp-top">
           <div>
-            <div class="exp-role">Software / ML Engineer</div>
-            <div class="exp-co">[ Previous company ]</div>
+            <div class="exp-role">Deep Learning Researcher</div>
+            <div class="exp-co">University of Texas at Arlington</div>
           </div>
-          <div class="exp-period">2020 — 2023</div>
+          <div class="exp-period">2021 — 2024</div>
         </div>
-        <div class="exp-desc">Developed AI-driven features and augmented reality applications. Built production ML pipelines integrating models with mobile and backend systems.</div>
+        <div class="exp-desc">Engineered novel transformer architectures achieving 98.7% accuracy on a 13,494-feature protein dataset — outperforming existing methods by 12%. Invented CasGen, a first-of-its-kind generative AI system for CRISPR-Cas protein design. Fine-tuned protein language models (ProtBert, ESM-2) pre-trained on 200M+ sequences. Mentored 5+ graduate students, cutting onboarding time by 50%.</div>
         <div class="exp-stack">
-          <span class="etag">ML</span><span class="etag">AR</span>
-          <span class="etag">Unity</span><span class="etag">Java</span><span class="etag">Python</span>
+          <span class="etag">ProtBert</span><span class="etag">ESM-2</span>
+          <span class="etag">CRISPR</span><span class="etag">Research</span><span class="etag">PyTorch</span>
+        </div>
+      </div>
+      <div class="exp-card">
+        <div class="exp-top">
+          <div>
+            <div class="exp-role">Machine Learning Engineer</div>
+            <div class="exp-co">Energy Sector Client (NDA) · Northeast US</div>
+          </div>
+          <div class="exp-period">2020 — 2021</div>
+        </div>
+        <div class="exp-desc">Designed and deployed a transformer-based net-load forecasting system on 5 years of multivariate time-series data, improving 24-hour prediction accuracy by 23% over the ARIMA baseline. Engineered a custom pinball loss for probabilistic forecasting. Built a high-throughput data pipeline ingesting 10M+ hourly records from 15+ sources.</div>
+        <div class="exp-stack">
+          <span class="etag">Time Series</span><span class="etag">Forecasting</span>
+          <span class="etag">Transformers</span><span class="etag">AWS</span><span class="etag">Python</span>
         </div>
       </div>
     </div>`
   },
 
   p1:{
-    title:'CRISPR-Cas Protein Classifier', sub:'bioRxiv · 2024 · Bioinformatics', subColor:'#06b6d4',
-    pdfEmbed:true,
+    title:'CRISPR-Cas Protein Classifier', sub:'IEEE TCBB · 2026 · Peer-Reviewed · First Author', subColor:'#06b6d4',
     html:`
-    <div class="pdf-embed-wrap">
-      <div class="ptabs">
-        <button class="ptab" onclick="switchPaperTab('p1-pdf',this)">Full Paper</button>
-        <button class="ptab active" onclick="switchPaperTab('p1-overview',this)">Overview</button>
-      </div>
-      <div id="p1-pdf" class="ptab-panel">
-        <iframe class="pdf-embed-frame"
-          src="/papers/Robust_CRISPR_Cas_Protein_Identification_using_Max_Margin_Regularized_Transformer_Models-2.pdf">
-        </iframe>
-      </div>
-      <div id="p1-overview" class="ptab-panel ptab-overview active">
+    <div class="paper-detail">
+      <div class="paper-detail-left">
         <div class="pd-venue-row">
-          <span class="pd-venue">bioRxiv</span><span class="pd-dot">·</span>
-          <span class="pd-venue">Bioinformatics</span><span class="pd-dot">·</span>
-          <span class="pd-year">March 2024</span>
-          <a class="paper-link" style="margin-left:auto" href="https://www.biorxiv.org/content/10.1101/2024.03.02.583136v1" target="_blank">bioRxiv ↗</a>
+          <span class="pd-venue">IEEE TCBB</span><span class="pd-dot">·</span>
+          <span class="pd-venue">Computational Biology</span><span class="pd-dot">·</span>
+          <span class="pd-year">2026</span>
+          <span class="nbadge badge-papers" style="margin-left:4px">Peer-Reviewed</span>
         </div>
-        <div class="pd-title">Robust CRISPR-Cas Protein Identification using Max Margin Regularized Transformer Models</div>
-        <div class="pd-authors">Bharani Nammi, S. S. Madugula, P. Pujar, V. Arachchige, J. Liu, S. Wang<br><span style="color:#3d4a6a;font-size:11px">University of Texas at Arlington</span></div>
+        <div class="pd-title">Robust CRISPR-Cas Protein Identification using Max-Margin Regularized Transformer Models</div>
+        <div class="pd-authors">Nammi, B. et al.<br><span style="color:#3d4a6a;font-size:11px">University of Texas at Arlington · <strong style="color:#67e8f9">First Author</strong></span></div>
         <div class="pd-section-label">Abstract</div>
-        <div class="pd-abstract">Introduces a transformer-based deep learning model with max-margin latent space regularization for robust CRISPR-Cas protein sequence classification. The model enforces margin constraints in the embedding space to improve inter-class separation across diverse Cas protein families. Evaluated on curated CRISPR-Cas protein datasets, the approach achieves high classification accuracy and generalizes well to novel Cas variants, demonstrating the value of combining attention mechanisms with geometric regularization for protein function prediction.</div>
+        <div class="pd-abstract">Introduces a transformer-based deep learning model with max-margin latent space regularization for robust CRISPR-Cas protein sequence classification. The model enforces margin constraints in the embedding space to improve inter-class separation across diverse Cas protein families. Achieves 98.7% classification accuracy on a 13,494-feature protein dataset — outperforming existing state-of-the-art methods by 12%.</div>
         <div class="pd-tags">
           <span class="ptag">Transformer</span><span class="ptag">CRISPR-Cas</span>
           <span class="ptag">Max-Margin</span><span class="ptag">Latent Space</span>
-          <span class="ptag">Protein Classification</span><span class="ptag">Deep Learning</span>
+          <span class="ptag">Protein Classification</span><span class="ptag">IEEE TCBB</span>
         </div>
+      </div>
+      <div class="paper-detail-right">
         <div class="pd-stat-box">
-          <div class="pd-stat-label">Model Details</div>
-          <div class="pd-stat-row"><span class="pd-stat-key">Architecture</span><span class="pd-stat-val">Transformer</span></div>
-          <div class="pd-stat-row"><span class="pd-stat-key">Regularization</span><span class="pd-stat-val">Max-Margin</span></div>
-          <div class="pd-stat-row"><span class="pd-stat-key">Task</span><span class="pd-stat-val">Cas classification</span></div>
-          <div class="pd-stat-row"><span class="pd-stat-key">Status</span><span class="pd-stat-val">bioRxiv 2024</span></div>
-          <div class="pd-stat-row"><span class="pd-stat-key">DOI</span><span class="pd-stat-val" style="font-size:10px">10.1101/2024.03.02.583136</span></div>
+          <div class="pd-stat-label">Results</div>
+          <div class="pd-stat-row"><span class="pd-stat-key">Accuracy</span><span class="pd-stat-val">98.7%</span></div>
+          <div class="pd-stat-row"><span class="pd-stat-key">Features</span><span class="pd-stat-val">13,494 protein</span></div>
+          <div class="pd-stat-row"><span class="pd-stat-key">vs. SOTA</span><span class="pd-stat-val">+12% improvement</span></div>
+          <div class="pd-stat-row"><span class="pd-stat-key">Journal</span><span class="pd-stat-val">IEEE TCBB 2026</span></div>
+          <div class="pd-stat-row"><span class="pd-stat-key">Role</span><span class="pd-stat-val">First Author</span></div>
         </div>
         <div class="pd-highlight">
           <div class="pd-highlight-label">Key Contribution</div>
-          <div class="pd-highlight-text">Max-margin regularization applied to transformer latent space enforces discriminative class boundaries — significantly improving robustness when classifying diverse CRISPR-Cas protein families from sequence alone.</div>
+          <div class="pd-highlight-text">Max-margin regularization in transformer latent space enforces discriminative class boundaries — setting a new state-of-the-art in CRISPR-Cas protein classification from sequence alone.</div>
         </div>
-        <a class="pd-read-btn" href="https://www.biorxiv.org/content/10.1101/2024.03.02.583136v1" target="_blank">
-          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-          Read on bioRxiv
-        </a>
       </div>
     </div>`
   },
@@ -811,45 +805,67 @@ const CONTENT = {
   },
 
   a1:{
-    title:'insARance', sub:'Facebook AR Hackathon 2020 · Winner 🏆', subColor:'#f59e0b',
+    title:'IISE ESD Analytics Competition', sub:'2nd Place · 2026', subColor:'#f59e0b',
     html:`
     <div class="awards-grid" style="max-width:600px;margin:0 auto">
       <div class="award-card win" style="--ac:linear-gradient(90deg,#f59e0b,#fbbf24)">
         <div class="award-top">
           <div class="award-title-wrap">
-            <div class="award-event">Facebook AR Hackathon 2020</div>
-            <div class="award-project">insARance — Augmented Reality Insurance App</div>
+            <div class="award-event">IISE ESD Data Analytics Competition 2026</div>
+            <div class="award-project">Bayesian Neural Network with Custom Neural Priors</div>
           </div>
-          <span class="award-badge badge-gold">🏆 Winner</span>
+          <span class="award-badge badge-gold">🥈 2nd Place</span>
         </div>
         <div class="award-desc" style="font-size:13.5px;line-height:1.75">
-          Built an AR application that overlays real-time insurance information on physical objects using the camera.
-          Users point their phone at a car, home, or object and instantly see policy details, claim history, and coverage.
-          Won against teams from top universities across the Dallas–Fort Worth region.
+          Designed a Bayesian neural network with custom neural priors — Gaussian, hierarchical, and sparsity-inducing —
+          for calibrated uncertainty quantification and prior-driven regularization. Encoded domain knowledge directly
+          into the model architecture, enabling reliable probabilistic predictions.
         </div>
-        <div class="award-year" style="margin-top:14px;font-size:12px">2020 · Facebook-sponsored · Dallas, TX</div>
+        <div class="award-year" style="margin-top:14px;font-size:12px">2026 · IISE Engineering &amp; Systems Division Analytics Competition</div>
       </div>
     </div>`
   },
 
   a2:{
-    title:'WeCare', sub:'Hackathon Winner 2020 🏆', subColor:'#f59e0b',
+    title:'INFORMS Data Mining Challenge', sub:'2nd Place · 2024 · 100+ International Teams', subColor:'#f59e0b',
     html:`
     <div class="awards-grid" style="max-width:600px;margin:0 auto">
       <div class="award-card win" style="--ac:linear-gradient(90deg,#f59e0b,#fbbf24)">
         <div class="award-top">
           <div class="award-title-wrap">
-            <div class="award-event">Hackathon Win · 2020</div>
-            <div class="award-project">WeCare — Post-Accident Information App</div>
+            <div class="award-event">INFORMS Data Mining Society Challenge 2024</div>
+            <div class="award-project">Short Video Popularity Prediction (TikTok Engagement)</div>
           </div>
-          <span class="award-badge badge-gold">🏆 Winner</span>
+          <span class="award-badge badge-gold">🥈 2nd Place</span>
         </div>
         <div class="award-desc" style="font-size:13.5px;line-height:1.75">
-          Streamlined information exchange between parties after vehicle accidents.
-          The app uses AI-assisted data capture to reduce friction, improve accuracy of incident documentation,
-          and speed up the insurance claims process — removing the need for manual paperwork at the scene.
+          Built a multimodal transformer pipeline fusing video, audio, text, and metadata features to predict
+          TikTok engagement metrics (views, likes, comments, shares). Ranked 2nd out of 100+ international teams —
+          demonstrating state-of-the-art performance in social media content understanding.
         </div>
-        <div class="award-year" style="margin-top:14px;font-size:12px">2020 · Texas hackathon circuit</div>
+        <div class="award-year" style="margin-top:14px;font-size:12px">2024 · INFORMS Data Mining Society · 100+ International Teams</div>
+      </div>
+    </div>`
+  },
+
+  a3:{
+    title:'INFORMS Data Mining Challenge', sub:'3rd Place · 2025 · Back-to-Back Podium', subColor:'#f59e0b',
+    html:`
+    <div class="awards-grid" style="max-width:600px;margin:0 auto">
+      <div class="award-card win" style="--ac:linear-gradient(90deg,#fb923c,#fbbf24)">
+        <div class="award-top">
+          <div class="award-title-wrap">
+            <div class="award-event">INFORMS Data Mining Society Challenge 2025</div>
+            <div class="award-project">Power Outage Forecasting (County-Level)</div>
+          </div>
+          <span class="award-badge badge-gold">🥉 3rd Place</span>
+        </div>
+        <div class="award-desc" style="font-size:13.5px;line-height:1.75">
+          Modeled county-level power outages from 108 hourly weather features over 24- and 48-hour horizons,
+          optimizing for RMSE. Back-to-back INFORMS Data Mining Challenge podium finish, demonstrating
+          consistent excellence in applied machine learning competitions.
+        </div>
+        <div class="award-year" style="margin-top:14px;font-size:12px">2025 · INFORMS Data Mining Society · Back-to-Back Podium (2024 &amp; 2025)</div>
       </div>
     </div>`
   },
@@ -887,7 +903,7 @@ const CONTENT = {
 // ── Moon definitions (kept for reference) ─────────────────────────────────
 const MOONS = {
   papers:[ {key:'p1',ang:0,dur:10}, {key:'p2',ang:120,dur:13}, {key:'p3',ang:240,dur:9} ],
-  awards:[ {key:'a1',ang:80,dur:8}, {key:'a2',ang:260,dur:11} ],
+  awards:[ {key:'a1',ang:80,dur:8}, {key:'a2',ang:200,dur:11}, {key:'a3',ang:320,dur:14} ],
 };
 
 // ── Three.js orbital params ───────────────────────────────────────────────
