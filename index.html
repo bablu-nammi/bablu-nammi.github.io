@@ -70,8 +70,8 @@
     }
 
     .card-topbar{
-      display:flex;align-items:center;gap:16px;
-      padding:28px 40px 18px 36px;
+      display:flex;align-items:center;gap:14px;
+      padding:22px 32px 16px 28px;
       border-bottom:1px solid rgba(255,255,255,0.05);
       flex-shrink:0;
       background:transparent;
@@ -85,8 +85,8 @@
     }
     .back-btn:hover{background:rgba(99,102,241,0.2);color:#c7d2fe;}
     .card-title-wrap{flex:1;}
-    .card-title{font-size:20px;font-weight:800;color:#eef2ff;letter-spacing:-0.5px;}
-    .card-sub{font-size:12.5px;font-weight:500;margin-top:2px;}
+    .card-title{font-size:22px;font-weight:800;color:#eef2ff;letter-spacing:-0.5px;}
+    .card-sub{font-size:13px;font-weight:500;margin-top:3px;}
 
     .card-node-tag{
       display:inline-flex;align-items:center;gap:5px;
@@ -98,16 +98,15 @@
     .card-node-dot{width:6px;height:6px;border-radius:50%;background:var(--nc);display:inline-block;}
     @keyframes cardBodyIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
     .card-body{
-      flex:1;overflow-y:auto;padding:28px 44px 48px 36px;
+      flex:1;overflow-y:auto;padding:24px 32px 48px 28px;
       scrollbar-width:thin;scrollbar-color:#1a2236 transparent;
       animation:cardBodyIn 0.32s ease both;
     }
-    .card-body::-webkit-scrollbar{width:5px;}
+    .card-body::-webkit-scrollbar{width:4px;}
     .card-body::-webkit-scrollbar-thumb{background:#1a2236;border-radius:3px;}
 
-    /* Two-column grid for papers and awards on wide card */
-    .two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
-    @media(max-width:800px){.two-col{grid-template-columns:1fr;}}
+    /* Layout: single column for clarity */
+    .two-col{display:flex;flex-direction:column;gap:16px;}
 
     /* ── About ──────────────────────────────────────────── */
     .about-layout{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start;}
@@ -130,61 +129,63 @@
     .alink:hover{border-color:#6366f1;color:#eef2ff;}
 
     /* ── Papers ─────────────────────────────────────────── */
-    .papers-grid{display:flex;flex-direction:column;gap:13px;}
-    .paper-card{background:#0c1020;border:1px solid #161e30;border-radius:12px;padding:18px;transition:border-color 0.2s;}
-    .paper-card:hover{border-color:#243048;}
-    .paper-title{font-size:13.5px;font-weight:700;color:#eef2ff;line-height:1.4;margin-bottom:5px;}
-    .paper-authors{font-size:11.5px;color:#818cf8;margin-bottom:3px;font-weight:500;}
-    .paper-venue{font-size:11px;color:#3d4a6a;font-style:italic;margin-bottom:9px;}
-    .paper-abstract{font-size:11.5px;color:#7c88a8;line-height:1.65;margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
-    .paper-footer{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:7px;}
-    .paper-tags{display:flex;gap:5px;flex-wrap:wrap;}
-    .ptag{background:rgba(6,182,212,0.07);border:1px solid rgba(6,182,212,0.2);color:#06b6d4;font-size:10px;font-weight:600;padding:2px 7px;border-radius:4px;}
-    .paper-year{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#3d4a6a;background:#070a16;border:1px solid #161e30;padding:2px 7px;border-radius:5px;}
-    .paper-link{font-size:12px;color:#818cf8;text-decoration:none;font-weight:600;display:flex;align-items:center;gap:4px;}
+    .papers-grid{display:flex;flex-direction:column;gap:16px;}
+    .paper-card{background:rgba(12,16,32,0.7);border:1px solid #1e2840;border-radius:14px;padding:22px 24px;transition:border-color 0.2s;}
+    .paper-card:hover{border-color:#2d3a5a;}
+    .paper-title{font-size:15.5px;font-weight:700;color:#eef2ff;line-height:1.5;margin-bottom:7px;}
+    .paper-authors{font-size:13px;color:#818cf8;margin-bottom:4px;font-weight:500;}
+    .paper-venue{font-size:12.5px;color:#4a5568;font-style:italic;margin-bottom:12px;}
+    .paper-abstract{font-size:13.5px;color:#a0aec0;line-height:1.75;margin-bottom:14px;}
+    .paper-footer{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+    .paper-tags{display:flex;gap:6px;flex-wrap:wrap;}
+    .ptag{background:rgba(6,182,212,0.07);border:1px solid rgba(6,182,212,0.22);color:#06b6d4;font-size:11.5px;font-weight:600;padding:3px 9px;border-radius:5px;}
+    .paper-year{font-family:'JetBrains Mono',monospace;font-size:11px;color:#4a5568;background:#070a16;border:1px solid #1e2840;padding:3px 9px;border-radius:5px;}
+    .paper-link{font-size:13px;color:#818cf8;text-decoration:none;font-weight:600;display:flex;align-items:center;gap:4px;}
     .paper-link:hover{color:#c7d2fe;}
     .papers-drop{background:#070a16;border:2px dashed rgba(99,102,241,0.2);border-radius:12px;padding:36px 22px;text-align:center;}
     .papers-drop strong{display:block;font-size:14px;color:#94a3b8;margin-bottom:6px;}
-    .papers-drop span{font-size:12px;color:#3d4a6a;line-height:1.7;display:block;}
+    .papers-drop span{font-size:12px;color:#4a5568;line-height:1.7;display:block;}
 
     /* ── Awards ─────────────────────────────────────────── */
-    .awards-grid{display:flex;flex-direction:column;gap:13px;}
-    .award-card{background:#0c1020;border:1px solid #161e30;border-radius:12px;padding:18px;position:relative;overflow:hidden;transition:all 0.2s;}
+    .awards-grid{display:flex;flex-direction:column;gap:16px;}
+    .award-card{background:rgba(12,16,32,0.7);border:1px solid #1e2840;border-radius:14px;padding:22px 24px;position:relative;overflow:hidden;transition:border-color 0.2s,transform 0.2s;}
     .award-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--ac,linear-gradient(90deg,#f59e0b,#fbbf24));}
-    .award-card.win{border-color:rgba(245,158,11,0.25);background:rgba(245,158,11,0.025);}
-    .award-card:hover{transform:translateY(-2px);}
-    .award-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:9px;}
-    .award-title-wrap{}
-    .award-event{font-size:14px;font-weight:700;color:#eef2ff;margin-bottom:3px;}
-    .award-project{font-size:12px;color:#f59e0b;font-weight:600;margin-bottom:6px;}
-    .award-badge{font-size:9.5px;font-weight:700;padding:3px 10px;border-radius:20px;border:1px solid;text-transform:uppercase;letter-spacing:0.4px;flex-shrink:0;margin-top:2px;}
-    .badge-gold{border-color:rgba(245,158,11,0.45);color:#f59e0b;background:rgba(245,158,11,0.1);}
+    .award-card.win{border-color:rgba(245,158,11,0.22);}
+    .award-card:hover{transform:translateY(-1px);border-color:rgba(245,158,11,0.38);}
+    .award-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;gap:14px;}
+    .award-title-wrap{flex:1;}
+    .award-event{font-size:16px;font-weight:700;color:#eef2ff;margin-bottom:5px;line-height:1.3;}
+    .award-project{font-size:13.5px;color:#fbbf24;font-weight:600;margin-bottom:0;}
+    .award-badge{font-size:11px;font-weight:800;padding:5px 14px;border-radius:20px;border:1px solid;text-transform:uppercase;letter-spacing:0.5px;flex-shrink:0;white-space:nowrap;}
+    .badge-gold{border-color:rgba(245,158,11,0.5);color:#fbbf24;background:rgba(245,158,11,0.12);}
     .badge-part{border-color:#1e2840;color:#3d4a6a;background:transparent;}
     .badge-papers{border-color:rgba(6,182,212,0.45);color:#06b6d4;background:rgba(6,182,212,0.1);}
-    .award-desc{font-size:12px;color:#7c88a8;line-height:1.6;}
-    .award-year{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#3d4a6a;margin-top:8px;}
+    .award-desc{font-size:14px;color:#a0aec0;line-height:1.75;margin-top:10px;}
+    .award-year{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#4a5568;margin-top:12px;}
 
     /* ── Experience ──────────────────────────────────────── */
-    .exp-timeline{display:flex;flex-direction:column;gap:13px;}
-    .exp-card{background:#0c1020;border:1px solid #161e30;border-radius:12px;padding:18px;transition:border-color 0.2s;}
-    .exp-card:hover{border-color:#243048;}
-    .exp-top{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:5px;}
-    .exp-role{font-size:14px;font-weight:700;color:#eef2ff;}
-    .exp-co{font-size:12px;color:#818cf8;font-weight:600;margin-top:2px;}
-    .exp-period{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#3d4a6a;background:#070a16;border:1px solid #161e30;padding:3px 9px;border-radius:5px;align-self:flex-start;white-space:nowrap;}
-    .exp-desc{font-size:12px;color:#7c88a8;line-height:1.7;margin-top:8px;}
-    .exp-stack{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px;}
-    .etag{background:rgba(99,102,241,0.07);border:1px solid rgba(99,102,241,0.16);color:#818cf8;font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;}
+    .exp-timeline{display:flex;flex-direction:column;gap:16px;}
+    .exp-card{background:rgba(12,16,32,0.7);border:1px solid #1e2840;border-radius:14px;padding:22px 24px;transition:border-color 0.2s;position:relative;overflow:hidden;}
+    .exp-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#8b5cf6,#6366f1);}
+    .exp-card:hover{border-color:#2d3a5a;}
+    .exp-top{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px;align-items:flex-start;}
+    .exp-role{font-size:17px;font-weight:700;color:#eef2ff;line-height:1.3;}
+    .exp-co{font-size:13.5px;color:#818cf8;font-weight:600;margin-top:4px;}
+    .exp-period{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#4a5568;background:#070a16;border:1px solid #1e2840;padding:4px 12px;border-radius:6px;align-self:flex-start;white-space:nowrap;}
+    .exp-desc{font-size:14px;color:#a0aec0;line-height:1.8;margin-top:10px;}
+    .exp-desc li{margin-bottom:7px;}
+    .exp-stack{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;}
+    .etag{background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);color:#818cf8;font-size:11.5px;font-weight:600;padding:4px 10px;border-radius:6px;}
 
     /* ── Education ───────────────────────────────────────── */
-    .edu-list{display:flex;flex-direction:column;gap:13px;}
-    .edu-card{background:#0c1020;border:1px solid #161e30;border-radius:12px;padding:20px;position:relative;overflow:hidden;}
+    .edu-list{display:flex;flex-direction:column;gap:16px;}
+    .edu-card{background:rgba(12,16,32,0.7);border:1px solid #1e2840;border-radius:14px;padding:22px 24px;position:relative;overflow:hidden;}
     .edu-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#6366f1,#06b6d4);}
-    .edu-school{font-size:15px;font-weight:800;color:#eef2ff;margin-bottom:4px;}
-    .edu-deg{font-size:13px;color:#818cf8;font-weight:600;margin-bottom:3px;}
-    .edu-year{font-family:'JetBrains Mono',monospace;font-size:11px;color:#3d4a6a;margin-bottom:12px;}
-    .edu-tags{display:flex;flex-wrap:wrap;gap:6px;}
-    .eutag{background:#070a16;border:1px solid #161e30;color:#7c88a8;font-size:11px;padding:3px 9px;border-radius:5px;}
+    .edu-school{font-size:18px;font-weight:800;color:#eef2ff;margin-bottom:5px;line-height:1.3;}
+    .edu-deg{font-size:14px;color:#818cf8;font-weight:600;margin-bottom:5px;}
+    .edu-year{font-family:'JetBrains Mono',monospace;font-size:12px;color:#4a5568;margin-bottom:16px;}
+    .edu-tags{display:flex;flex-wrap:wrap;gap:7px;}
+    .eutag{background:#070a16;border:1px solid #1e2840;color:#7c88a8;font-size:12px;padding:5px 11px;border-radius:6px;}
 
     /* ── Hint ────────────────────────────────────────────── */
     #hint{
@@ -632,7 +633,11 @@ const CONTENT = {
           </div>
           <div class="exp-period">2023 — Present</div>
         </div>
-        <div class="exp-desc">Architected transformer-based generative models for de novo protein sequence design on 50K+ curated sequences. Delivered wet-lab validated AI-designed gene-editing proteins — a first-of-its-kind in the US (patent WO2026089800). Pioneered a novel margin-based latent-space regularization technique cutting biologically invalid outputs by 40%. Compressed model development cycles by 75% via custom MLOps infrastructure.</div>
+        <ul class="exp-desc">
+          <li>Built transformer-based generative models for de novo protein design on 50K+ sequences — delivered first AI-designed gene-editing proteins in the US to pass wet-lab validation (patent WO2026089800)</li>
+          <li>Pioneered margin-based latent-space regularization, cutting invalid outputs by 40%</li>
+          <li>Compressed model development cycles by 75% via custom MLOps (multi-GPU training, hyperparameter optimization)</li>
+        </ul>
         <div class="exp-stack">
           <span class="etag">Transformers</span><span class="etag">Generative AI</span>
           <span class="etag">PyTorch</span><span class="etag">MLOps</span><span class="etag">Protein Design</span>
@@ -646,7 +651,11 @@ const CONTENT = {
           </div>
           <div class="exp-period">2021 — 2024</div>
         </div>
-        <div class="exp-desc">Engineered novel transformer architectures achieving 98.7% accuracy on a 13,494-feature protein dataset — outperforming existing methods by 12%. Invented CasGen, a first-of-its-kind generative AI system for CRISPR-Cas protein design. Fine-tuned protein language models (ProtBert, ESM-2) pre-trained on 200M+ sequences. Mentored 5+ graduate students, cutting onboarding time by 50%.</div>
+        <ul class="exp-desc">
+          <li>Engineered transformer architectures achieving 98.7% accuracy on 13,494-feature protein data — +12% vs. SOTA (IEEE TCBB 2026)</li>
+          <li>Invented CasGen, a first-of-its-kind generative AI system for CRISPR-Cas protein design; wet-lab validated</li>
+          <li>Fine-tuned ProtBert and ESM-2 protein language models (200M+ sequences); mentored 5+ grad students</li>
+        </ul>
         <div class="exp-stack">
           <span class="etag">ProtBert</span><span class="etag">ESM-2</span>
           <span class="etag">CRISPR</span><span class="etag">Research</span><span class="etag">PyTorch</span>
@@ -660,7 +669,11 @@ const CONTENT = {
           </div>
           <div class="exp-period">2020 — 2021</div>
         </div>
-        <div class="exp-desc">Designed and deployed a transformer-based net-load forecasting system on 5 years of multivariate time-series data, improving 24-hour prediction accuracy by 23% over the ARIMA baseline. Engineered a custom pinball loss for probabilistic forecasting. Built a high-throughput data pipeline ingesting 10M+ hourly records from 15+ sources.</div>
+        <ul class="exp-desc">
+          <li>Deployed transformer-based net-load forecasting system on 5 years of multivariate data — +23% accuracy over ARIMA baseline</li>
+          <li>Engineered custom pinball loss for calibrated probabilistic prediction intervals for energy trading</li>
+          <li>Built data pipeline ingesting 10M+ hourly records from 15+ sources with weather &amp; renewable feature engineering</li>
+        </ul>
         <div class="exp-stack">
           <span class="etag">Time Series</span><span class="etag">Forecasting</span>
           <span class="etag">Transformers</span><span class="etag">AWS</span><span class="etag">Python</span>
@@ -1576,18 +1589,44 @@ const WATER_CFGS={
 };
 function makeWaterSphere(r, key, scaleFactor){
   const cfg=WATER_CFGS[key]; if(!cfg) return null;
-  const segs=48;
-  const geo=new THREE.SphereGeometry(r*1.007,segs,segs);
-  const orig=new Float32Array(geo.attributes.position.array);
-  const mat=new THREE.MeshPhongMaterial({
-    color:cfg.color, emissive:cfg.emissive, emissiveIntensity:cfg.emissiveInt,
-    transparent:true, opacity:cfg.op, shininess:120, depthWrite:false,
-  });
-  const mesh=new THREE.Mesh(geo,mat);
-  mesh.userData.origPos=orig;
   const s=scaleFactor||1;
-  waterRefs.push({mesh, amp:cfg.amp*s, freq:cfg.freq, spd:cfg.spd});
-  return mesh;
+  const group=new THREE.Group();
+
+  // ── Solid glow layer ──────────────────────────────────────────────────────
+  const geoS=new THREE.SphereGeometry(r*1.005,36,36);
+  const origS=new Float32Array(geoS.attributes.position.array);
+  const matS=new THREE.MeshPhongMaterial({
+    color:cfg.color, emissive:cfg.emissive, emissiveIntensity:cfg.emissiveInt*0.8,
+    transparent:true, opacity:cfg.op*0.45, shininess:80, depthWrite:false,
+  });
+  const meshS=new THREE.Mesh(geoS,matS);
+  meshS.userData.origPos=origS;
+  waterRefs.push({mesh:meshS, amp:cfg.amp*s, freq:cfg.freq, spd:cfg.spd});
+  group.add(meshS);
+
+  // ── Fine outer wireframe (spins forward) ─────────────────────────────────
+  const geoW=new THREE.SphereGeometry(r*1.022,28,28);
+  const origW=new Float32Array(geoW.attributes.position.array);
+  const matW=new THREE.MeshBasicMaterial({
+    color:cfg.color, wireframe:true, transparent:true, opacity:0.70, depthWrite:false,
+  });
+  const meshW=new THREE.Mesh(geoW,matW);
+  meshW.userData.origPos=origW;
+  waterRefs.push({mesh:meshW, amp:cfg.amp*s*1.3, freq:cfg.freq, spd:cfg.spd*1.1, spinRate:0.12});
+  group.add(meshW);
+
+  // ── Coarse inner wireframe (counter-spins for 3D depth) ──────────────────
+  const geoW2=new THREE.SphereGeometry(r*1.011,14,14);
+  const origW2=new Float32Array(geoW2.attributes.position.array);
+  const matW2=new THREE.MeshBasicMaterial({
+    color:cfg.color, wireframe:true, transparent:true, opacity:0.28, depthWrite:false,
+  });
+  const meshW2=new THREE.Mesh(geoW2,matW2);
+  meshW2.userData.origPos=origW2;
+  waterRefs.push({mesh:meshW2, amp:cfg.amp*s*0.9, freq:cfg.freq*1.2, spd:cfg.spd*0.7, spinRate:-0.07});
+  group.add(meshW2);
+
+  return group;
 }
 
 // ── Build root scene ──────────────────────────────────────────────────────
@@ -1814,8 +1853,9 @@ function animate(){
     pa.needsUpdate=true;
   });
 
-  // ── Animated water surface (vertex displacement) ──────────────────────
-  waterRefs.forEach(({mesh,amp,freq,spd})=>{
+  // ── Animated water surface (vertex displacement + wireframe spin) ────────
+  waterRefs.forEach(({mesh,amp,freq,spd,spinRate})=>{
+    if(spinRate) mesh.rotation.y+=spinRate*d;
     const pa=mesh.geometry.attributes.position;
     const orig=mesh.userData.origPos;
     const N=pa.count;
