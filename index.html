@@ -2157,6 +2157,148 @@ function buildPlanetScene(planetKey){
   }
 }
 
+// ── Rich 3D panels for moon detail view ──────────────────────────────────
+const MOON_INFO_3D = {
+  p1:[
+    { x:-2.3, y:1.1, z:0.8, color:'#06b6d4',
+      title:'IEEE TCBB 2026 · First Author · Peer-Reviewed',
+      sub:'Nammi, B. et al. · UT Arlington',
+      lines:['Accepted: IEEE Trans. Comp. Bio. & Bioinformatics','Transformer architecture built from scratch','Max-margin regularization (SVM-inspired loss)','Outperforms ESM-2 fine-tuning on same dataset'] },
+    { x:-2.3, y:-0.7, z:0.8, color:'#06b6d4',
+      title:'Technical Approach',
+      sub:'13,494-feature CRISPR protein dataset',
+      lines:['Novel margin-based loss function','Contrastive embedding regularization','Stratified k-fold cross-validation','1,000+ ablation experiments across architectures'] },
+    { x:2.3, y:0.2, z:0.8, color:'#06b6d4',
+      title:'Results & Impact',
+      sub:'State-of-the-art · −12% error vs prior best',
+      lines:['98.7% classification accuracy','Identifies CRISPR-Cas protein families','Generalizes across novel protein sequences','Foundation for CasGen generative system'] },
+  ],
+  p2:[
+    { x:-2.3, y:1.1, z:0.8, color:'#06b6d4',
+      title:'bioRxiv 2025 · Co-First Author',
+      sub:'Nammi, B.*, Vindi, M.* et al. · Neoclease + UTA',
+      lines:['Preprint under journal review','First generative AI for CRISPR-Cas design','Co-led architecture + training pipeline','Collaboration: computational + wet-lab teams'] },
+    { x:-2.3, y:-0.7, z:0.8, color:'#06b6d4',
+      title:'CasGen Architecture',
+      sub:'Regularized VAE-based generative model',
+      lines:['Latent-space margin regularization (novel)','Trained on 50K+ curated protein sequences','Controlled generation via latent steering','40% reduction in biologically invalid outputs'] },
+    { x:2.3, y:0.2, z:0.8, color:'#06b6d4',
+      title:'Validation & Impact',
+      sub:'Wet-lab confirmed functional activity',
+      lines:['AlphaFold structural validation','Wet-lab: real functional gene-editing activity','First AI-designed CRISPR proteins in the US','Patent WO2026089800 · second pending'] },
+  ],
+  p3:[
+    { x:-2.3, y:1.1, z:0.8, color:'#06b6d4',
+      title:'ACS J. Chem. Inf. Model. 2024 · Peer-Reviewed',
+      sub:'Madugula, S.S., Pujar, P., Nammi, B. et al.',
+      lines:['ACS Journal of Chem. Informatics & Modeling','Multi-author collaboration at UT Arlington','Comparative ML study across protein families'] },
+    { x:-2.3, y:-0.7, z:0.8, color:'#06b6d4',
+      title:'Methodology',
+      sub:'Cas9 vs Cas12 family discrimination',
+      lines:['ML feature importance analysis (SHAP, etc.)','Sequence + structural feature engineering','Identifies family-specific binding residues','Cross-family classification benchmarks'] },
+    { x:2.3, y:0.2, z:0.8, color:'#06b6d4',
+      title:'Key Findings',
+      sub:'Biologically meaningful feature sets',
+      lines:['Distinct feature signatures per Cas family','Improves downstream protein classification','Informs protein engineering decisions','Contributes to CRISPR toolbox understanding'] },
+  ],
+  a1:[
+    { x:-2.3, y:1.1, z:0.8, color:'#f59e0b',
+      title:'IISE ESD Analytics Competition 2026',
+      sub:'2nd Place · Engineering & Systems Division',
+      lines:['Institute of Industrial & Systems Engineers','National data analytics competition','Competing against graduate research teams'] },
+    { x:-2.3, y:-0.7, z:0.8, color:'#f59e0b',
+      title:'Technical Approach',
+      sub:'Bayesian Neural Network with Custom Priors',
+      lines:['Custom prior distributions: Gaussian, hierarchical','Sparsity-inducing priors for regularization','Domain knowledge encoded directly into priors','Calibrated uncertainty quantification outputs'] },
+    { x:2.3, y:0.2, z:0.8, color:'#f59e0b',
+      title:'Innovation',
+      sub:'Prior-driven uncertainty quantification',
+      lines:['Traditional NNs give point predictions','This model gives calibrated probability distributions','Domain experts can inject knowledge via priors','Robust under distribution shift / edge cases'] },
+  ],
+  a2:[
+    { x:-2.3, y:1.1, z:0.8, color:'#f59e0b',
+      title:'INFORMS Data Mining Challenge 2024',
+      sub:'2nd Place · 100+ International Teams',
+      lines:['INFORMS Data Mining Society annual challenge','Most competitive ML competition in operations research','Teams from top universities worldwide'] },
+    { x:-2.3, y:-0.7, z:0.8, color:'#f59e0b',
+      title:'Multimodal Transformer Pipeline',
+      sub:'TikTok short-video popularity prediction',
+      lines:['Fused: video frames, audio, text captions, metadata','Cross-modal attention across 4 modalities','Predicted: views, likes, comments, shares','Custom loss weighting per engagement metric'] },
+    { x:2.3, y:0.2, z:0.8, color:'#f59e0b',
+      title:'Result',
+      sub:'2nd of 100+ international teams',
+      lines:['Top 2% globally in this challenge','Outperformed teams from MIT, Stanford, CMU peers','Demonstrated multimodal ML expertise','Generalized to unseen video content'] },
+  ],
+  a3:[
+    { x:-2.3, y:1.1, z:0.8, color:'#f59e0b',
+      title:'INFORMS Data Mining Challenge 2025',
+      sub:'3rd Place · Back-to-Back INFORMS Podium',
+      lines:['Two consecutive years in INFORMS top 3','Only back-to-back podium finisher in challenge history','Competing against 100+ global research teams'] },
+    { x:-2.3, y:-0.7, z:0.8, color:'#f59e0b',
+      title:'Power Outage Forecasting Model',
+      sub:'County-level · 24h & 48h horizons · RMSE',
+      lines:['108 hourly weather features as input','Transformer-based sequence model','County-level spatial granularity','Optimized jointly for 24h and 48h horizons'] },
+    { x:2.3, y:0.2, z:0.8, color:'#f59e0b',
+      title:'Significance',
+      sub:'Critical infrastructure + public safety',
+      lines:['Enables utility companies to pre-position crews','Improves emergency response planning','Weather-driven renewable energy integration','Applicable to grid resilience at national scale'] },
+  ],
+};
+
+// ── Build moon detail scene ────────────────────────────────────────────────
+function buildMoonScene(moonKey){
+  clearWorld();
+  const nd=NODES[moonKey];
+  const parentKey=nd.parent;
+  const sz=0.75;
+
+  // Moon as central body
+  const moon=makeSphere(sz, nd.color, 0.35, 55, moonKey);
+  moon.userData={key:moonKey, type:'moon-center', selfSpin:0.18};
+  moon.rotation.z=8*Math.PI/180;
+
+  // Water mesh using parent planet's config
+  const water=makeWaterSphere(sz, parentKey, 1.8);
+  if(water) moon.add(water);
+
+  // Two glow shells
+  moon.add(makeAnimGlow(sz*1.35, nd.color, 0.18, 1.0, 0));
+  moon.add(makeAnimGlow(sz*1.8,  nd.color, 0.07, 0.6, 1.1));
+
+  const lbl=makeLabel(nd.label.replace('\n',' '), sz+0.6);
+  moon.add(lbl); labelObjs[moonKey]=lbl;
+  lbl.element.classList.add('visible');
+
+  worldGroup.add(moon); bodyMeshes[moonKey]=moon;
+
+  // Stop rotation
+  focusedPlanetKey=moonKey;
+
+  // Rich 3D info panels
+  const panels=MOON_INFO_3D[moonKey]||[];
+  panels.forEach((p,i)=>{
+    const div=document.createElement('div');
+    div.className='info-3d-card';
+    div.style.setProperty('--ic', p.color);
+    div.innerHTML=`<div class="i3d-title">${p.title}</div><div class="i3d-sub">${p.sub}</div>`
+      +p.lines.map(l=>`<div class="i3d-line"><span class="i3d-dot">›</span>${l}</div>`).join('');
+    const obj=new CSS2DObject(div);
+    obj.position.set(p.x, p.y, p.z);
+    worldGroup.add(obj);
+    labelObjs[`minfo_${moonKey}_${i}`]=obj;
+    setTimeout(()=>div.classList.add('visible'), 450+i*160);
+  });
+}
+
+// ── Helper: which view is "up" from current ───────────────────────────────
+function getParentView(key){
+  if(key==='root') return null;
+  const nd=NODES[key];
+  if(nd?.parent) return nd.parent; // moon → parent planet
+  return 'root';                    // planet → solar system
+}
+const MOON_KEYS=new Set(['p1','p2','p3','a1','a2','a3']);
+
 // ── View switching ────────────────────────────────────────────────────────
 let viewState='root';
 const container=document.getElementById('three-container');
@@ -2166,21 +2308,21 @@ function switchView(key){
   renderer.domElement.style.cursor='grab';
   container.style.opacity='0';
   setTimeout(()=>{
-    introActive=false; controls.enabled=true; // ensure controls are live after any transition
+    introActive=false; controls.enabled=true;
     viewState=key;
     if(key==='root'){
       buildRootScene();
       camera.position.set(0,12,26);
       controls.target.set(0,0,0);
+    } else if(MOON_KEYS.has(key)){
+      // Moon detail view — close zoom with rich info panels
+      buildMoonScene(key);
+      camera.position.set(0,2.5,5.5);
+      controls.target.set(0,0,0);
     } else {
       const hasMoons=(MOON_ORBITS[key]||[]).length>0;
       buildPlanetScene(key);
-      if(hasMoons){
-        camera.position.set(0,6,12);
-      } else {
-        // Solo planet — zoom in close, planet fills screen with 3D info panels
-        camera.position.set(0,2.5,5.5);
-      }
+      camera.position.set(hasMoons?0:0, hasMoons?6:2.5, hasMoons?12:5.5);
       controls.target.set(0,0,0);
     }
     controls.update();
@@ -2247,9 +2389,9 @@ renderer.domElement.addEventListener('click',e=>{
   while(obj && !obj.userData.key) obj=obj.parent;
   if(!obj) return;
   const {key,type}=obj.userData;
-  if(type==='sun'||type==='planet-center') { /* info shown in 3D — no panel */ }
+  if(type==='sun'||type==='planet-center'||type==='moon-center') { /* info shown in 3D panels */ }
   else if(type==='planet') switchView(key);
-  else if(type==='moon') { /* info chip always visible when in planet view */ }
+  else if(type==='moon') switchView(key); // zoom into moon detail view
 });
 
 // ── Animate loop ──────────────────────────────────────────────────────────
@@ -2445,20 +2587,31 @@ function updateLegend(){
       + cats.map(([k,n])=>
         `<div class="leg-item" onclick="switchView('${k}')"><span class="leg-dot" style="background:${n.color}"></span>${n.label.replace('\n',' ')}</div>`
       ).join('');
+  } else if(MOON_KEYS.has(viewState)){
+    // Moon detail view
+    leg.className='leg-detail';
+    const mn=NODES[viewState];
+    const parentKey=mn.parent;
+    const parentNd=NODES[parentKey];
+    leg.innerHTML=
+      `<div class="leg-back" onclick="switchView('${parentKey}')">← ${parentNd.label.replace('\n',' ')}</div>`
+      +`<div class="leg-section">${mn.label.replace('\n',' ')}</div>`
+      +`<div class="leg-summary">${mn.desc||''}</div>`
+      +`<div class="leg-back" style="margin-top:10px;background:rgba(99,102,241,0.05);color:#3d4a6a" onclick="switchView('root')">← Solar System</div>`;
   } else {
+    // Planet view
     leg.className='leg-detail';
     const pN = NODES[viewState];
     const ms = MOON_ORBITS[viewState]||[];
-    const summaryHtml = pN.summary
-      ? `<div class="leg-summary">${pN.summary}</div>` : '';
+    const summaryHtml = pN.summary ? `<div class="leg-summary">${pN.summary}</div>` : '';
     leg.innerHTML =
       '<div class="leg-back" onclick="switchView(\'root\')">← Solar System</div>'
       +'<div class="leg-section">'+pN.label.replace('\n',' ')+'</div>'
       + summaryHtml
-      +(ms.length ? '<div class="leg-section" style="margin-top:12px">In this orbit</div>' : '')
+      +(ms.length ? '<div class="leg-section" style="margin-top:12px">Click a moon to explore</div>' : '')
       + ms.map(m=>{
           const mn=NODES[m.key];
-          return `<div class="leg-item leg-item-d" onclick="openCard('${m.key}','${m.key}')">
+          return `<div class="leg-item leg-item-d" onclick="switchView('${m.key}')">
             <span class="leg-dot" style="background:${mn.color};flex-shrink:0"></span>
             <div class="leg-item-text">
               <div class="leg-name">${mn.label.replace('\n',' ')}</div>
@@ -2537,13 +2690,13 @@ function applyTheme(isLight){
 
 document.getElementById('zoom-backdrop').addEventListener('click', ()=>{
   if(document.body.classList.contains('zoomed-in')) closeCard();
-  else if(viewState!=='root') switchView('root');
+  else if(viewState!=='root') switchView(getParentView(viewState)||'root');
 });
 document.getElementById('content-card').addEventListener('click', e=>e.stopPropagation());
 document.addEventListener('keydown', e=>{
   if(e.key==='Escape'){
     if(document.body.classList.contains('zoomed-in')) closeCard();
-    else if(viewState!=='root') switchView('root');
+    else if(viewState!=='root') switchView(getParentView(viewState)||'root');
   }
 });
 
