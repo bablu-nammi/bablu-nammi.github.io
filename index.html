@@ -187,6 +187,17 @@
     .edu-tags{display:flex;flex-wrap:wrap;gap:7px;}
     .eutag{background:#070a16;border:1px solid #1e2840;color:#7c88a8;font-size:12px;padding:5px 11px;border-radius:6px;}
 
+    /* ── Stat orbs (floating info bubbles around solo planets) ──────────── */
+    .stat-orb{
+      background:rgba(6,9,22,0.90);border:1px solid rgba(255,255,255,0.10);
+      border-radius:12px;padding:10px 18px;text-align:center;
+      pointer-events:none;opacity:0;transition:opacity 0.5s;
+      backdrop-filter:blur(8px);
+    }
+    .stat-orb.visible{opacity:1;}
+    .stat-orb-val{font-size:17px;font-weight:900;color:var(--oc,#eef2ff);display:block;line-height:1.2;}
+    .stat-orb-label{font-size:9.5px;font-weight:700;color:#4a5568;text-transform:uppercase;letter-spacing:0.9px;margin-top:4px;display:block;}
+
     /* ── Hint ────────────────────────────────────────────── */
     #hint{
       position:fixed;bottom:22px;left:50%;transform:translateX(-50%);
@@ -936,6 +947,23 @@ const MOON_ORBITS = {
   awards: [
     { key:'a1', r:1.8, speed:0.8,  startAng:1.4  },
     { key:'a2', r:2.8, speed:0.50, startAng:4.5  },
+    { key:'a3', r:3.6, speed:0.35, startAng:2.8  },
+  ],
+};
+
+// ── Floating stat bubbles for solo planets ─────────────────────────────────
+const SOLO_STATS = {
+  edu: [
+    {val:'M.S. CS', label:'UT Arlington · 2023'},
+    {val:'B.S. CS', label:'UT Dallas · 2020'},
+    {val:'AI Research', label:'Deep Learning Focus'},
+    {val:'5 Certs', label:'AWS + Udacity'},
+  ],
+  exp: [
+    {val:'5+ Years', label:'AI/ML Engineering'},
+    {val:'75% Faster', label:'Dev Cycle Reduction'},
+    {val:'40% Fewer', label:'Invalid Outputs'},
+    {val:'Patent', label:'WIPO WO2026089800'},
   ],
 };
 
@@ -1812,6 +1840,29 @@ function buildPlanetScene(planetKey){
     const lbl=makeLabel(mn.label,sz+0.45);
     moon.add(lbl); labelObjs[m.key]=lbl;
   });
+
+  if(moonList.length>0){
+    // Moon planet: add glowing tendril lines from planet center to each moon
+    moonList.forEach(m=>{
+      worldGroup.add(makeGravityStream(m.key, NODES[m.key].color));
+    });
+  } else {
+    // Solo planet: floating stat bubbles around planet
+    const stats=SOLO_STATS[planetKey]||[];
+    stats.forEach((s,i)=>{
+      const ang=(i/Math.max(stats.length,1))*Math.PI*2;
+      const rx=Math.cos(ang)*2.6, ry=Math.sin(ang)*1.0, rz=Math.sin(ang)*1.2;
+      const div=document.createElement('div');
+      div.className='stat-orb';
+      div.style.setProperty('--oc', nd.color);
+      div.innerHTML=`<span class="stat-orb-val">${s.val}</span><span class="stat-orb-label">${s.label}</span>`;
+      const obj=new CSS2DObject(div);
+      obj.position.set(rx, ry, rz);
+      worldGroup.add(obj);
+      labelObjs[`solo_stat_${i}`]=obj;
+      setTimeout(()=>div.classList.add('visible'), 550+i*130);
+    });
+  }
 }
 
 // ── View switching ────────────────────────────────────────────────────────
@@ -1830,8 +1881,16 @@ function switchView(key){
       camera.position.set(0,12,26);
       controls.target.set(0,0,0);
     } else {
+      const hasMoons=(MOON_ORBITS[key]||[]).length>0;
       buildPlanetScene(key);
-      camera.position.set(0,6,12);
+      if(hasMoons){
+        camera.position.set(0,6,12);
+      } else {
+        // Solo planet — zoom in close, planet fills screen
+        camera.position.set(0,2.5,5.5);
+        // Auto-open content panel after transition settles
+        setTimeout(()=>{ if(viewState===key) openCard(key,key); }, 550);
+      }
       controls.target.set(0,0,0);
     }
     controls.update();
@@ -1887,8 +1946,7 @@ renderer.domElement.addEventListener('click',e=>{
   if(!obj) return;
   const {key,type}=obj.userData;
   if(type==='sun') openCard('root','root');
-  else if(type==='planet'&&MOON_ORBITS[key]) switchView(key);
-  else if(type==='planet') openCard(key,key);
+  else if(type==='planet') switchView(key);
   else if(type==='moon') openCard(key,key);
   else if(type==='planet-center') openCard(key,key);
 });
