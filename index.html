@@ -1120,6 +1120,76 @@ function makeSolarCorona(){
   return pts;
 }
 
+// ── Sun chaos wireframe (chaotic vertex-displaced spinning meshes) ─────────
+function makeSunChaos(){
+  const g=new THREE.Group();
+  const r=1.35;
+  // Fine fast purple chaos layer
+  const geo1=new THREE.SphereGeometry(r*1.030,32,32);
+  const m1=new THREE.Mesh(geo1,new THREE.MeshBasicMaterial({
+    color:0x9966ff,wireframe:true,transparent:true,opacity:0.58,
+    blending:THREE.AdditiveBlending,depthWrite:false}));
+  m1.userData.origPos=new Float32Array(geo1.attributes.position.array);
+  waterRefs.push({mesh:m1,amp:0.16,freq:7.0,spd:4.2,spinRate:0.40});
+  g.add(m1);
+  // Coarser counter-spinning orange flare layer
+  const geo2=new THREE.SphereGeometry(r*1.055,18,18);
+  const m2=new THREE.Mesh(geo2,new THREE.MeshBasicMaterial({
+    color:0xff5500,wireframe:true,transparent:true,opacity:0.38,
+    blending:THREE.AdditiveBlending,depthWrite:false}));
+  m2.userData.origPos=new Float32Array(geo2.attributes.position.array);
+  waterRefs.push({mesh:m2,amp:0.24,freq:4.8,spd:3.2,spinRate:-0.25});
+  g.add(m2);
+  // Outer slow deep chaos pulse
+  const geo3=new THREE.SphereGeometry(r*1.10,12,12);
+  const m3=new THREE.Mesh(geo3,new THREE.MeshBasicMaterial({
+    color:0x5522cc,wireframe:true,transparent:true,opacity:0.18,
+    blending:THREE.AdditiveBlending,depthWrite:false}));
+  m3.userData.origPos=new Float32Array(geo3.attributes.position.array);
+  waterRefs.push({mesh:m3,amp:0.30,freq:2.8,spd:1.6,spinRate:0.16});
+  g.add(m3);
+  return g;
+}
+
+// ── Gravity stream line: sun → planet ─────────────────────────────────────
+function makeGravityStream(planetKey, hexColor){
+  const N=40;
+  const pos=new Float32Array(N*3);
+  const geo=new THREE.BufferGeometry();
+  geo.setAttribute('position',new THREE.BufferAttribute(pos,3));
+  const line=new THREE.Line(geo,new THREE.LineBasicMaterial({
+    color:hexNum(hexColor),transparent:true,opacity:0.18,
+    blending:THREE.AdditiveBlending,depthWrite:false
+  }));
+  line.userData={dstKey:planetKey,N,phaseOff:Math.random()*Math.PI*2};
+  gravStreamRefs.push(line);
+  return line;
+}
+
+// ── Solar-wind particles toward camera ────────────────────────────────────
+function makeSolarWindToCamera(){
+  const N=80;
+  const pos=new Float32Array(N*3),data=[];
+  for(let i=0;i<N;i++){
+    const spread=0.55;
+    const th=(Math.random()-0.5)*spread,ph=(Math.random()-0.5)*spread;
+    const life=Math.random();
+    const dist=life*14;
+    pos[i*3  ]=dist*Math.sin(th);
+    pos[i*3+1]=dist*Math.sin(ph);
+    pos[i*3+2]=dist; // shoots toward +Z (toward camera)
+    data.push({th,ph,life,speed:0.28+Math.random()*0.35});
+  }
+  const geo=new THREE.BufferGeometry();
+  geo.setAttribute('position',new THREE.BufferAttribute(pos,3));
+  const pts=new THREE.Points(geo,new THREE.PointsMaterial({
+    color:0x8866ff,size:0.18,transparent:true,opacity:0.50,
+    blending:THREE.AdditiveBlending,depthWrite:false
+  }));
+  pts.userData.cd=data;
+  return pts;
+}
+
 // ── Asteroid belt ─────────────────────────────────────────────────────────
 function makeAsteroidBelt(){
   const N=750;
@@ -1548,7 +1618,8 @@ const bodyMeshes = {};
 const labelObjs = {};
 const glowRefs = []; // {shell, baseOpacity, amp, freq, phase}
 const eruptionSystems = []; // volcano particle emitters
-const waterRefs = []; // {mesh, amp, freq, spd}
+const waterRefs = []; // {mesh, amp, freq, spd, spinRate}
+const gravStreamRefs = []; // gravity stream lines sun→planet
 
 // ── 3D animation state ────────────────────────────────────────────────────
 // Fly-in
@@ -1573,10 +1644,11 @@ function clearWorld(){
   Object.keys(pivots).forEach(k=>delete pivots[k]);
   Object.keys(bodyMeshes).forEach(k=>delete bodyMeshes[k]);
   Object.keys(labelObjs).forEach(k=>delete labelObjs[k]);
-  glowRefs.length=0;       // clear animated glows
-  eruptionSystems.length=0; // clear volcano particles
-  waterRefs.length=0;       // clear animated water meshes
-  coronaRef=null; asteroidBeltRef=null; // reset 3D effect refs
+  glowRefs.length=0;
+  eruptionSystems.length=0;
+  waterRefs.length=0;
+  gravStreamRefs.length=0;
+  coronaRef=null; asteroidBeltRef=null;
   hoveredKey=null; // reset hover state so no stale labels persist
 }
 
@@ -1644,10 +1716,22 @@ function buildRootScene(){
   sun.userData={key:'root',type:'sun',selfSpin:SUN_SPIN};
   sun.add(makeAnimGlow(1.9,'#6366f1',0.22,1.1,0));
   sun.add(makeAnimGlow(2.9,'#6366f1',0.07,0.7,1.2));
+  sun.add(makeAnimGlow(3.8,'#ff6600',0.04,0.5,0.8)); // extra flare shell
+  sun.add(makeSunChaos()); // chaotic spinning wireframe layers
   const sunLbl=makeLabel('Bharani\nNammi',2.1);
   sun.add(sunLbl); labelObjs['root']=sunLbl;
   sunLbl.element.classList.add('visible');
   worldGroup.add(sun); bodyMeshes['root']=sun;
+
+  // Gravity streams from sun to each planet + solar wind toward camera
+  Object.entries(PLANET_ORBITS).forEach(([key])=>{
+    worldGroup.add(makeGravityStream(key, NODES[key].color));
+  });
+  const solarWind=makeSolarWindToCamera();
+  worldGroup.add(solarWind);
+  // reuse coronaRef slot for solar wind so it clears on scene switch
+  // store separately in worldGroup userData
+  worldGroup.userData.solarWind=solarWind;
 
   Object.entries(PLANET_ORBITS).forEach(([key,orb],pi)=>{
     const nd=NODES[key];
@@ -1871,6 +1955,50 @@ function animate(){
     }
     pa.needsUpdate=true;
   });
+
+  // ── Gravity streams (sun → each planet, wavy pulsing lines) ─────────────
+  if(gravStreamRefs.length){
+    const _gv=new THREE.Vector3();
+    gravStreamRefs.forEach(line=>{
+      const dst=bodyMeshes[line.userData.dstKey];
+      if(!dst) return;
+      dst.getWorldPosition(_gv);
+      const {N,phaseOff}=line.userData;
+      const pa=line.geometry.attributes.position;
+      const perp=new THREE.Vector3(-_gv.z,0,_gv.x).normalize();
+      for(let i=0;i<N;i++){
+        const f=i/(N-1);
+        const wave=Math.sin(f*8+t*2.2+phaseOff)*0.55*(1-f)*f*4;
+        const vwave=Math.cos(f*6+t*1.7+phaseOff)*0.3*(1-f)*f*3;
+        pa.setXYZ(i,
+          _gv.x*f+perp.x*wave,
+          _gv.y*f+vwave,
+          _gv.z*f+perp.z*wave
+        );
+      }
+      pa.needsUpdate=true;
+      line.material.opacity=0.10+0.16*Math.abs(Math.sin(t*1.3+phaseOff));
+    });
+  }
+
+  // ── Solar wind toward camera ──────────────────────────────────────────
+  const sw=worldGroup.userData?.solarWind;
+  if(sw && viewState==='root'){
+    const swData=sw.userData.cd;
+    const swPos=sw.geometry.attributes.position;
+    for(let i=0;i<swData.length;i++){
+      swData[i].life+=swData[i].speed*d*0.40;
+      if(swData[i].life>1){ swData[i].life=0; }
+      const dist=swData[i].life*16;
+      swPos.setXYZ(i,
+        dist*Math.sin(swData[i].th),
+        dist*Math.sin(swData[i].ph),
+        dist
+      );
+    }
+    swPos.needsUpdate=true;
+    sw.material.opacity=0.40+0.15*Math.sin(t*2.1);
+  }
 
   // ── Solar corona particles ────────────────────────────────────────────
   if(coronaRef){
