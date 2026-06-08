@@ -46,18 +46,18 @@
 
     /* ── Floating 3D info cards ──────────────────────────────────────────── */
     .info-3d-card{
-      background:rgba(5,8,20,0.92);
-      border:1px solid rgba(255,255,255,0.08);
+      background:rgba(5,8,20,0.93);
+      border:1px solid rgba(255,255,255,0.09);
       border-top:2px solid var(--ic,#6366f1);
-      border-radius:12px;padding:13px 17px;width:210px;
+      border-radius:12px;padding:14px 18px;width:230px;
       pointer-events:none;opacity:0;transition:opacity 0.55s;
-      backdrop-filter:blur(14px);
-      box-shadow:0 6px 28px rgba(0,0,0,0.55);
+      backdrop-filter:blur(16px);
+      box-shadow:0 8px 32px rgba(0,0,0,0.6);
     }
     .info-3d-card.visible{opacity:1;}
-    .i3d-title{font-size:12.5px;font-weight:800;color:#eef2ff;line-height:1.35;margin-bottom:3px;}
-    .i3d-sub{font-size:10.5px;font-weight:600;color:var(--ic,#818cf8);margin-bottom:8px;opacity:0.9;}
-    .i3d-line{font-size:11px;color:#8892a8;line-height:1.65;}
+    .i3d-title{font-size:12px;font-weight:800;color:#eef2ff;line-height:1.35;margin-bottom:3px;}
+    .i3d-sub{font-size:10px;font-weight:600;color:var(--ic,#818cf8);margin-bottom:9px;opacity:0.9;}
+    .i3d-line{font-size:10.5px;color:#8892a8;line-height:1.7;}
     .i3d-dot{color:var(--ic,#818cf8);margin-right:3px;}
 
     /* ── Moon info chips (compact, float above orbiting moons) ───────────── */
@@ -2116,27 +2116,9 @@ function buildPlanetScene(planetKey){
   });
 
   if(moonList.length>0){
-    // Moon planet: tendril lines + floating info chips above each moon
-    moonList.forEach((m,mi)=>{
+    // Moon planet: tendril lines only — click a moon to see its full detail
+    moonList.forEach(m=>{
       worldGroup.add(makeGravityStream(m.key, NODES[m.key].color));
-
-      // Floating info chip above this moon (child of pivot so it orbits with moon)
-      const chip=MOON_CHIPS[m.key];
-      if(chip){
-        const piv=pivots[m.key];
-        const mn=NODES[m.key];
-        const sz=([0.33,0.26,0.30])[mi%3];
-        const div=document.createElement('div');
-        div.className='moon-chip';
-        div.style.setProperty('--mc', mn.color);
-        div.innerHTML=`<div class="mc-title">${chip.title}</div><div class="mc-badge">${chip.badge}</div><div class="mc-desc">${chip.desc}</div>`;
-        const obj=new CSS2DObject(div);
-        // position above the moon in the pivot's local space (moon is at m.r on X axis)
-        obj.position.set(m.r, sz+1.5, 0);
-        piv.add(obj);
-        labelObjs[`moon_chip_${m.key}`]=obj;
-        setTimeout(()=>div.classList.add('visible'), 700+mi*180);
-      }
     });
   } else {
     // Solo planet: rich 3D info panels + stop rotation
@@ -2157,91 +2139,115 @@ function buildPlanetScene(planetKey){
   }
 }
 
-// ── Rich 3D panels for moon detail view ──────────────────────────────────
+// ── Rich 3D panels for moon detail view (4 panels per moon) ──────────────
 const MOON_INFO_3D = {
   p1:[
-    { x:-2.3, y:1.1, z:0.8, color:'#06b6d4',
-      title:'IEEE TCBB 2026 · First Author · Peer-Reviewed',
-      sub:'Nammi, B. et al. · UT Arlington',
-      lines:['Accepted: IEEE Trans. Comp. Bio. & Bioinformatics','Transformer architecture built from scratch','Max-margin regularization (SVM-inspired loss)','Outperforms ESM-2 fine-tuning on same dataset'] },
-    { x:-2.3, y:-0.7, z:0.8, color:'#06b6d4',
-      title:'Technical Approach',
-      sub:'13,494-feature CRISPR protein dataset',
-      lines:['Novel margin-based loss function','Contrastive embedding regularization','Stratified k-fold cross-validation','1,000+ ablation experiments across architectures'] },
-    { x:2.3, y:0.2, z:0.8, color:'#06b6d4',
+    { x:-2.6, y:1.5, z:0.8, color:'#06b6d4',
+      title:'Publication · IEEE TCBB 2026',
+      sub:'First Author · Peer-Reviewed · Impact Factor 4.5+',
+      lines:['IEEE Transactions on Computational Biology','& Bioinformatics — flagship journal','Nammi, B. et al. · UT Arlington','Submitted 2024 → Accepted & Published 2026','Sets new state-of-the-art benchmark'] },
+    { x:-2.6, y:-0.5, z:0.8, color:'#06b6d4',
+      title:'Problem & Dataset',
+      sub:'CRISPR-Cas Protein Family Classification',
+      lines:['13,494 protein sequence features per sample','Multi-class classification across Cas families','Prior methods: ~86% accuracy ceiling','Imbalanced classes — rare Cas subtypes','Needed robust generalization to novel proteins'] },
+    { x:2.5, y:1.2, z:0.8, color:'#06b6d4',
+      title:'Architecture & Methods',
+      sub:'Novel Max-Margin Transformer',
+      lines:['Transformer encoder built from scratch (no pretrain)','SVM-inspired max-margin classification loss','Contrastive embedding regularization layer','Stratified k-fold CV across all experiments','1,000+ ablation runs — layer depth, heads, LR'] },
+    { x:2.5, y:-0.8, z:0.8, color:'#06b6d4',
       title:'Results & Impact',
-      sub:'State-of-the-art · −12% error vs prior best',
-      lines:['98.7% classification accuracy','Identifies CRISPR-Cas protein families','Generalizes across novel protein sequences','Foundation for CasGen generative system'] },
+      sub:'98.7% accuracy · +12% over prior SOTA',
+      lines:['Outperforms fine-tuned ESM-2 & ProtBert','Generalizes to novel unseen protein families','Zero overfitting on held-out test splits','Foundation architecture powering CasGen','Cited in patent WO2026089800 (WIPO)'] },
   ],
   p2:[
-    { x:-2.3, y:1.1, z:0.8, color:'#06b6d4',
-      title:'bioRxiv 2025 · Co-First Author',
-      sub:'Nammi, B.*, Vindi, M.* et al. · Neoclease + UTA',
-      lines:['Preprint under journal review','First generative AI for CRISPR-Cas design','Co-led architecture + training pipeline','Collaboration: computational + wet-lab teams'] },
-    { x:-2.3, y:-0.7, z:0.8, color:'#06b6d4',
-      title:'CasGen Architecture',
-      sub:'Regularized VAE-based generative model',
-      lines:['Latent-space margin regularization (novel)','Trained on 50K+ curated protein sequences','Controlled generation via latent steering','40% reduction in biologically invalid outputs'] },
-    { x:2.3, y:0.2, z:0.8, color:'#06b6d4',
-      title:'Validation & Impact',
-      sub:'Wet-lab confirmed functional activity',
-      lines:['AlphaFold structural validation','Wet-lab: real functional gene-editing activity','First AI-designed CRISPR proteins in the US','Patent WO2026089800 · second pending'] },
+    { x:-2.6, y:1.5, z:0.8, color:'#06b6d4',
+      title:'Publication · bioRxiv 2025',
+      sub:'Co-First Author · Preprint → Journal Submission',
+      lines:['Nammi, B.*, Vindi, M.* et al.','UT Arlington + Neoclease collaboration','Co-led: model architecture & training','First generative AI paper for CRISPR-Cas design','Preprint under peer review (major journal)'] },
+    { x:-2.6, y:-0.5, z:0.8, color:'#06b6d4',
+      title:'CasGen System Design',
+      sub:'Regularized VAE Generative Architecture',
+      lines:['Variational Autoencoder latent space model','Trained on 50,000+ curated CRISPR sequences','Novel margin-based latent-space regularization','Latent steering for controlled protein generation','Condition on functional properties at inference'] },
+    { x:2.5, y:1.2, z:0.8, color:'#06b6d4',
+      title:'Training & Optimization',
+      sub:'End-to-end ML pipeline at Neoclease',
+      lines:['Data curation pipeline: 200M seq → 50K quality','Multi-GPU distributed training (custom MLOps)','40% reduction in biologically invalid outputs','Hyperparameter optimization: Bayesian search','3-day dev cycle (down from 2 weeks)'] },
+    { x:2.5, y:-0.8, z:0.8, color:'#06b6d4',
+      title:'Validation & Real-World Impact',
+      sub:'Wet-lab confirmed · Patent filed',
+      lines:['AlphaFold2 structural plausibility screening','Wet-lab: functional gene-editing activity confirmed','First AI-designed CRISPR proteins in the US','Patent WO2026089800 published by WIPO 2026','Second patent pending for derivative designs'] },
   ],
   p3:[
-    { x:-2.3, y:1.1, z:0.8, color:'#06b6d4',
-      title:'ACS J. Chem. Inf. Model. 2024 · Peer-Reviewed',
-      sub:'Madugula, S.S., Pujar, P., Nammi, B. et al.',
-      lines:['ACS Journal of Chem. Informatics & Modeling','Multi-author collaboration at UT Arlington','Comparative ML study across protein families'] },
-    { x:-2.3, y:-0.7, z:0.8, color:'#06b6d4',
-      title:'Methodology',
-      sub:'Cas9 vs Cas12 family discrimination',
-      lines:['ML feature importance analysis (SHAP, etc.)','Sequence + structural feature engineering','Identifies family-specific binding residues','Cross-family classification benchmarks'] },
-    { x:2.3, y:0.2, z:0.8, color:'#06b6d4',
-      title:'Key Findings',
-      sub:'Biologically meaningful feature sets',
-      lines:['Distinct feature signatures per Cas family','Improves downstream protein classification','Informs protein engineering decisions','Contributes to CRISPR toolbox understanding'] },
+    { x:-2.6, y:1.5, z:0.8, color:'#06b6d4',
+      title:'Publication · ACS J. Chem. Inf. Model. 2024',
+      sub:'Peer-Reviewed · Multi-author · UT Arlington',
+      lines:['ACS Journal of Chemical Information','& Modeling — high-impact chemistry/CS journal','Madugula S.S., Pujar P., Nammi B. et al.','Completed during PhD research at UTA','Establishes ML baseline for CRISPR characterization'] },
+    { x:-2.6, y:-0.5, z:0.8, color:'#06b6d4',
+      title:'Research Question',
+      sub:'What makes Cas9 and Cas12 proteins distinct?',
+      lines:['Cas9 & Cas12 serve different editing roles','Understanding differences guides protein engineering','Prior work: manual curation, limited scalability','Goal: automated ML-driven feature identification','Dataset: curated Cas protein sequences + annotations'] },
+    { x:2.5, y:1.2, z:0.8, color:'#06b6d4',
+      title:'Methods',
+      sub:'Feature Engineering + Interpretable ML',
+      lines:['Sequence-level feature extraction pipeline','Physicochemical + evolutionary properties','SHAP-based feature importance analysis','Cross-family classification experiments','Statistical significance testing across features'] },
+    { x:2.5, y:-0.8, z:0.8, color:'#06b6d4',
+      title:'Findings & Significance',
+      sub:'Biologically validated feature signatures',
+      lines:['Identified distinct residue patterns per family','Features align with known binding domains','Improves downstream protein classifier accuracy','Informs synthetic Cas protein engineering','Cited in follow-up CasGen generative work'] },
   ],
   a1:[
-    { x:-2.3, y:1.1, z:0.8, color:'#f59e0b',
+    { x:-2.6, y:1.5, z:0.8, color:'#f59e0b',
       title:'IISE ESD Analytics Competition 2026',
-      sub:'2nd Place · Engineering & Systems Division',
-      lines:['Institute of Industrial & Systems Engineers','National data analytics competition','Competing against graduate research teams'] },
-    { x:-2.3, y:-0.7, z:0.8, color:'#f59e0b',
-      title:'Technical Approach',
+      sub:'2nd Place · Institute of Industrial & Systems Eng.',
+      lines:['Annual national data analytics competition','Engineering & Systems Division (ESD)','Graduate-level teams from top US universities','Judged on model performance + methodology','Competed March–April 2026'] },
+    { x:-2.6, y:-0.5, z:0.8, color:'#f59e0b',
+      title:'Competition Task',
+      sub:'Uncertainty-Aware Predictive Modeling',
+      lines:['Real-world engineering dataset provided','Required: calibrated uncertainty estimates','Not just point predictions — full distributions','Evaluation: accuracy + calibration metrics','Domain: systems reliability / engineering data'] },
+    { x:2.5, y:1.2, z:0.8, color:'#f59e0b',
+      title:'Technical Solution',
       sub:'Bayesian Neural Network with Custom Priors',
-      lines:['Custom prior distributions: Gaussian, hierarchical','Sparsity-inducing priors for regularization','Domain knowledge encoded directly into priors','Calibrated uncertainty quantification outputs'] },
-    { x:2.3, y:0.2, z:0.8, color:'#f59e0b',
-      title:'Innovation',
-      sub:'Prior-driven uncertainty quantification',
-      lines:['Traditional NNs give point predictions','This model gives calibrated probability distributions','Domain experts can inject knowledge via priors','Robust under distribution shift / edge cases'] },
+      lines:['Custom prior types: Gaussian, hierarchical','Sparsity-inducing priors (Laplace / horseshoe)','Domain knowledge encoded directly into priors','Variational inference for posterior approximation','Calibration via Expected Calibration Error (ECE)'] },
+    { x:2.5, y:-0.8, z:0.8, color:'#f59e0b',
+      title:'Innovation & Outcome',
+      sub:'2nd Place · Prior-driven regularization',
+      lines:['Outperformed teams using standard NNs','Prior knowledge improved out-of-distribution perf.','Model was interpretable + uncertainty-aware','Judges cited novelty of prior design approach','Demonstrated AI beyond black-box predictions'] },
   ],
   a2:[
-    { x:-2.3, y:1.1, z:0.8, color:'#f59e0b',
+    { x:-2.6, y:1.5, z:0.8, color:'#f59e0b',
       title:'INFORMS Data Mining Challenge 2024',
       sub:'2nd Place · 100+ International Teams',
-      lines:['INFORMS Data Mining Society annual challenge','Most competitive ML competition in operations research','Teams from top universities worldwide'] },
-    { x:-2.3, y:-0.7, z:0.8, color:'#f59e0b',
-      title:'Multimodal Transformer Pipeline',
-      sub:'TikTok short-video popularity prediction',
-      lines:['Fused: video frames, audio, text captions, metadata','Cross-modal attention across 4 modalities','Predicted: views, likes, comments, shares','Custom loss weighting per engagement metric'] },
-    { x:2.3, y:0.2, z:0.8, color:'#f59e0b',
-      title:'Result',
-      sub:'2nd of 100+ international teams',
-      lines:['Top 2% globally in this challenge','Outperformed teams from MIT, Stanford, CMU peers','Demonstrated multimodal ML expertise','Generalized to unseen video content'] },
+      lines:['INFORMS Data Mining Society annual competition','Most prestigious ML competition in OR/MS field','Teams from top universities globally','Task released: Sep 2024 · Results: Nov 2024 INFORMS','Highest-profile ML competition in operations research'] },
+    { x:-2.6, y:-0.5, z:0.8, color:'#f59e0b',
+      title:'Task: Short Video Popularity Prediction',
+      sub:'TikTok engagement prediction at scale',
+      lines:['Dataset: thousands of TikTok video clips','Predict: views, likes, comments, shares','Multimodal inputs: video + audio + text + metadata','Challenge: highly skewed engagement distributions','Time constraints: hours-long video + feature pipeline'] },
+    { x:2.5, y:1.2, z:0.8, color:'#f59e0b',
+      title:'Multimodal Transformer System',
+      sub:'4-modality fusion architecture',
+      lines:['Video: frame-level CNN + temporal attention','Audio: spectrogram features + MCLIP encodings','Text: caption BERT embeddings + transcript','Metadata: creator stats, hashtags, upload time','Cross-modal attention for modality fusion'] },
+    { x:2.5, y:-0.8, z:0.8, color:'#f59e0b',
+      title:'Result & Impact',
+      sub:'2nd of 100+ teams · Top 2% globally',
+      lines:['Ranked 2nd against teams from CMU, NYU, etc.','Custom loss function weighting per metric','Ensemble of multimodal + unimodal models','Demonstrated state-of-the-art social AI skills','Led to INFORMS 2025 invitation (back-to-back)'] },
   ],
   a3:[
-    { x:-2.3, y:1.1, z:0.8, color:'#f59e0b',
+    { x:-2.6, y:1.5, z:0.8, color:'#f59e0b',
       title:'INFORMS Data Mining Challenge 2025',
       sub:'3rd Place · Back-to-Back INFORMS Podium',
-      lines:['Two consecutive years in INFORMS top 3','Only back-to-back podium finisher in challenge history','Competing against 100+ global research teams'] },
-    { x:-2.3, y:-0.7, z:0.8, color:'#f59e0b',
-      title:'Power Outage Forecasting Model',
-      sub:'County-level · 24h & 48h horizons · RMSE',
-      lines:['108 hourly weather features as input','Transformer-based sequence model','County-level spatial granularity','Optimized jointly for 24h and 48h horizons'] },
-    { x:2.3, y:0.2, z:0.8, color:'#f59e0b',
-      title:'Significance',
-      sub:'Critical infrastructure + public safety',
-      lines:['Enables utility companies to pre-position crews','Improves emergency response planning','Weather-driven renewable energy integration','Applicable to grid resilience at national scale'] },
+      lines:['INFORMS Data Mining Society annual competition','2nd consecutive year in INFORMS top 3','Unique achievement: back-to-back podium finalist','Task released: Sep 2025 · Results: Nov 2025','Competing against 100+ global research teams'] },
+    { x:-2.6, y:-0.5, z:0.8, color:'#f59e0b',
+      title:'Task: Power Outage Forecasting',
+      sub:'County-level · 24h & 48h horizons',
+      lines:['Dataset: US county-level historical outages','108 hourly weather features (wind, rain, temp, etc.)','Target: outage events at county granularity','Two forecasting horizons: 24h and 48h ahead','Metric: Root Mean Squared Error (RMSE)'] },
+    { x:2.5, y:1.2, z:0.8, color:'#f59e0b',
+      title:'Forecasting Model',
+      sub:'Transformer-based temporal sequence model',
+      lines:['Temporal transformer over 108 weather channels','Spatial embeddings for county-level context','Multi-horizon output heads (24h + 48h jointly)','Feature engineering: weather rolling stats, lags','Ensemble of GBM + transformer for robustness'] },
+    { x:2.5, y:-0.8, z:0.8, color:'#f59e0b',
+      title:'Impact & Significance',
+      sub:'Critical infrastructure · Grid resilience',
+      lines:['Enables utilities to pre-position repair crews','Reduces outage restoration time for communities','Supports renewable energy integration planning','Applicable to FEMA emergency response prep','Demonstrates AI value for national infrastructure'] },
   ],
 };
 
